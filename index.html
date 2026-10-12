@@ -386,7 +386,9 @@
             <h3 class="font-heading font-extrabold text-base text-slate-900">Painel de Gerenciamento</h3>
             <span class="text-[11px] text-emerald-700 font-bold">Modo Administrador Ativo</span>
           </div>
-          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="syncAllStoresToSupabase()" id="btnSyncCloud" class="text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1" title="Subir catálogo para a nuvem do Supabase">
+              <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> Salvar na Nuvem
+            </button>
             <button onclick="changeAdminPin()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1" title="Mudar Senha">
               <i data-lucide="key" class="w-3.5 h-3.5"></i> Mudar Senha
             </button>
@@ -1386,8 +1388,30 @@
             vip,
             keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
           };
+          stores[index] = {
+            ...stores[index],
+            nome,
+            logo,
+            categoria,
+            bairro,
+            whatsapp,
+            instagram,
+            horario,
+            endereco,
+            descricao,
+            vip,
+            keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
+          };
           saveStores(stores);
-          alert(`O estabelecimento "${nome}" foi atualizado com sucesso!`);
+
+          // Salvar na nuvem (Supabase) para atualizar para todo mundo
+          if (supabaseClient) {
+            supabaseClient.from('stores').upsert([stores[index]]).then(({ error }) => {
+              if (error) console.warn('Supabase update store error:', error);
+            });
+          }
+
+          alert(`O estabelecimento "${nome}" foi atualizado e salvo para todos!`);
         }
         cancelAdminEdit();
       } else {
@@ -1408,22 +1432,62 @@
         };
         stores.unshift(newStore);
         saveStores(stores);
+
+        // Salvar na nuvem (Supabase) para atualizar para todo mundo
+        if (supabaseClient) {
+          supabaseClient.from('stores').insert([newStore]).then(({ error }) => {
+            if (error) console.warn('Supabase insert store error:', error);
+          });
+        }
+
         e.target.reset();
-        alert(`O comércio "${nome}" foi cadastrado com sucesso!`);
+        alert(`O comércio "${nome}" foi cadastrado e publicado na nuvem para todos!`);
       }
 
       renderAdminStoresList();
       renderStores();
     }
 
-    function deleteStore(id) {
-      if (confirm('Tem certeza que deseja excluir este estabelecimento?')) {
+    async function deleteStore(id) {
+      if (confirm('Tem certeza que deseja excluir este estabelecimento para todos os moradores?')) {
         let stores = getStores();
         stores = stores.filter(s => s.id !== id);
         saveStores(stores);
+
+        if (supabaseClient) {
+          try {
+            await supabaseClient.from('stores').delete().eq('id', id);
+          } catch(e) {
+            console.warn('Supabase delete error:', e);
+          }
+        }
+
         renderAdminStoresList();
         renderStores();
       }
+    }
+
+    async function syncAllStoresToSupabase() {
+      if (!supabaseClient) {
+        alert('Supabase não conectado!');
+        return;
+      }
+      const btn = document.getElementById('btnSyncCloud');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Enviando...`;
+      try {
+        const stores = getStores();
+        const { error } = await supabaseClient.from('stores').upsert(stores);
+        if (error) {
+          alert('Atenção: A tabela "stores" ainda não foi criada no Supabase.\n\nExecute o script SQL no painel do Supabase para ativar a sincronização em nuvem completa!');
+        } else {
+          alert(`Sucesso total! Todas as ${stores.length} lojas foram salvas na nuvem e agora atualizam para todo mundo em tempo real!`);
+        }
+      } catch(err) {
+        alert('Erro ao enviar para o Supabase: ' + err.message);
+      }
+      btn.innerHTML = originalHtml;
+      lucide.createIcons();
     }
 
     function exportDataJSON() {
@@ -1883,6 +1947,12 @@
           });
           localReviewsCache = grouped;
           localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+        }
+
+        // 3. SINCRONIZAR LOJAS DA NUVEM (SE JÁ ESTIVEREM NO SUPABASE)
+        const { data: cloudStores, error: storesErr } = await supabaseClient.from('stores').select('*');
+        if (!storesErr && cloudStores && cloudStores.length > 0) {
+          saveStores(cloudStores);
         }
 
         renderStores();

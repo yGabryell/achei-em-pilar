@@ -3,7 +3,24 @@
 -- Execute este script no SQL Editor do Supabase (https://supabase.com)
 -- ====================================================================
 
--- 1. TABELA DE ESTATÍSTICAS E CLIQUES POR LOJA
+-- 1. TABELA DE ESTABELECIMENTOS / LOJAS (SINCRONIZAÇÃO EM NUVEM PARA TODOS OS MORADORES)
+CREATE TABLE IF NOT EXISTS public.stores (
+    id TEXT PRIMARY KEY,
+    nome TEXT NOT NULL,
+    categoria TEXT NOT NULL,
+    bairro TEXT NOT NULL,
+    endereco TEXT,
+    whatsapp TEXT NOT NULL,
+    instagram TEXT,
+    descricao TEXT,
+    horario TEXT,
+    logo TEXT,
+    vip BOOLEAN DEFAULT false,
+    keywords TEXT,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. TABELA DE ESTATÍSTICAS E CLIQUES POR LOJA
 CREATE TABLE IF NOT EXISTS public.store_stats (
     store_id TEXT PRIMARY KEY,
     whatsapp_clicks INT DEFAULT 0,
@@ -30,11 +47,14 @@ CREATE TABLE IF NOT EXISTS public.site_visits (
 );
 
 -- 4. HABILITAR SEGURANÇA ROW LEVEL SECURITY (RLS)
+ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
 
 -- 5. POLÍTICAS DE ACESSO (PERMITIR LEITURA E REGISTRO PÚBLICO)
+CREATE POLICY "Permitir leitura de lojas" ON public.stores FOR SELECT USING (true);
+CREATE POLICY "Permitir gerenciamento de lojas" ON public.stores FOR ALL USING (true);
 CREATE POLICY "Permitir leitura de estatísticas" ON public.store_stats FOR SELECT USING (true);
 CREATE POLICY "Permitir leitura de comentários" ON public.store_reviews FOR SELECT USING (true);
 CREATE POLICY "Permitir inserção de comentários" ON public.store_reviews FOR INSERT WITH CHECK (true);
