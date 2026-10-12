@@ -367,14 +367,18 @@
           <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white mx-auto flex items-center justify-center mb-2 shadow-sm">
             <i data-lucide="lock" class="w-6 h-6"></i>
           </div>
-          <h3 class="font-heading font-extrabold text-lg text-slate-900">Acesso Restrito ao ADM</h3>
-          <p class="text-xs text-slate-500">Digite a senha para gerenciar, adicionar e excluir comércios.</p>
+          <h3 class="font-extrabold text-lg text-slate-900">Acesso Restrito ao ADM</h3>
+          <p class="text-xs text-slate-500 mt-1">Digite sua senha de administrador para acessar o painel.</p>
           <div class="mt-4 max-w-xs mx-auto">
-            <input type="password" id="adminPassInput" onkeydown="if(event.key==='Enter') checkAdminPassword()" placeholder="Senha do ADM" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-center font-bold tracking-widest focus:ring-2 focus:ring-slate-900 outline-none">
-            <button onclick="checkAdminPassword()" class="w-full mt-2 bg-slate-900 hover:bg-black text-white text-xs font-extrabold py-2.5 rounded-xl transition">
+            <div class="relative">
+              <input type="password" id="adminPassInput" onkeydown="if(event.key==='Enter') checkAdminPassword()" placeholder="Digite a senha de ADM" class="w-full border border-slate-200 rounded-xl px-4 pr-10 py-2.5 text-xs text-center font-bold tracking-wider focus:ring-2 focus:ring-slate-900 outline-none bg-slate-50/50">
+              <button type="button" onclick="toggleAdminPassVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1" title="Ver/Ocultar Senha">
+                <i data-lucide="eye" id="adminEyeIcon" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <button onclick="checkAdminPassword()" class="w-full mt-2.5 bg-slate-900 hover:bg-black text-white text-xs font-extrabold py-2.5 rounded-xl transition shadow-xs active:scale-95">
               Entrar no Painel
             </button>
-            <p class="text-[10px] text-slate-400 mt-2">Senha padrão: <strong>1234</strong> (Você pode alterar no painel)</p>
           </div>
         </div>
       </div>
@@ -1216,7 +1220,25 @@
     }
 
     function getAdminPin() {
-      return localStorage.getItem('pilar_admin_pin') || '1234';
+      const pin = localStorage.getItem('pilar_admin_pin');
+      if (!pin || pin === '1234') {
+        localStorage.setItem('pilar_admin_pin', 'Pilar@Adm2026');
+        return 'Pilar@Adm2026';
+      }
+      return pin;
+    }
+
+    function toggleAdminPassVisibility() {
+      const input = document.getElementById('adminPassInput');
+      const icon = document.getElementById('adminEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
     }
 
     function checkAdminPassword() {
