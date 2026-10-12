@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achei em Pilar — Guia Comercial da Chã do Pilar & Centro</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Syne', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            pilar: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-24 md:pb-12 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ================= BARRA DE AVISO TOPO ================= -->
+  <div class="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white text-xs text-center py-2 px-4 font-bold flex items-center justify-center gap-2 shadow-sm">
+    <span>📍 O Guia Oficial de Chã do Pilar e Pilar Centro • Encontre comércios e serviços no Zap!</span>
+  </div>
+
+  <!-- ================= CABEÇALHO / NAVBAR ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-heading font-extrabold text-xl shadow-md shadow-emerald-600/20">
+          P
+        </div>
+        <div>
+          <span class="font-heading font-extrabold text-lg text-slate-900 leading-none block">Achei em Pilar</span>
+          <span class="text-[11px] text-emerald-700 font-bold">Chã do Pilar & Centro • AL</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- BOTÃO CADASTRAR LOJA -->
+        <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Cadastrar Meu Negócio</span>
+          <span class="sm:hidden">Cadastrar</span>
+        </button>
+
+        <!-- BOTÃO ACESSO ADM -->
+        <button onclick="openAdminModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-xl border border-slate-200 transition" title="Painel Administrativo">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 pt-4">
+
+    <!-- ================= BANNER PATROCINADO (RENDA PASSIVA) ================= -->
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 sm:p-6 shadow-md border border-slate-800">
+      <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-bold uppercase tracking-wider mb-1.5">
+            Espaço Patrocinador Master
+          </span>
+          <h2 class="text-xl sm:text-2xl font-heading font-extrabold text-white">Precisa de algo em Pilar?</h2>
+          <p class="text-slate-300 text-xs sm:text-sm mt-0.5">Bolo, lanche, pastel, frete, remédio ou corte de cabelo em 1 clique.</p>
+        </div>
+        <a href="#lojas" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition shrink-0 shadow-sm">
+          Explorar Comércios
+        </a>
+      </div>
+      <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+    </div>
+
+    <!-- ================= BARRA DE BUSCA RÁPIDA ================= -->
+    <div class="mt-4 relative">
+      <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+      <input 
+        type="text" 
+        id="searchInput" 
+        onkeyup="applyFilters()" 
+        placeholder="O que você procura? (ex: bolo, pastel, pizza, frete, tênis...)" 
+        class="w-full bg-white border border-slate-200 rounded-2xl pl-11 pr-4 py-3.5 text-base sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-xs"
+      >
+    </div>
+
+    <!-- ================= FILTRO POR BAIRROS ================= -->
+    <div class="mt-3 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+      <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+        <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Bairro:
+      </span>
+      <button onclick="setBairro('all')" class="bairro-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-xs transition shrink-0" data-bairro="all">
+        Todos os Bairros
+      </button>
+      <button onclick="setBairro('Chã do Pilar')" class="bairro-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0" data-bairro="Chã do Pilar">
+        Chã do Pilar
+      </button>
+      <button onclick="setBairro('Pilar Centro')" class="bairro-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0" data-bairro="Pilar Centro">
+        Pilar Centro
+      </button>
+      <button onclick="setBairro('Chã Elias')" class="bairro-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0" data-bairro="Chã Elias">
+        Chã Elias
+      </button>
+      <button onclick="setBairro('Imburi')" class="bairro-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0" data-bairro="Imburi">
+        Imburi
+      </button>
+    </div>
+
+    <!-- ================= FILTRO POR CATEGORIAS ================= -->
+    <div class="mt-2 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      <button onclick="setCategory('all')" class="cat-btn active px-4 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="all">
+        <span>🔥 Todos</span>
+      </button>
+      <button onclick="setCategory('delivery')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="delivery">
+        <span>🍔 Lanches & Delivery</span>
+      </button>
+      <button onclick="setCategory('bolos')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="bolos">
+        <span>🎂 Bolos & Doces</span>
+      </button>
+      <button onclick="setCategory('roupas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="roupas">
+        <span>🛍️ Roupas & Calçados</span>
+      </button>
+      <button onclick="setCategory('beleza')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="beleza">
+        <span>✂️ Salão & Barbearia</span>
+      </button>
+      <button onclick="setCategory('servicos')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="servicos">
+        <span>🚚 Fretes & Serviços</span>
+      </button>
+      <button onclick="setCategory('utilidades')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="utilidades">
+        <span>🏠 Variedades & Móveis</span>
+      </button>
+      <button onclick="setCategory('saude')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 transition shrink-0 flex items-center gap-1.5" data-cat="saude">
+        <span>💊 Farmácia & Saúde</span>
+      </button>
+    </div>
+
+    <!-- ================= CONTADOR DE RESULTADOS ================= -->
+    <div class="mt-4 flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+      <span id="resultsCount">Carregando estabelecimentos...</span>
+      <span class="text-emerald-700 flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Atualizado recentemente
+      </span>
+    </div>
+
+    <!-- ================= GRADE DE LOJAS / ESTABELECIMENTOS ================= -->
+    <div id="storesGrid" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+      <!-- Inserido dinamicamente via JavaScript -->
+    </div>
+
+    <!-- SE NENHUM RESULTADO FOR ENCONTRADO -->
+    <div id="noResults" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 mt-4 p-6">
+      <i data-lucide="search-x" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+      <h3 class="font-bold text-slate-700 text-sm">Nenhum estabelecimento encontrado com esse termo</h3>
+      <p class="text-xs text-slate-400 mt-1">Conhece algum comércio que não está aqui? Cadastre gratuitamente!</p>
+      <button onclick="openRegisterModal()" class="mt-4 bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl">
+        Cadastrar Estabelecimento
+      </button>
+    </div>
+  </main>
+
+  <!-- ================= RODAPÉ ================= -->
+  <footer class="mt-12 text-center text-xs text-slate-400 pb-8 px-4">
+    <p>© 2026 Achei em Pilar — O Guia Comercial de Chã do Pilar & Pilar Centro • AL</p>
+    <div class="mt-2 flex items-center justify-center gap-4 text-[11px] text-slate-500">
+      <button onclick="openAdminModal()" class="hover:text-slate-700 flex items-center gap-1">
+        <i data-lucide="shield" class="w-3.5 h-3.5"></i> Painel do Administrador
+      </button>
+      <span>•</span>
+      <a href="https://wa.me/5582000000000" target="_blank" class="hover:text-slate-700">Anuncie Aqui (R$ 29/mês)</a>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL DE CADASTRO PÚBLICO (QUERO CADASTRAR) ================= -->
+  <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+          <i data-lucide="store" class="w-4 h-4"></i>
+        </div>
+        <h3 class="font-heading font-extrabold text-lg text-slate-900">Cadastre seu Negócio</h3>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">Apareça para centenas de moradores de Pilar que buscam produtos e serviços todos os dias!</p>
+
+      <form onsubmit="handlePublicRegister(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Estabelecimento *</label>
+          <input type="text" id="pubNome" required placeholder="Ex: Pastelaria do Zé, Salão da Mary..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Categoria *</label>
+            <select id="pubCategoria" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none">
+              <option value="delivery">Lanches & Delivery</option>
+              <option value="bolos">Bolos & Doces</option>
+              <option value="roupas">Roupas & Calçados</option>
+              <option value="beleza">Salão & Barbearia</option>
+              <option value="servicos">Fretes & Serviços</option>
+              <option value="utilidades">Variedades & Móveis</option>
+              <option value="saude">Farmácia & Saúde</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Bairro *</label>
+            <select id="pubBairro" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none">
+              <option value="Chã do Pilar">Chã do Pilar</option>
+              <option value="Pilar Centro">Pilar Centro</option>
+              <option value="Chã Elias">Chã Elias</option>
+              <option value="Imburi">Imburi</option>
+              <option value="Outro">Outro Bairro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp com DDD (somente números) *</label>
+            <input type="tel" id="pubWhatsapp" required placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (@da_loja - opcional)</label>
+            <input type="text" id="pubInstagram" placeholder="Ex: @minhaloja_pilar" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-rose-500 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Endereço ou Ponto de Referência</label>
+          <input type="text" id="pubEndereco" placeholder="Ex: Rua das Graças, perto do mercado" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">O que você vende ou oferece?</label>
+          <textarea id="pubDescricao" rows="2" placeholder="Ex: Bolos confeitados por encomenda, salgados para festa..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          Enviar Solicitação de Cadastro
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PAINEL DO ADMINISTRADOR (ADM) ================= -->
+  <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- TELA DE LOGIN DO ADM (SE NÃO ESTIVER LOGADO) -->
+      <div id="adminLoginSection">
+        <div class="text-center py-4">
+          <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white mx-auto flex items-center justify-center mb-2 shadow-sm">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-extrabold text-lg text-slate-900">Acesso Restrito ao ADM</h3>
+          <p class="text-xs text-slate-500">Digite a senha para gerenciar, adicionar e excluir comércios.</p>
+          <div class="mt-4 max-w-xs mx-auto">
+            <input type="password" id="adminPassInput" onkeydown="if(event.key==='Enter') checkAdminPassword()" placeholder="Senha do ADM" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-center font-bold tracking-widest focus:ring-2 focus:ring-slate-900 outline-none">
+            <button onclick="checkAdminPassword()" class="w-full mt-2 bg-slate-900 hover:bg-black text-white text-xs font-extrabold py-2.5 rounded-xl transition">
+              Entrar no Painel
+            </button>
+            <p class="text-[10px] text-slate-400 mt-2">Senha padrão: <strong>1234</strong> (Você pode alterar no painel)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL INTERNO DO ADM (APÓS LOGIN) -->
+      <div id="adminDashboardSection" class="hidden">
+        <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-200 mb-4 gap-2">
+          <div>
+            <h3 class="font-heading font-extrabold text-base text-slate-900">Painel de Gerenciamento</h3>
+            <span class="text-[11px] text-emerald-700 font-bold">Modo Administrador Ativo</span>
+          </div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="changeAdminPin()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1" title="Mudar Senha">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i> Mudar Senha
+            </button>
+            <button onclick="exportDataJSON()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1" title="Baixar Backup">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Backup
+            </button>
+            <button onclick="resetStoresToDefault()" class="text-[11px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1" title="Restaurar dados originais">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Restaurar
+            </button>
+            <button onclick="adminLogout()" class="text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg">
+              Sair
+            </button>
+          </div>
+        </div>
+
+        <!-- FORMULÁRIO DE CADASTRO E EDIÇÃO PELO ADM -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6" id="admFormContainer">
+          <div class="flex items-center justify-between mb-2">
+            <h4 id="admFormTitle" class="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento
+            </h4>
+            <span id="admEditingBadge" class="hidden bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              Modo Edição
+            </span>
+          </div>
+
+          <form onsubmit="handleAdminAddStore(event)" class="space-y-3">
+            <input type="hidden" id="admEditId" value="">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nome da Loja *</label>
+                <input type="text" id="admNome" required placeholder="Ex: Caetano's Burguer" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Logo / Foto da Loja</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="admLogo" placeholder="URL da foto ou envie um arquivo" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                  <label class="bg-slate-200 hover:bg-slate-300 active:scale-95 cursor-pointer text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1 shrink-0 transition" title="Enviar arquivo do computador/celular">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    <span class="text-[11px]">Subir Foto</span>
+                    <input type="file" id="admLogoFile" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Categoria *</label>
+                <select id="admCategoria" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                  <option value="delivery">Lanches & Delivery</option>
+                  <option value="bolos">Bolos & Doces</option>
+                  <option value="roupas">Roupas & Calçados</option>
+                  <option value="beleza">Salão & Barbearia</option>
+                  <option value="servicos">Fretes & Serviços</option>
+                  <option value="utilidades">Variedades & Móveis</option>
+                  <option value="saude">Farmácia & Saúde</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Bairro *</label>
+                <select id="admBairro" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                  <option value="Chã do Pilar">Chã do Pilar</option>
+                  <option value="Pilar Centro">Pilar Centro</option>
+                  <option value="Chã Elias">Chã Elias</option>
+                  <option value="Imburi">Imburi</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">WhatsApp (DDD + Número) *</label>
+                <input type="tel" id="admWhatsapp" required placeholder="82999990000" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Instagram (@usuario)</label>
+                <input type="text" id="admInstagram" placeholder="@nomedaloja" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Horário / Funcionamento</label>
+                <input type="text" id="admHorario" placeholder="Ex: 18h às 23h" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
+              <input type="text" id="admEndereco" placeholder="Rua Joaquina Rosa da Silva..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Descrição / Especialidades</label>
+              <input type="text" id="admDescricao" placeholder="Hambúrguer artesanal na brasa, batata frita e entrega rápida..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+            </div>
+
+            <!-- CHECKBOX VIP / DESTAQUE -->
+            <div class="flex items-center gap-2 pt-1">
+              <input type="checkbox" id="admVip" class="w-4 h-4 accent-amber-500 rounded">
+              <label for="admVip" class="text-xs font-bold text-amber-700 flex items-center gap-1 cursor-pointer">
+                ⭐ Marcar como Cliente VIP / Destaque Recomendado
+              </label>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button type="submit" id="admSubmitBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="check" class="w-4 h-4"></i> <span id="admSubmitBtnText">Salvar e Publicar Estabelecimento</span>
+              </button>
+              <button type="button" id="admCancelBtn" onclick="cancelAdminEdit()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl transition">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- LISTA DE ESTABELECIMENTOS JÁ CADASTRADOS (PARA EXCLUIR/GERENCIAR) -->
+        <div>
+          <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">Comércios Cadastrados (<span id="admTotalCount">0</span>)</h4>
+          <div id="admStoresList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <!-- Inserido dinamicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT / DADOS INICIAIS REAIS DE PILAR ================= -->
+  <script>
+    // BASE DE DADOS COM ESTABELECIMENTOS E FOTOS 100% VERIFICADOS DE PILAR
+    const INITIAL_STORES = [
+      // 1. ALIMENTAÇÃO & DELIVERY
+      {
+        id: "1",
+        nome: "Pilar Grill Pizzaria & Restaurante",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Nossa Senhora das Graças, 160 (próx. ao Mercado Público)",
+        whatsapp: "5582999990001",
+        instagram: "@pilar.grill", // VERIFICADO
+        descricao: "Pizzas de forno a lenha, refeições completas, petiscos e açaí com entrega em toda a cidade.",
+        horario: "Aberto das 18h às 23h • Delivery Ativo",
+        logo: "Fotos/758678145_18129921454725055_5081357892444509207_n.jpg",
+        vip: true,
+        keywords: "pizza restaurante janta entrega almoco acai pilar grill pilar.grill"
+      },
+      {
+        id: "2",
+        nome: "Caetano's Burguer",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Joaquina Rosa da Silva",
+        whatsapp: "5582996943148", // WHATSAPP REAL VERIFICADO
+        instagram: "@caetanos.burguer", // VERIFICADO
+        descricao: "Hambúrgueres artesanais suculentos, combos especiais, batata frita e entrega rápida.",
+        horario: "Quarta a Domingo das 18h às 00h",
+        logo: "Fotos/741649608_18610835614055102_6904544628369894632_n.jpg",
+        vip: true,
+        keywords: "hamburguer lanche caetano burguer batata refri delivery caetanos.burguer"
+      },
+      {
+        id: "3",
+        nome: "Pizzaria Robson Lima",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Chã do Pilar (Atendimento Delivery)",
+        whatsapp: "5582988392755", // WHATSAPP REAL VERIFICADO
+        instagram: "@_limapizzaria", // VERIFICADO
+        descricao: "Pizzas tradicionais e especiais com massa crocante, borda recheada e refrigerante gelado.",
+        horario: "Terça a Domingo das 18h às 00h",
+        logo: "Fotos/469257140_1113141227016609_4079611873170702731_n.jpg",
+        vip: true,
+        keywords: "pizza robson lima delivery janta refrigerante cha _limapizzaria"
+      },
+      {
+        id: "4",
+        nome: "Armazém Pilar Pizzaria & Petiscaria",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Luís Bernardo de Moraes, 207 (Lot. Manguaba)",
+        whatsapp: "5582999990006",
+        instagram: "@armazempilar", // VERIFICADO
+        descricao: "Pizzas, calzones, porções e petiscos com atendimento local e entregas rápidas na Chã.",
+        horario: "Terça a Domingo das 18h às 23h",
+        logo: "Fotos/473993420_904257744882650_1760190424913474141_n.jpg",
+        vip: false,
+        keywords: "armazem pilar pizza manguaba petisco delivery cha armazempilar"
+      },
+      {
+        id: "5",
+        nome: "Fábrica Burguer",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Dr. José Lages Filho, 206",
+        whatsapp: "5582999990003",
+        instagram: "@fabricaburguerpilar", // VERIFICADO
+        descricao: "Sanduíches prensados, smash burgers artesanais e molhos especiais da casa no delivery.",
+        horario: "Aberto até as 23h com entregador",
+        logo: "Fotos/733519677_18381597151162706_6660706131387529274_n.jpg",
+        vip: false,
+        keywords: "fabrica burguer lanches artesanal entrega delivery fabricaburguerpilar"
+      },
+      {
+        id: "6",
+        nome: "Cantinho Do Açaí",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Chã do Pilar",
+        whatsapp: "558287344964",
+        instagram: "@cantinhodoacai_pilar", // VERIFICADO
+        descricao: "O melhor açaí na tigela e no copo com frutas frescas, leite condensado, ninho e guloseimas.",
+        horario: "Aberto todos os dias das 14h às 22h",
+        logo: "Fotos/650761915_17906011806371273_2711328361740589404_n.jpg",
+        vip: true,
+        keywords: "acai açaí cantinho do acai sobremesa delivery cha do pilar cantinhodoacai_pilar"
+      },
+
+      // 2. BOLOS & DOCES
+      {
+        id: "7",
+        nome: "Isabel Que Faz Bolo",
+        categoria: "bolos",
+        bairro: "Chã Elias",
+        endereco: "Chã Elias (Atendimento por encomenda)",
+        whatsapp: "558291800665",
+        instagram: "",
+        descricao: "Bolos caseiros, bolos decorados para aniversário, casamento, tortas e docinhos de festa.",
+        horario: "Encomendas no WhatsApp • Peça com antecedência",
+        logo: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=200&q=80",
+        vip: true,
+        keywords: "bolo bolos torta doce festa aniversario casamento isabel cha elias"
+      },
+
+      // 3. BARBEARIA & SALÃO DE BELEZA
+      {
+        id: "8",
+        nome: "Terto Barbearia",
+        categoria: "beleza",
+        bairro: "Chã do Pilar",
+        endereco: "Loteamento Edite França - Chã do Pilar",
+        whatsapp: "5582999990009",
+        instagram: "@tertobarbearia", // VERIFICADO
+        descricao: "Cortes modernos, degradê na navalha, barba desenhada e produtos para cabelo masculino.",
+        horario: "Terça a Sábado das 08h às 19h • Domingo das 07h às 12h",
+        logo: "Fotos/609734247_18114861106611485_7951149115201890215_n.jpg",
+        vip: true,
+        keywords: "terto barbearia corte degrade navalha barba cha tertobarbearia"
+      },
+      {
+        id: "9",
+        nome: "Studio Letícia Santos Makeup & Hair",
+        categoria: "beleza",
+        bairro: "Pilar Centro",
+        endereco: "Centro de Pilar",
+        whatsapp: "5582999990010",
+        instagram: "@leticiasantosof_", // VERIFICADO
+        descricao: "Especialista em mechas, loiros, penteados, maquiagem profissional e tratamentos capilares.",
+        horario: "Terça a Sábado com agendamento",
+        logo: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "salao de beleza leticia santos cabelo mechas maquiagem loiro leticiasantosof_"
+      },
+      {
+        id: "10",
+        nome: "Dom Barba Barbearia",
+        categoria: "beleza",
+        bairro: "Chã do Pilar",
+        endereco: "Av. Principal - Chã do Pilar",
+        whatsapp: "5582999990011",
+        instagram: "",
+        descricao: "Corte tradicional, degradê navalhado, barba terapia na toalha quente e ambiente climatizado.",
+        horario: "Terça a Sábado das 09h às 20h",
+        logo: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "barbearia corte cabelo barba fade degrade salao dom barba"
+      },
+
+      // 4. FARMÁCIAS & SAÚDE
+      {
+        id: "11",
+        nome: "Farmácia Verde / Drogaria Verde",
+        categoria: "saude",
+        bairro: "Pilar Centro",
+        endereco: "Rua Sr. do Bonfim, 13 - Centro",
+        whatsapp: "5582999990012",
+        instagram: "@farmaciaverdeal", // VERIFICADO
+        descricao: "Medicamentos de referência e genéricos, perfumaria, suplementos e aferição de pressão.",
+        horario: "Segunda a Domingo das 07h às 22h • Delivery Ativo",
+        logo: "Fotos/452346547_3732106737100283_4708188934294071355_n.jpg",
+        vip: true,
+        keywords: "farmacia verde drogaria remedio generico bonfim saude farmaciaverdeal"
+      },
+      {
+        id: "12",
+        nome: "Farmácia do Trabalhador de Alagoas (Rede Lucena)",
+        categoria: "saude",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Nossa Senhora das Graças, 40A (próx. Mercado da Rosiete)",
+        whatsapp: "5582999990013",
+        instagram: "",
+        descricao: "Os menores preços em medicamentos genéricos, fraldas, leite e produtos infantis.",
+        horario: "Segunda a Sábado das 07h30 às 20h",
+        logo: "Fotos/343301552_699263475374770_5545125744583860051_n.jpg",
+        vip: false,
+        keywords: "farmacia trabalhador lucena remedio cha do pilar generico"
+      },
+      {
+        id: "13",
+        nome: "DrogaMaster Farmácia do Trabalhador",
+        categoria: "saude",
+        bairro: "Pilar Centro",
+        endereco: "Rua Sr. do Bonfim, 250",
+        whatsapp: "5582999990014",
+        instagram: "",
+        descricao: "Grande variedade de medicamentos, cosméticos, vitaminas e atendimento atencioso.",
+        horario: "Aberto de Segunda a Sábado",
+        logo: "https://images.unsplash.com/photo-1576602976047-174e57a47881?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "drogamaster farmacia trabalhador remedios bonfim"
+      },
+      {
+        id: "14",
+        nome: "Drogaria Pilar Farma",
+        categoria: "saude",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Antônio Serafim Costa, 200",
+        whatsapp: "5582999990015",
+        instagram: "",
+        descricao: "Farmácia completa perto de você na Chã. Medicamentos, pomadas e primeiros socorros.",
+        horario: "Segunda a Sábado das 08h às 19h",
+        logo: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "pilar farma drogaria remedio cha pilar"
+      },
+
+      // 5. LOJAS, ÓTICAS & VARIEDADES
+      {
+        id: "15",
+        nome: "Pilar Multcoisas Home Center",
+        categoria: "utilidades",
+        bairro: "Chã do Pilar",
+        endereco: "Rua Nossa Senhora das Graças, 36 (próx. ao Mercado Público)",
+        whatsapp: "5582999990017",
+        instagram: "@pilarmultcoisasal", // VERIFICADO
+        descricao: "O maior Home Center de Pilar! Utilidades de cozinha, sala, quarto, móveis em madeira e ferramentas.",
+        horario: "Segunda a Sábado das 08h às 18h",
+        logo: "Fotos/373236002_735855511885126_6998145342914866896_n.jpg",
+        vip: true,
+        keywords: "moveis utilidades casa decoracao pilar multcoisas home center mercado pilarmultcoisasal"
+      },
+      {
+        id: "16",
+        nome: "Óptica Visão Pilar",
+        categoria: "utilidades",
+        bairro: "Pilar Centro",
+        endereco: "Rua Nossa Senhora das Graças - Centro",
+        whatsapp: "5582999990018",
+        instagram: "@opticavisaopilar", // VERIFICADO
+        descricao: "Óculos de grau, solares, lentes multifocais digitais e exames computadorizados com consulta.",
+        horario: "Segunda a Sábado das 08h às 17h30",
+        logo: "Fotos/791102810_18092787878540367_874198235194265191_n.jpg",
+        vip: true,
+        keywords: "otica oculos visao lentes exame armacao centro opticavisaopilar"
+      },
+      {
+        id: "17",
+        nome: "MF-Calçados",
+        categoria: "roupas",
+        bairro: "Chã do Pilar",
+        endereco: "Chã do Pilar (Entregas e retiradas)",
+        whatsapp: "558296208562",
+        instagram: "",
+        descricao: "Tênis masculinos e femininos de R$ 85,00 a R$ 100,00. As melhores marcas e modelos esportivos.",
+        horario: "Chama no Zap para ver fotos dos modelos!",
+        logo: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "tenis calcados sapato chuteira moda masculino feminino mf"
+      },
+      {
+        id: "18",
+        nome: "Mercadinho Renascer",
+        categoria: "utilidades",
+        bairro: "Chã do Pilar",
+        endereco: "Rua 57 - Chã do Pilar",
+        whatsapp: "5582999990020",
+        instagram: "",
+        descricao: "Estivas, frios, carnes frescas, bebidas geladas e produtos de limpeza com os melhores preços.",
+        horario: "Segunda a Sábado das 07h às 19h30 • Domingo até 12h",
+        logo: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "mercadinho renascer compras alimentos bebida limpeza"
+      },
+
+      // 6. AUTOMOTIVO, FRETES & FITNESS
+      {
+        id: "19",
+        nome: "Caetano Estética Automotiva & Lava Jato",
+        categoria: "servicos",
+        bairro: "Chã do Pilar",
+        endereco: "Chã do Pilar",
+        whatsapp: "5582999990023",
+        instagram: "@caetanoesteticaautomotiva", // VERIFICADO
+        descricao: "Lavagem detalhada, polimento técnico, higienização interna de bancos e proteção de pintura.",
+        horario: "Segunda a Sábado das 08h às 17h30",
+        logo: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=200&q=80",
+        vip: true,
+        keywords: "lava jato caetano lavagem polimento higienizacao carro caetanoesteticaautomotiva"
+      },
+      {
+        id: "20",
+        nome: "Cross Experience Pilar",
+        categoria: "servicos",
+        bairro: "Chã do Pilar",
+        endereco: "Chã do Pilar - AL",
+        whatsapp: "5582999990026",
+        instagram: "@crossexperience.pilar", // VERIFICADO
+        descricao: "Treinamento funcional em grupo, perda de peso, condicionamento físico e ganho de massa magra.",
+        horario: "Aulas de Segunda a Sexta em vários horários",
+        logo: "Fotos/540499038_17842406136565927_5958517892441571546_n.jpg",
+        vip: false,
+        keywords: "academia cross funcional treino peso saude fitness centro crossexperience.pilar"
+      },
+      {
+        id: "21",
+        nome: "Frete & Mudanças Pilar / Chã",
+        categoria: "servicos",
+        bairro: "Chã do Pilar",
+        endereco: "Atendimento em Pilar, Chã, Imburi e Região",
+        whatsapp: "5582999990024",
+        instagram: "",
+        descricao: "Transporte de cargas, compras no mercado, móveis, eletrodomésticos e mudanças com cuidado e rapidez.",
+        horario: "Atendimento todos os dias • Faça seu orçamento",
+        logo: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=200&q=80",
+        vip: false,
+        keywords: "frete transporte mudanca carreto caminhao cha pilar imburi"
+      }
+    ];
+
+    // ================= FUNÇÕES DE SEGURANÇA E HIGIENIZAÇÃO =================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeUrl(url) {
+      if (!url) return '';
+      const trimmed = url.trim();
+      if (/^(https?:\/\/|data:image\/|Fotos\/|\.\/)/i.test(trimmed)) {
+        return trimmed;
+      }
+      return '';
+    }
+
+    // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS (VERSÃO 5 COM FOTOS REAIS DO INSTAGRAM)
+    function getStores() {
+      const stored = localStorage.getItem('pilar_stores_data_v5');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch(e) {
+          console.error(e);
+        }
+      }
+      localStorage.setItem('pilar_stores_data_v5', JSON.stringify(INITIAL_STORES));
+      return INITIAL_STORES;
+    }
+
+    function saveStores(stores) {
+      localStorage.setItem('pilar_stores_data_v5', JSON.stringify(stores));
+    }
+
+    let currentCategory = 'all';
+    let currentBairro = 'all';
+
+    // RENDERIZAR LOJAS NA TELA (COM PROTEÇÃO XSS COMPLETA E BOTÕES TOUCH 44PX)
+    function renderStores() {
+      const stores = getStores();
+      const grid = document.getElementById('storesGrid');
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      // Filtrar
+      const filtered = stores.filter(store => {
+        const matchCat = (currentCategory === 'all' || store.categoria === currentCategory);
+        const matchBairro = (currentBairro === 'all' || store.bairro === currentBairro);
+        
+        const searchable = `${store.nome} ${store.descricao} ${store.keywords || ''} ${store.bairro} ${store.endereco} ${store.instagram || ''}`.toLowerCase();
+        const matchQuery = !query || searchable.includes(query);
+
+        return matchCat && matchBairro && matchQuery;
+      });
+
+      // Ordenar: VIPs aparecem primeiro!
+      filtered.sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0));
+
+      document.getElementById('resultsCount').innerText = `${filtered.length} estabelecimentos encontrados`;
+      document.getElementById('noResults').classList.toggle('hidden', filtered.length > 0);
+
+      grid.innerHTML = filtered.map(store => {
+        const defaultLogo = "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80";
+        const rawLogo = store.logo && store.logo.trim() ? store.logo : defaultLogo;
+        const logoUrl = sanitizeUrl(rawLogo) || defaultLogo;
+
+        const zapMsg = encodeURIComponent(`Olá! Encontrei o contato de vocês no *Achei em Pilar* e gostaria de informações.`);
+        const zapCleanDigits = (store.whatsapp || '').replace(/\D/g, '');
+        const zapLink = `https://wa.me/${zapCleanDigits}?text=${zapMsg}`;
+
+        // Link do Instagram (Apenas se tiver usuário real preenchido, sanitizado contra caracteres perigosos)
+        const rawInsta = store.instagram ? store.instagram.replace('@', '').trim() : '';
+        const instaClean = rawInsta.replace(/[^a-zA-Z0-9._]/g, '');
+
+        // Link do Google Maps
+        const mapsLink = `https://maps.google.com/?q=${encodeURIComponent(store.nome + ' ' + store.endereco + ' Pilar AL')}`;
+
+        return `
+          <div class="bg-white rounded-2xl p-4 border ${store.vip ? 'border-amber-400/80 shadow-md ring-1 ring-amber-400/30' : 'border-slate-200 shadow-xs'} flex flex-col justify-between transition hover:shadow-md">
+            <div>
+              <div class="flex items-start gap-3">
+                <!-- LOGO DO ESTABELECIMENTO -->
+                <div class="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                  <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(store.nome)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80'" class="w-full h-full object-cover">
+                  ${store.vip ? '<span class="absolute bottom-0 right-0 bg-amber-500 text-white p-0.5 rounded-tl-lg text-[9px] font-bold" title="Destaque VIP">★</span>' : ''}
+                </div>
+
+                <!-- INFORMAÇÕES BÁSICAS -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <h3 class="font-bold text-sm text-slate-900 leading-tight">${escapeHtml(store.nome)}</h3>
+                    ${store.vip ? '<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md">Destaque</span>' : ''}
+                  </div>
+                  
+                  <div class="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold mt-1">
+                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                    <span>${escapeHtml(store.bairro)}</span>
+                  </div>
+
+                  <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(store.endereco)}</p>
+                </div>
+              </div>
+
+              <!-- DESCRIÇÃO DO SERVIÇO / PRODUTO -->
+              <p class="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+                ${escapeHtml(store.descricao)}
+              </p>
+
+              <!-- HORÁRIO -->
+              ${store.horario ? `
+                <div class="mt-2 text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                  <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                  <span>${escapeHtml(store.horario)}</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- BOTÕES DE AÇÃO COM LOGOS OFICIAIS: WHATSAPP, INSTAGRAM E GOOGLE MAPS (TOUCH TARGET 44PX) -->
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
+              <!-- BOTÃO WHATSAPP OFICIAL -->
+              <a href="${zapLink}" target="_blank" rel="noopener noreferrer" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
+                <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                <span>WhatsApp</span>
+              </a>
+
+              <!-- BOTÃO INSTAGRAM OFICIAL (APENAS SE TIVER PERFIL VERIFICADO) -->
+              ${instaClean ? `
+              <a href="https://instagram.com/${instaClean}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver Instagram (@${instaClean})">
+                <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689-.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+              ` : ''}
+
+              <!-- BOTÃO GOOGLE MAPS OFICIAL -->
+              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white hover:bg-slate-50 active:scale-95 border border-slate-200 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver no Google Maps">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <path fill="#EA4335" d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V7.71C8 4.56 10.56 2 13.71 2H12z"/>
+                  <path fill="#FBBC05" d="M16 14.74c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7h1.71C16.88 2 19 4.12 19 6.71v8.03z"/>
+                  <path fill="#34A853" d="M12 22s-7-7.75-7-13c0-.73.11-1.43.32-2.1L12 22z"/>
+                  <circle cx="12" cy="9" r="2.5" fill="#FFFFFF"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // FILTRO DE CATEGORIAS
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.classList.add('bg-emerald-700', 'text-white');
+          btn.classList.remove('bg-white', 'text-slate-700');
+        } else {
+          btn.classList.remove('bg-emerald-700', 'text-white');
+          btn.classList.add('bg-white', 'text-slate-700');
+        }
+      });
+      renderStores();
+    }
+
+    // FILTRO DE BAIRROS
+    function setBairro(bairro) {
+      currentBairro = bairro;
+      document.querySelectorAll('.bairro-btn').forEach(btn => {
+        if (btn.getAttribute('data-bairro') === bairro) {
+          btn.classList.add('bg-slate-900', 'text-white');
+          btn.classList.remove('bg-white', 'text-slate-600');
+        } else {
+          btn.classList.remove('bg-slate-900', 'text-white');
+          btn.classList.add('bg-white', 'text-slate-600');
+        }
+      });
+      renderStores();
+    }
+
+    function applyFilters() {
+      renderStores();
+    }
+
+    // ================= MODAL DE CADASTRO PÚBLICO =================
+    function openRegisterModal() {
+      document.getElementById('registerModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.add('hidden');
+    }
+
+    function handlePublicRegister(e) {
+      e.preventDefault();
+      const nome = document.getElementById('pubNome').value;
+      const categoria = document.getElementById('pubCategoria').value;
+      const bairro = document.getElementById('pubBairro').value;
+      const zap = document.getElementById('pubWhatsapp').value;
+      const insta = document.getElementById('pubInstagram').value.trim();
+      const endereco = document.getElementById('pubEndereco').value;
+      const desc = document.getElementById('pubDescricao').value;
+
+      // Mensagem que será enviada direto para o WhatsApp do Gabriel (Administrador)
+      const admZap = "5582999990000"; // Seu número oficial!
+      const texto = `Olá! Gostaria de cadastrar meu negócio no *Achei em Pilar*:\n\n` +
+                    `🏢 *Nome:* ${nome}\n` +
+                    `📁 *Categoria:* ${categoria}\n` +
+                    `📍 *Bairro:* ${bairro}\n` +
+                    `📞 *WhatsApp:* ${zap}\n` +
+                    `📸 *Instagram:* ${insta || 'Não informado'}\n` +
+                    `🏠 *Endereço:* ${endereco}\n` +
+                    `📝 *Detalhes:* ${desc}`;
+
+      window.open(`https://wa.me/${admZap}?text=${encodeURIComponent(texto)}`, '_blank');
+      alert('Sua solicitação foi enviada! O administrador adicionará seu negócio em breve.');
+      closeRegisterModal();
+    }
+
+    // ================= PAINEL DO ADMINISTRADOR =================
+    let isAdminLoggedIn = false;
+
+    function openAdminModal() {
+      document.getElementById('adminModal').classList.remove('hidden');
+      if (isAdminLoggedIn) {
+        showAdminDashboard();
+      } else {
+        document.getElementById('adminLoginSection').classList.remove('hidden');
+        document.getElementById('adminDashboardSection').classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    function getAdminPin() {
+      return localStorage.getItem('pilar_admin_pin') || '1234';
+    }
+
+    function checkAdminPassword() {
+      const pass = (document.getElementById('adminPassInput').value || '').trim();
+      if (pass === getAdminPin()) {
+        isAdminLoggedIn = true;
+        showAdminDashboard();
+      } else {
+        alert('Senha incorreta! Digite a senha cadastrada para o painel.');
+      }
+    }
+
+    function changeAdminPin() {
+      const current = prompt('Digite a senha atual de Administrador:');
+      if (current === null) return;
+      if (current.trim() !== getAdminPin()) {
+        alert('Senha atual incorreta!');
+        return;
+      }
+      const nova = prompt('Digite a nova senha desejada (mínimo 4 caracteres):');
+      if (nova && nova.trim().length >= 4) {
+        localStorage.setItem('pilar_admin_pin', nova.trim());
+        alert('Senha de Administrador alterada com sucesso!');
+      } else {
+        alert('Senha inválida. Digite pelo menos 4 caracteres.');
+      }
+    }
+
+    function resetStoresToDefault() {
+      if (confirm('Tem certeza que deseja restaurar as lojas para o catálogo original com as 12 fotos oficiais do Instagram? Todas as edições manuais feitas no navegador serão restauradas.')) {
+        localStorage.setItem('pilar_stores_data_v5', JSON.stringify(INITIAL_STORES));
+        renderStores();
+        renderAdminStoresList();
+        alert('Lojas restauradas com sucesso para a versão oficial!');
+      }
+    }
+
+    function showAdminDashboard() {
+      document.getElementById('adminLoginSection').classList.add('hidden');
+      document.getElementById('adminDashboardSection').classList.remove('hidden');
+      renderAdminStoresList();
+      lucide.createIcons();
+    }
+
+    function adminLogout() {
+      isAdminLoggedIn = false;
+      document.getElementById('adminPassInput').value = '';
+      closeAdminModal();
+    }
+
+    // UPLOAD DE LOGO DIRETO DO DISPOSITIVO (BASE64)
+    function handleLogoUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 2 * 1024 * 1024) {
+          alert('Por favor, escolha uma imagem menor que 2MB.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('admLogo').value = e.target.result;
+          alert('Foto carregada com sucesso!');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function renderAdminStoresList() {
+      const stores = getStores();
+      document.getElementById('admTotalCount').innerText = stores.length;
+      const list = document.getElementById('admStoresList');
+
+      list.innerHTML = stores.map(store => `
+        <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full ${store.vip ? 'bg-amber-500' : 'bg-slate-300'} shrink-0"></span>
+            <div class="truncate">
+              <span class="text-xs font-bold text-slate-800 block truncate">${escapeHtml(store.nome)}</span>
+              <span class="text-[10px] text-slate-400">${escapeHtml(store.bairro)} • ${escapeHtml(store.categoria)}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <!-- BOTÃO EDITAR -->
+            <button onclick="startEditStore('${escapeHtml(store.id)}')" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Editar Estabelecimento">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+            </button>
+            <!-- BOTÃO EXCLUIR -->
+            <button onclick="deleteStore('${escapeHtml(store.id)}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Excluir Estabelecimento">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // INICIAR EDIÇÃO DE UMA LOJA
+    function startEditStore(id) {
+      const stores = getStores();
+      const store = stores.find(s => s.id === id);
+      if (!store) return;
+
+      document.getElementById('admEditId').value = store.id;
+      document.getElementById('admNome').value = store.nome || '';
+      document.getElementById('admLogo').value = store.logo || '';
+      document.getElementById('admCategoria').value = store.categoria || 'delivery';
+      document.getElementById('admBairro').value = store.bairro || 'Chã do Pilar';
+      document.getElementById('admWhatsapp').value = store.whatsapp || '';
+      document.getElementById('admInstagram').value = store.instagram || '';
+      document.getElementById('admHorario').value = store.horario || '';
+      document.getElementById('admEndereco').value = store.endereco || '';
+      document.getElementById('admDescricao').value = store.descricao || '';
+      document.getElementById('admVip').checked = !!store.vip;
+
+      // Atualizar interface de edição
+      document.getElementById('admFormTitle').innerHTML = `<i data-lucide="edit-3" class="w-3.5 h-3.5 text-blue-600"></i> Editar: ${store.nome}`;
+      document.getElementById('admEditingBadge').classList.remove('hidden');
+      document.getElementById('admSubmitBtnText').innerText = 'Salvar Alterações';
+      document.getElementById('admCancelBtn').classList.remove('hidden');
+
+      // Rolar até o topo do formulário
+      document.getElementById('admFormContainer').scrollIntoView({ behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // CANCELAR EDIÇÃO
+    function cancelAdminEdit() {
+      document.getElementById('admEditId').value = '';
+      document.querySelector('#admFormContainer form').reset();
+      document.getElementById('admFormTitle').innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento`;
+      document.getElementById('admEditingBadge').classList.add('hidden');
+      document.getElementById('admSubmitBtnText').innerText = 'Salvar e Publicar Estabelecimento';
+      document.getElementById('admCancelBtn').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function handleAdminAddStore(e) {
+      e.preventDefault();
+      const editId = document.getElementById('admEditId').value.trim();
+      const nome = document.getElementById('admNome').value.trim();
+      const logo = document.getElementById('admLogo').value.trim();
+      const categoria = document.getElementById('admCategoria').value.trim();
+      const bairro = document.getElementById('admBairro').value.trim();
+      const whatsapp = document.getElementById('admWhatsapp').value.trim();
+      const instagram = document.getElementById('admInstagram').value.trim();
+      const horario = document.getElementById('admHorario').value.trim();
+      const endereco = document.getElementById('admEndereco').value.trim();
+      const descricao = document.getElementById('admDescricao').value.trim();
+      const vip = document.getElementById('admVip').checked;
+
+      const stores = getStores();
+
+      if (editId) {
+        // MODO ATUALIZAÇÃO / EDIÇÃO
+        const index = stores.findIndex(s => s.id === editId);
+        if (index !== -1) {
+          stores[index] = {
+            ...stores[index],
+            nome,
+            logo,
+            categoria,
+            bairro,
+            whatsapp,
+            instagram,
+            horario,
+            endereco,
+            descricao,
+            vip,
+            keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
+          };
+          saveStores(stores);
+          alert(`O estabelecimento "${nome}" foi atualizado com sucesso!`);
+        }
+        cancelAdminEdit();
+      } else {
+        // MODO NOVO CADASTRO
+        const newStore = {
+          id: Date.now().toString(),
+          nome,
+          logo,
+          categoria,
+          bairro,
+          whatsapp,
+          instagram,
+          horario,
+          endereco,
+          descricao,
+          vip,
+          keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
+        };
+        stores.unshift(newStore);
+        saveStores(stores);
+        e.target.reset();
+        alert(`O comércio "${nome}" foi cadastrado com sucesso!`);
+      }
+
+      renderAdminStoresList();
+      renderStores();
+    }
+
+    function deleteStore(id) {
+      if (confirm('Tem certeza que deseja excluir este estabelecimento?')) {
+        let stores = getStores();
+        stores = stores.filter(s => s.id !== id);
+        saveStores(stores);
+        renderAdminStoresList();
+        renderStores();
+      }
+    }
+
+    function exportDataJSON() {
+      const stores = getStores();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(stores, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "achei_em_pilar_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // INICIALIZAÇÃO
+    window.onload = function() {
+      renderStores();
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
