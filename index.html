@@ -26,6 +26,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -281,6 +283,56 @@
     </div>
   </div>
 
+  <!-- ================= MODAL DE AVALIAÇÕES E COMENTÁRIOS DOS MORADORES ================= -->
+  <div id="reviewsModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeReviewsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2.5 mb-2">
+        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 id="reviewsStoreTitle" class="font-heading font-extrabold text-base text-slate-900 leading-tight">Avaliações</h3>
+          <p class="text-[11px] text-slate-400">Opiniões de moradores e clientes</p>
+        </div>
+      </div>
+
+      <!-- LISTA DE COMENTÁRIOS -->
+      <div id="reviewsList" class="my-4 space-y-2.5 max-h-56 overflow-y-auto pr-1">
+        <p class="text-xs text-slate-400 text-center py-4">Carregando avaliações...</p>
+      </div>
+
+      <!-- FORMULÁRIO DE NOVA AVALIAÇÃO -->
+      <form onsubmit="handleSendReview(event)" class="border-t border-slate-100 pt-3 space-y-2.5">
+        <input type="hidden" id="revStoreId" value="">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Seu Nome *</label>
+          <input type="text" id="revAuthor" required placeholder="Ex: Maria Clara, João..." class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sua Nota *</label>
+          <select id="revRating" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+            <option value="5">⭐⭐⭐⭐⭐ Excelente (5 estrelas)</option>
+            <option value="4">⭐⭐⭐⭐ Muito bom (4 estrelas)</option>
+            <option value="3">⭐⭐⭐ Bom (3 estrelas)</option>
+            <option value="2">⭐⭐ Regular (2 estrelas)</option>
+            <option value="1">⭐ Ruim (1 estrela)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sua Opinião ou Recomendação *</label>
+          <textarea id="revComment" required rows="2" placeholder="Ex: Atendimento excelente, entrega rápida e lanche delicioso!" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+        <button type="submit" id="revSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Avaliação
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= PAINEL DO ADMINISTRADOR (ADM) ================= -->
   <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
@@ -329,111 +381,192 @@
           </div>
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO E EDIÇÃO PELO ADM -->
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6" id="admFormContainer">
-          <div class="flex items-center justify-between mb-2">
-            <h4 id="admFormTitle" class="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento
-            </h4>
-            <span id="admEditingBadge" class="hidden bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-              Modo Edição
-            </span>
-          </div>
-
-          <form onsubmit="handleAdminAddStore(event)" class="space-y-3">
-            <input type="hidden" id="admEditId" value="">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nome da Loja *</label>
-                <input type="text" id="admNome" required placeholder="Ex: Caetano's Burguer" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Logo / Foto da Loja</label>
-                <div class="flex gap-1.5">
-                  <input type="text" id="admLogo" placeholder="URL da foto ou envie um arquivo" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-                  <label class="bg-slate-200 hover:bg-slate-300 active:scale-95 cursor-pointer text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1 shrink-0 transition" title="Enviar arquivo do computador/celular">
-                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                    <span class="text-[11px]">Subir Foto</span>
-                    <input type="file" id="admLogoFile" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Categoria *</label>
-                <select id="admCategoria" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-                  <option value="delivery">Lanches & Delivery</option>
-                  <option value="bolos">Bolos & Doces</option>
-                  <option value="roupas">Roupas & Calçados</option>
-                  <option value="beleza">Salão & Barbearia</option>
-                  <option value="servicos">Fretes & Serviços</option>
-                  <option value="utilidades">Variedades & Móveis</option>
-                  <option value="saude">Farmácia & Saúde</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Bairro *</label>
-                <select id="admBairro" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-                  <option value="Chã do Pilar">Chã do Pilar</option>
-                  <option value="Pilar Centro">Pilar Centro</option>
-                  <option value="Chã Elias">Chã Elias</option>
-                  <option value="Imburi">Imburi</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">WhatsApp (DDD + Número) *</label>
-                <input type="tel" id="admWhatsapp" required placeholder="82999990000" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Instagram (@usuario)</label>
-                <input type="text" id="admInstagram" placeholder="@nomedaloja" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Horário / Funcionamento</label>
-                <input type="text" id="admHorario" placeholder="Ex: 18h às 23h" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
-              <input type="text" id="admEndereco" placeholder="Rua Joaquina Rosa da Silva..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Descrição / Especialidades</label>
-              <input type="text" id="admDescricao" placeholder="Hambúrguer artesanal na brasa, batata frita e entrega rápida..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-            </div>
-
-            <!-- CHECKBOX VIP / DESTAQUE -->
-            <div class="flex items-center gap-2 pt-1">
-              <input type="checkbox" id="admVip" class="w-4 h-4 accent-amber-500 rounded">
-              <label for="admVip" class="text-xs font-bold text-amber-700 flex items-center gap-1 cursor-pointer">
-                ⭐ Marcar como Cliente VIP / Destaque Recomendado
-              </label>
-            </div>
-
-            <div class="flex items-center gap-2 pt-1">
-              <button type="submit" id="admSubmitBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
-                <i data-lucide="check" class="w-4 h-4"></i> <span id="admSubmitBtnText">Salvar e Publicar Estabelecimento</span>
-              </button>
-              <button type="button" id="admCancelBtn" onclick="cancelAdminEdit()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl transition">
-                Cancelar
-              </button>
-            </div>
-          </form>
+        <!-- NAVEGAÇÃO DE ABAS DO ADM -->
+        <div class="flex items-center gap-2 mb-4 p-1 bg-slate-100 rounded-2xl">
+          <button id="adminTabStoresBtn" onclick="switchAdminTab('stores')" class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs">
+            <i data-lucide="store" class="w-3.5 h-3.5 text-emerald-600"></i> Lojas & Cadastros
+          </button>
+          <button id="adminTabStatsBtn" onclick="switchAdminTab('stats')" class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-indigo-600"></i> 📊 Cliques & Métricas
+          </button>
         </div>
 
-        <!-- LISTA DE ESTABELECIMENTOS JÁ CADASTRADOS (PARA EXCLUIR/GERENCIAR) -->
-        <div>
-          <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">Comércios Cadastrados (<span id="admTotalCount">0</span>)</h4>
-          <div id="admStoresList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-            <!-- Inserido dinamicamente -->
+        <!-- ABA 1: GERENCIAMENTO DE LOJAS (CADASTRAR E EDITAR) -->
+        <div id="adminStoresTab">
+          <!-- FORMULÁRIO DE CADASTRO E EDIÇÃO PELO ADM -->
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6" id="admFormContainer">
+            <div class="flex items-center justify-between mb-2">
+              <h4 id="admFormTitle" class="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento
+              </h4>
+              <span id="admEditingBadge" class="hidden bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Modo Edição
+              </span>
+            </div>
+
+            <form onsubmit="handleAdminAddStore(event)" class="space-y-3">
+              <input type="hidden" id="admEditId" value="">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nome da Loja *</label>
+                  <input type="text" id="admNome" required placeholder="Ex: Caetano's Burguer" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Logo / Foto da Loja</label>
+                  <div class="flex gap-1.5">
+                    <input type="text" id="admLogo" placeholder="URL da foto ou envie um arquivo" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                    <label class="bg-slate-200 hover:bg-slate-300 active:scale-95 cursor-pointer text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1 shrink-0 transition" title="Enviar arquivo do computador/celular">
+                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                      <span class="text-[11px]">Subir Foto</span>
+                      <input type="file" id="admLogoFile" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Categoria *</label>
+                  <select id="admCategoria" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                    <option value="delivery">Lanches & Delivery</option>
+                    <option value="bolos">Bolos & Doces</option>
+                    <option value="roupas">Roupas & Calçados</option>
+                    <option value="beleza">Salão & Barbearia</option>
+                    <option value="servicos">Fretes & Serviços</option>
+                    <option value="utilidades">Variedades & Móveis</option>
+                    <option value="saude">Farmácia & Saúde</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Bairro *</label>
+                  <select id="admBairro" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                    <option value="Chã do Pilar">Chã do Pilar</option>
+                    <option value="Pilar Centro">Pilar Centro</option>
+                    <option value="Chã Elias">Chã Elias</option>
+                    <option value="Imburi">Imburi</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">WhatsApp (DDD + Número) *</label>
+                  <input type="tel" id="admWhatsapp" required placeholder="82999990000" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Instagram (@usuario)</label>
+                  <input type="text" id="admInstagram" placeholder="@nomedaloja" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Horário / Funcionamento</label>
+                  <input type="text" id="admHorario" placeholder="Ex: 18h às 23h" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
+                <input type="text" id="admEndereco" placeholder="Rua Joaquina Rosa da Silva..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Descrição / Especialidades</label>
+                <input type="text" id="admDescricao" placeholder="Hambúrguer artesanal na brasa, batata frita e entrega rápida..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              </div>
+
+              <!-- CHECKBOX VIP / DESTAQUE -->
+              <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="admVip" class="w-4 h-4 accent-amber-500 rounded">
+                <label for="admVip" class="text-xs font-bold text-amber-700 flex items-center gap-1 cursor-pointer">
+                  ⭐ Marcar como Cliente VIP / Destaque Recomendado
+                </label>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <button type="submit" id="admSubmitBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="check" class="w-4 h-4"></i> <span id="admSubmitBtnText">Salvar e Publicar Estabelecimento</span>
+                </button>
+                <button type="button" id="admCancelBtn" onclick="cancelAdminEdit()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl transition">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- LISTA DE ESTABELECIMENTOS JÁ CADASTRADOS (PARA EXCLUIR/GERENCIAR) -->
+          <div>
+            <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">Comércios Cadastrados (<span id="admTotalCount">0</span>)</h4>
+            <div id="admStoresList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <!-- Inserido dinamicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA 2: MÉTRICAS, VISITAS E CLIQUES (PAINEL ANALÍTICO) -->
+        <div id="adminStatsTab" class="hidden space-y-4">
+          <!-- CARDS RESUMO -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-2xl text-center">
+              <div class="w-7 h-7 mx-auto mb-1 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </div>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Visitas no Site</p>
+              <h4 id="statTotalVisits" class="text-lg font-heading font-extrabold text-slate-900">0</h4>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-2xl text-center">
+              <div class="w-7 h-7 mx-auto mb-1 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+              </div>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Cliques Zap</p>
+              <h4 id="statTotalWhatsapp" class="text-lg font-heading font-extrabold text-slate-900">0</h4>
+            </div>
+            <div class="bg-pink-50 border border-pink-100 p-3 rounded-2xl text-center">
+              <div class="w-7 h-7 mx-auto mb-1 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+              </div>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Cliques Insta</p>
+              <h4 id="statTotalInstagram" class="text-lg font-heading font-extrabold text-slate-900">0</h4>
+            </div>
+            <div class="bg-rose-50 border border-rose-100 p-3 rounded-2xl text-center">
+              <div class="w-7 h-7 mx-auto mb-1 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </div>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Curtidas ❤️</p>
+              <h4 id="statTotalLikes" class="text-lg font-heading font-extrabold text-slate-900">0</h4>
+            </div>
+          </div>
+
+          <!-- STATUS DA CONEXÃO COM SUPABASE -->
+          <div id="statDbStatusBanner" class="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span id="statDbDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="statDbText" class="text-slate-700 font-semibold">Supabase conectado e sincronizado</span>
+            </div>
+            <button onclick="loadAdminStats()" class="text-indigo-600 hover:text-indigo-800 text-[11px] font-bold flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i> Atualizar
+            </button>
+          </div>
+
+          <!-- RANKING DE CLIQUES POR ESTABELECIMENTO -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider">Desempenho por Estabelecimento</h4>
+              <span class="text-[10px] text-slate-400">Gere relatórios para fechar R$ 29/mês</span>
+            </div>
+            <div id="statStoresTable" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+              <!-- Renderizado dinamicamente -->
+            </div>
+          </div>
+
+          <!-- MODERAÇÃO DE AVALIAÇÕES RECENTES -->
+          <div class="pt-2 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider">Comentários e Avaliações</h4>
+              <span id="statReviewsCount" class="text-[10px] text-slate-500">0 avaliações</span>
+            </div>
+            <div id="statReviewsList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+              <!-- Renderizado dinamicamente com botão de deletar -->
+            </div>
           </div>
         </div>
       </div>
@@ -789,6 +922,53 @@
       localStorage.setItem('pilar_stores_data_v6', JSON.stringify(stores));
     }
 
+    // ================= CONFIGURAÇÃO DO SUPABASE (BANCO DE DADOS EM NUVEM) =================
+    const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
+
+    let supabaseClient = null;
+    if (window.supabase) {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch(e) {
+        console.warn('Erro ao inicializar Supabase client:', e);
+      }
+    }
+
+    // CACHES LOCAIS COM FALLBACK SEGURO
+    let localStatsCache = {};
+    try {
+      localStatsCache = JSON.parse(localStorage.getItem('pilar_stats_cache') || '{}');
+    } catch(e) { localStatsCache = {}; }
+
+    let localLikedStores = [];
+    try {
+      localLikedStores = JSON.parse(localStorage.getItem('pilar_liked_stores') || '[]');
+    } catch(e) { localLikedStores = []; }
+
+    let localReviewsCache = {};
+    try {
+      localReviewsCache = JSON.parse(localStorage.getItem('pilar_reviews_cache') || '{}');
+    } catch(e) { localReviewsCache = {}; }
+
+    function getStoreLikes(storeId) {
+      return localStatsCache[storeId]?.likes || 0;
+    }
+
+    function getStoreClicks(storeId) {
+      const s = localStatsCache[storeId];
+      if (!s) return 0;
+      return (s.whatsapp_clicks || 0) + (s.instagram_clicks || 0) + (s.maps_clicks || 0);
+    }
+
+    function getStoreReviewCount(storeId) {
+      return (localReviewsCache[storeId] || []).length;
+    }
+
+    function isStoreLiked(storeId) {
+      return localLikedStores.includes(storeId);
+    }
+
     let currentCategory = 'all';
     let currentBairro = 'all';
 
@@ -834,27 +1014,37 @@
         return `
           <div class="bg-white rounded-2xl p-4 border ${store.vip ? 'border-amber-400/80 shadow-md ring-1 ring-amber-400/30' : 'border-slate-200 shadow-xs'} flex flex-col justify-between transition hover:shadow-md">
             <div>
-              <div class="flex items-start gap-3">
-                <!-- LOGO DO ESTABELECIMENTO -->
-                <div class="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                  <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(store.nome)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80'" class="w-full h-full object-cover">
-                  ${store.vip ? '<span class="absolute bottom-0 right-0 bg-amber-500 text-white p-0.5 rounded-tl-lg text-[9px] font-bold" title="Destaque VIP">★</span>' : ''}
-                </div>
-
-                <!-- INFORMAÇÕES BÁSICAS -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <h3 class="font-bold text-sm text-slate-900 leading-tight">${escapeHtml(store.nome)}</h3>
-                    ${store.vip ? '<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md">Destaque</span>' : ''}
-                  </div>
-                  
-                  <div class="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold mt-1">
-                    <i data-lucide="map-pin" class="w-3 h-3"></i>
-                    <span>${escapeHtml(store.bairro)}</span>
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-start gap-3 min-w-0">
+                  <!-- LOGO DO ESTABELECIMENTO -->
+                  <div class="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                    <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(store.nome)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80'" class="w-full h-full object-cover">
+                    ${store.vip ? '<span class="absolute bottom-0 right-0 bg-amber-500 text-white p-0.5 rounded-tl-lg text-[9px] font-bold" title="Destaque VIP">★</span>' : ''}
                   </div>
 
-                  <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(store.endereco)}</p>
+                  <!-- INFORMAÇÕES BÁSICAS -->
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <h3 class="font-bold text-sm text-slate-900 leading-tight">${escapeHtml(store.nome)}</h3>
+                      ${store.vip ? '<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md">Destaque</span>' : ''}
+                    </div>
+                    
+                    <div class="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold mt-1">
+                      <i data-lucide="map-pin" class="w-3 h-3"></i>
+                      <span>${escapeHtml(store.bairro)}</span>
+                    </div>
+
+                    <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(store.endereco)}</p>
+                  </div>
                 </div>
+
+                <!-- BOTÃO DE CURTIDA (❤️) -->
+                <button onclick="handleStoreLike('${store.id}')" id="like-btn-${store.id}" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl transition shrink-0 ${isStoreLiked(store.id) ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500'}" title="Curtir este estabelecimento">
+                  <svg class="w-4 h-4 transition active:scale-125 ${isStoreLiked(store.id) ? 'fill-rose-500 text-rose-500' : 'fill-none text-current'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                  <span id="like-count-${store.id}" class="text-xs font-bold">${getStoreLikes(store.id)}</span>
+                </button>
               </div>
 
               <!-- DESCRIÇÃO DO SERVIÇO / PRODUTO -->
@@ -869,12 +1059,23 @@
                   <span>${escapeHtml(store.horario)}</span>
                 </div>
               ` : ''}
+
+              <!-- BARRA DE AVALIAÇÕES / OPINIÕES DOS MORADORES -->
+              <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 px-2.5 py-1 rounded-xl transition border border-slate-200/60" title="Ver ou deixar uma avaliação">
+                  <i data-lucide="message-square" class="w-3 h-3 text-emerald-600"></i>
+                  <span>Opiniões <span id="rev-badge-${store.id}" class="text-emerald-700 font-extrabold">(${getStoreReviewCount(store.id)})</span></span>
+                </button>
+                <span class="text-[10px] text-slate-400 font-medium">
+                  <span id="views-badge-${store.id}">${getStoreClicks(store.id)} contatos</span>
+                </span>
+              </div>
             </div>
 
             <!-- BOTÕES DE AÇÃO COM LOGOS OFICIAIS: WHATSAPP, INSTAGRAM E GOOGLE MAPS (TOUCH TARGET 44PX) -->
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2">
               <!-- BOTÃO WHATSAPP OFICIAL -->
-              <a href="${zapLink}" target="_blank" rel="noopener noreferrer" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
+              <a href="${zapLink}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'whatsapp')" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
                 <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                 </svg>
@@ -883,7 +1084,7 @@
 
               <!-- BOTÃO INSTAGRAM OFICIAL (APENAS SE TIVER PERFIL VERIFICADO) -->
               ${instaClean ? `
-              <a href="https://instagram.com/${instaClean}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver Instagram (@${instaClean})">
+              <a href="https://instagram.com/${instaClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'instagram')" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver Instagram (@${instaClean})">
                 <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689-.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
@@ -891,7 +1092,7 @@
               ` : ''}
 
               <!-- BOTÃO GOOGLE MAPS OFICIAL -->
-              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white hover:bg-slate-50 active:scale-95 border border-slate-200 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver no Google Maps">
+              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'maps')" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white hover:bg-slate-50 active:scale-95 border border-slate-200 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver no Google Maps">
                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
                   <path fill="#EA4335" d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V7.71C8 4.56 10.56 2 13.71 2H12z"/>
@@ -1215,9 +1416,432 @@
       downloadAnchor.remove();
     }
 
+    // ================= ENGAJAMENTO: CURTIDAS, CLIQUES E VISITAS (SUPABASE & LOCAL) =================
+    async function trackSiteVisit() {
+      try {
+        let localVisits = parseInt(localStorage.getItem('pilar_total_visits') || '0', 10);
+        if (!sessionStorage.getItem('pilar_visited_session')) {
+          localVisits++;
+          localStorage.setItem('pilar_total_visits', localVisits);
+          sessionStorage.setItem('pilar_visited_session', '1');
+          if (supabaseClient) {
+            await supabaseClient.from('site_visits').insert([{}]);
+          }
+        }
+      } catch(e) {
+        console.warn('Visits tracking fallback:', e);
+      }
+    }
+
+    async function handleStoreLike(storeId) {
+      if (isStoreLiked(storeId)) {
+        alert('Você já curtiu este estabelecimento! Muito obrigado pelo apoio aos comércios de Pilar.');
+        return;
+      }
+      
+      // Otimista imediato
+      localLikedStores.push(storeId);
+      localStorage.setItem('pilar_liked_stores', JSON.stringify(localLikedStores));
+      
+      if (!localStatsCache[storeId]) {
+        localStatsCache[storeId] = { whatsapp_clicks: 0, instagram_clicks: 0, maps_clicks: 0, likes: 0 };
+      }
+      localStatsCache[storeId].likes = (localStatsCache[storeId].likes || 0) + 1;
+      localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+      
+      const countEl = document.getElementById(`like-count-${storeId}`);
+      if (countEl) countEl.innerText = localStatsCache[storeId].likes;
+      const btnEl = document.getElementById(`like-btn-${storeId}`);
+      if (btnEl) {
+        btnEl.className = 'flex items-center gap-1 px-2.5 py-1.5 rounded-xl transition shrink-0 bg-rose-50 text-rose-600';
+        btnEl.innerHTML = `
+          <svg class="w-4 h-4 fill-rose-500 text-rose-500 active:scale-125" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+          <span id="like-count-${storeId}" class="text-xs font-bold">${localStatsCache[storeId].likes}</span>
+        `;
+      }
+      
+      if (supabaseClient) {
+        try {
+          await supabaseClient.rpc('increment_store_like', { p_store_id: storeId });
+        } catch(e) {
+          console.warn('RPC increment_store_like fallback:', e);
+        }
+      }
+    }
+
+    async function trackStoreClick(storeId, type) {
+      try {
+        if (!localStatsCache[storeId]) {
+          localStatsCache[storeId] = { whatsapp_clicks: 0, instagram_clicks: 0, maps_clicks: 0, likes: 0 };
+        }
+        if (type === 'whatsapp') localStatsCache[storeId].whatsapp_clicks = (localStatsCache[storeId].whatsapp_clicks || 0) + 1;
+        if (type === 'instagram') localStatsCache[storeId].instagram_clicks = (localStatsCache[storeId].instagram_clicks || 0) + 1;
+        if (type === 'maps') localStatsCache[storeId].maps_clicks = (localStatsCache[storeId].maps_clicks || 0) + 1;
+        localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+        
+        const viewsEl = document.getElementById(`views-badge-${storeId}`);
+        if (viewsEl) viewsEl.innerText = `${getStoreClicks(storeId)} contatos`;
+        
+        if (supabaseClient) {
+          await supabaseClient.rpc('increment_store_click', { p_store_id: storeId, p_click_type: type });
+        }
+      } catch(e) {
+        console.warn('RPC increment_store_click fallback:', e);
+      }
+    }
+
+    // ================= MODAL DE AVALIAÇÕES E COMENTÁRIOS DOS MORADORES =================
+    let currentReviewStoreId = null;
+
+    async function openReviewsModal(storeId, storeName) {
+      currentReviewStoreId = storeId;
+      document.getElementById('revStoreId').value = storeId;
+      document.getElementById('reviewsStoreTitle').innerText = `Opiniões • ${storeName}`;
+      document.getElementById('reviewsModal').classList.remove('hidden');
+      await loadStoreReviews(storeId);
+      lucide.createIcons();
+    }
+
+    function closeReviewsModal() {
+      document.getElementById('reviewsModal').classList.add('hidden');
+      currentReviewStoreId = null;
+    }
+
+    async function loadStoreReviews(storeId) {
+      const listEl = document.getElementById('reviewsList');
+      listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Carregando opiniões...</p>`;
+      
+      let reviews = localReviewsCache[storeId] || [];
+      
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('store_reviews')
+            .select('*')
+            .eq('store_id', storeId)
+            .order('created_at', { ascending: false });
+            
+          if (!error && data) {
+            reviews = data;
+            localReviewsCache[storeId] = data;
+            localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+          }
+        } catch(e) {
+          console.warn('Supabase reviews load fallback:', e);
+        }
+      }
+      
+      const revBadge = document.getElementById(`rev-badge-${storeId}`);
+      if (revBadge) revBadge.innerText = `(${reviews.length})`;
+
+      if (!reviews || reviews.length === 0) {
+        listEl.innerHTML = `
+          <div class="text-center py-6 px-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <i data-lucide="message-square-plus" class="w-7 h-7 mx-auto text-slate-300 mb-1.5"></i>
+            <p class="text-xs font-bold text-slate-700">Seja o primeiro a avaliar!</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Conte para os moradores de Pilar como foi sua experiência.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+      
+      listEl.innerHTML = reviews.map(rev => `
+        <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-2xl">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-slate-800">${escapeHtml(rev.author_name)}</span>
+            <span class="text-[11px] text-amber-500">${'⭐'.repeat(Math.max(1, Math.min(5, rev.rating || 5)))}</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(rev.comment)}</p>
+          <span class="text-[9px] text-slate-400 block mt-1.5">${rev.created_at ? new Date(rev.created_at).toLocaleDateString('pt-BR') : 'Hoje'}</span>
+        </div>
+      `).join('');
+    }
+
+    async function handleSendReview(e) {
+      e.preventDefault();
+      const storeId = document.getElementById('revStoreId').value;
+      const author_name = document.getElementById('revAuthor').value.trim();
+      const rating = parseInt(document.getElementById('revRating').value, 10);
+      const comment = document.getElementById('revComment').value.trim();
+      const btn = document.getElementById('revSubmitBtn');
+      
+      if (!author_name || !comment) return;
+      
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Publicando...`;
+      
+      const newRev = {
+        id: 'local_' + Date.now(),
+        store_id: storeId,
+        author_name,
+        rating,
+        comment,
+        created_at: new Date().toISOString()
+      };
+      
+      if (!localReviewsCache[storeId]) localReviewsCache[storeId] = [];
+      localReviewsCache[storeId].unshift(newRev);
+      localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+      
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('store_reviews').insert([{
+            store_id: storeId,
+            author_name,
+            rating,
+            comment
+          }]);
+        } catch(err) {
+          console.warn('Insert review Supabase error:', err);
+        }
+      }
+      
+      document.getElementById('revComment').value = '';
+      document.getElementById('revAuthor').value = '';
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Avaliação`;
+      
+      alert('Obrigado! Sua avaliação foi publicada com sucesso.');
+      await loadStoreReviews(storeId);
+      const revBadge = document.getElementById(`rev-badge-${storeId}`);
+      if (revBadge) revBadge.innerText = `(${localReviewsCache[storeId].length})`;
+    }
+
+    // ================= ABAS DO PAINEL ADM E MÉTRICAS =================
+    function switchAdminTab(tab) {
+      const storesTab = document.getElementById('adminStoresTab');
+      const statsTab = document.getElementById('adminStatsTab');
+      const storesBtn = document.getElementById('adminTabStoresBtn');
+      const statsBtn = document.getElementById('adminTabStatsBtn');
+      
+      if (tab === 'stores') {
+        storesTab.classList.remove('hidden');
+        statsTab.classList.add('hidden');
+        storesBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs';
+        statsBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+      } else {
+        storesTab.classList.add('hidden');
+        statsTab.classList.remove('hidden');
+        statsBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs';
+        storesBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+        loadAdminStats();
+      }
+      lucide.createIcons();
+    }
+
+    async function loadAdminStats() {
+      const stores = getStores();
+      let totalVisits = parseInt(localStorage.getItem('pilar_total_visits') || '0', 10);
+      
+      if (supabaseClient) {
+        try {
+          const [visitsRes, statsRes, reviewsRes] = await Promise.all([
+            supabaseClient.from('site_visits').select('id', { count: 'exact', head: true }),
+            supabaseClient.from('store_stats').select('*'),
+            supabaseClient.from('store_reviews').select('*')
+          ]);
+          
+          if (visitsRes.count !== null && visitsRes.count !== undefined) {
+            totalVisits = Math.max(totalVisits, visitsRes.count);
+          }
+          
+          if (statsRes.data) {
+            statsRes.data.forEach(row => {
+              localStatsCache[row.store_id] = {
+                whatsapp_clicks: Math.max(row.whatsapp_clicks || 0, localStatsCache[row.store_id]?.whatsapp_clicks || 0),
+                instagram_clicks: Math.max(row.instagram_clicks || 0, localStatsCache[row.store_id]?.instagram_clicks || 0),
+                maps_clicks: Math.max(row.maps_clicks || 0, localStatsCache[row.store_id]?.maps_clicks || 0),
+                likes: Math.max(row.likes || 0, localStatsCache[row.store_id]?.likes || 0)
+              };
+            });
+            localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+          }
+          
+          if (reviewsRes.data) {
+            const grouped = {};
+            reviewsRes.data.forEach(r => {
+              if (!grouped[r.store_id]) grouped[r.store_id] = [];
+              grouped[r.store_id].push(r);
+            });
+            localReviewsCache = grouped;
+            localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+          }
+          
+          document.getElementById('statDbDot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+          document.getElementById('statDbText').innerText = 'Supabase Conectado • Métricas em Tempo Real';
+        } catch(err) {
+          console.warn('Stats sync fallback:', err);
+          document.getElementById('statDbDot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+          document.getElementById('statDbText').innerText = 'Modo Local Ativo (Execute o script no SQL Editor para nuvem)';
+        }
+      }
+
+      let totalZap = 0, totalInsta = 0, totalLikes = 0;
+      Object.values(localStatsCache).forEach(s => {
+        totalZap += (s.whatsapp_clicks || 0);
+        totalInsta += (s.instagram_clicks || 0);
+        totalLikes += (s.likes || 0);
+      });
+      
+      document.getElementById('statTotalVisits').innerText = totalVisits;
+      document.getElementById('statTotalWhatsapp').innerText = totalZap;
+      document.getElementById('statTotalInstagram').innerText = totalInsta;
+      document.getElementById('statTotalLikes').innerText = totalLikes;
+      
+      const tableEl = document.getElementById('statStoresTable');
+      const sorted = [...stores].sort((a, b) => {
+        const ca = getStoreClicks(a.id) + getStoreLikes(a.id);
+        const cb = getStoreClicks(b.id) + getStoreLikes(b.id);
+        return cb - ca;
+      });
+      
+      tableEl.innerHTML = sorted.map(st => {
+        const zap = localStatsCache[st.id]?.whatsapp_clicks || 0;
+        const insta = localStatsCache[st.id]?.instagram_clicks || 0;
+        const likes = localStatsCache[st.id]?.likes || 0;
+        
+        return `
+          <div class="bg-white border border-slate-200 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:border-slate-300 transition">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-slate-900 truncate">${escapeHtml(st.nome)}</span>
+                ${st.vip ? '<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.2 rounded">VIP</span>' : ''}
+              </div>
+              <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-0.5">
+                <span class="text-emerald-700 font-bold flex items-center gap-0.5"><i data-lucide="message-circle" class="w-3 h-3"></i> ${zap} zap</span>
+                <span class="text-pink-600 font-bold flex items-center gap-0.5"><i data-lucide="instagram" class="w-3 h-3"></i> ${insta} insta</span>
+                <span class="text-rose-600 font-bold flex items-center gap-0.5"><i data-lucide="heart" class="w-3 h-3"></i> ${likes} likes</span>
+              </div>
+            </div>
+            <button onclick="sendMerchantReport('${st.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center justify-center gap-1 shrink-0 transition" title="Enviar relatório no WhatsApp do dono da loja">
+              <i data-lucide="send" class="w-3 h-3 text-emerald-600"></i> Relatório WhatsApp
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      const revListEl = document.getElementById('statReviewsList');
+      let allReviews = [];
+      Object.keys(localReviewsCache).forEach(sid => {
+        const st = stores.find(s => s.id === sid);
+        (localReviewsCache[sid] || []).forEach(r => {
+          allReviews.push({ ...r, storeNome: st ? st.nome : 'Loja' });
+        });
+      });
+      
+      document.getElementById('statReviewsCount').innerText = `${allReviews.length} avaliações`;
+      
+      if (allReviews.length === 0) {
+        revListEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-3">Nenhum comentário recebido ainda.</p>`;
+      } else {
+        revListEl.innerHTML = allReviews.map(r => `
+          <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-800">${escapeHtml(r.author_name)}</span>
+                <span class="text-[10px] text-emerald-700 font-semibold">• ${escapeHtml(r.storeNome)}</span>
+                <span class="text-[10px] text-amber-500">${'⭐'.repeat(r.rating || 5)}</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">${escapeHtml(r.comment)}</p>
+            </div>
+            <button onclick="deleteReview('${r.id}', '${r.store_id}')" class="text-rose-400 hover:text-rose-600 p-1 rounded-lg" title="Excluir este comentário">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    function sendMerchantReport(storeId) {
+      const stores = getStores();
+      const st = stores.find(s => s.id === storeId);
+      if (!st) return;
+      
+      const zap = localStatsCache[storeId]?.whatsapp_clicks || 0;
+      const insta = localStatsCache[storeId]?.instagram_clicks || 0;
+      const likes = localStatsCache[storeId]?.likes || 0;
+      const total = zap + insta;
+      
+      const phone = (st.whatsapp || '').replace(/\D/g, '');
+      const texto = `Olá, pessoal da *${st.nome}*! Tudo bem?\n\n` +
+        `Aqui é o Gabriel do *Achei em Pilar* (achei-em-pilar.netlify.app).\n\n` +
+        `Passando para compartilhar os números do seu negócio no nosso portal:\n` +
+        `📲 *${zap} cliques diretos no seu WhatsApp*\n` +
+        `📸 *${insta} visitas no seu perfil do Instagram*\n` +
+        `❤️ *${likes} curtidas de moradores de Pilar*\n` +
+        `🔥 *Total de ${total} clientes interessados gerados!*\n\n` +
+        `O Achei em Pilar está crescendo todos os dias. Vamos manter seu destaque VIP ativo por apenas R$ 29/mês?`;
+        
+      if (phone) {
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`, '_blank');
+      } else {
+        navigator.clipboard.writeText(texto);
+        alert('Relatório copiado com sucesso! Você pode colar no WhatsApp do comerciante.');
+      }
+    }
+
+    async function deleteReview(reviewId, storeId) {
+      if (!confirm('Deseja realmente apagar esta avaliação?')) return;
+      
+      if (localReviewsCache[storeId]) {
+        localReviewsCache[storeId] = localReviewsCache[storeId].filter(r => r.id !== reviewId);
+        localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+      }
+      
+      if (supabaseClient && !reviewId.startsWith('local_')) {
+        try {
+          await supabaseClient.from('store_reviews').delete().eq('id', reviewId);
+        } catch(e) {
+          console.warn('Delete review Supabase error:', e);
+        }
+      }
+      
+      loadAdminStats();
+    }
+
+    async function syncSupabaseData() {
+      if (!supabaseClient) return;
+      try {
+        const { data: stats } = await supabaseClient.from('store_stats').select('*');
+        if (stats) {
+          stats.forEach(row => {
+            localStatsCache[row.store_id] = {
+              whatsapp_clicks: row.whatsapp_clicks || 0,
+              instagram_clicks: row.instagram_clicks || 0,
+              maps_clicks: row.maps_clicks || 0,
+              likes: row.likes || 0
+            };
+          });
+          localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+        }
+        
+        const { data: reviews } = await supabaseClient.from('store_reviews').select('*');
+        if (reviews) {
+          const grouped = {};
+          reviews.forEach(r => {
+            if (!grouped[r.store_id]) grouped[r.store_id] = [];
+            grouped[r.store_id].push(r);
+          });
+          localReviewsCache = grouped;
+          localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+        }
+
+        renderStores();
+      } catch(e) {
+        console.warn('Initial Supabase sync fallback:', e);
+      }
+    }
+
     // INICIALIZAÇÃO
     window.onload = function() {
+      trackSiteVisit();
       renderStores();
+      syncSupabaseData();
       lucide.createIcons();
     };
   </script>
