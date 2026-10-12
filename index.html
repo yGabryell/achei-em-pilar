@@ -31,14 +31,14 @@
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            heading: ['Syne', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
             sans: ['Plus Jakarta Sans', 'sans-serif'],
           },
           colors: {
@@ -63,28 +63,28 @@
 <body class="bg-slate-100 text-slate-800 font-sans pb-24 md:pb-12 antialiased selection:bg-emerald-500 selection:text-white">
 
   <!-- ================= CABEÇALHO / NAVBAR ================= -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-    <div class="max-w-4xl mx-auto px-4 h-15 flex items-center justify-between">
-      <div class="flex items-center gap-2 min-w-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-heading font-extrabold text-lg shadow-md shrink-0">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-3.5 sm:py-4">
+    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
           P
         </div>
         <div class="min-w-0">
-          <span class="font-heading font-extrabold text-base text-slate-900 leading-tight block whitespace-nowrap truncate">Achei em Pilar</span>
-          <span class="text-[10px] text-emerald-700 font-bold block whitespace-nowrap">Chã do Pilar & Centro • AL</span>
+          <span class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight block whitespace-nowrap tracking-tight">Achei em Pilar</span>
+          <span class="text-[11px] text-emerald-700 font-bold block whitespace-nowrap tracking-wide">Chã do Pilar & Centro • AL</span>
         </div>
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
         <!-- BOTÃO CADASTRAR LOJA -->
-        <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 shrink-0">
+        <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Cadastrar Meu Negócio</span>
           <span class="sm:hidden">Cadastrar</span>
         </button>
 
         <!-- BOTÃO ACESSO ADM -->
-        <button onclick="openAdminModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-xl border border-slate-200 transition shrink-0" title="Painel Administrativo">
+        <button onclick="openAdminModal()" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 w-9 h-9 rounded-xl border border-slate-200 transition flex items-center justify-center shrink-0" title="Painel Administrativo">
           <i data-lucide="lock" class="w-4 h-4"></i>
         </button>
       </div>
