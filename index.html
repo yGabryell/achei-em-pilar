@@ -285,48 +285,69 @@
 
   <!-- ================= MODAL DE AVALIAÇÕES E COMENTÁRIOS DOS MORADORES ================= -->
   <div id="reviewsModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeReviewsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <div class="flex items-center gap-2.5 mb-2">
-        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-          <i data-lucide="message-square" class="w-4 h-4"></i>
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <!-- CABEÇALHO ELEGANTE -->
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100 mb-3">
+        <div class="flex items-center gap-3 min-w-0 pr-6">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 block">Opiniões & Avaliações</span>
+            <h3 id="reviewsStoreTitle" class="font-bold text-sm sm:text-base text-slate-900 truncate">Avaliações</h3>
+          </div>
         </div>
-        <div>
-          <h3 id="reviewsStoreTitle" class="font-heading font-extrabold text-base text-slate-900 leading-tight">Avaliações</h3>
-          <p class="text-[11px] text-slate-400">Opiniões de moradores e clientes</p>
-        </div>
+        <button onclick="closeReviewsModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition shrink-0" title="Fechar">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
       <!-- LISTA DE COMENTÁRIOS -->
-      <div id="reviewsList" class="my-4 space-y-2.5 max-h-56 overflow-y-auto pr-1">
+      <div id="reviewsList" class="my-3 space-y-2.5 max-h-56 overflow-y-auto pr-1">
         <p class="text-xs text-slate-400 text-center py-4">Carregando avaliações...</p>
       </div>
 
       <!-- FORMULÁRIO DE NOVA AVALIAÇÃO -->
-      <form onsubmit="handleSendReview(event)" class="border-t border-slate-100 pt-3 space-y-2.5">
+      <form onsubmit="handleSendReview(event)" class="border-t border-slate-100 pt-3 space-y-3">
         <input type="hidden" id="revStoreId" value="">
+        
         <div>
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Seu Nome *</label>
-          <input type="text" id="revAuthor" required placeholder="Ex: Maria Clara, João..." class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Seu Nome *</label>
+          <input type="text" id="revAuthor" required placeholder="Ex: Maria Clara, João..." class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
         </div>
+
+        <!-- SELETOR INTERATIVO DE ESTRELAS (SEM DROPDOWN NATIVO FEIO) -->
         <div>
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sua Nota *</label>
-          <select id="revRating" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-            <option value="5">⭐⭐⭐⭐⭐ Excelente (5 estrelas)</option>
-            <option value="4">⭐⭐⭐⭐ Muito bom (4 estrelas)</option>
-            <option value="3">⭐⭐⭐ Bom (3 estrelas)</option>
-            <option value="2">⭐⭐ Regular (2 estrelas)</option>
-            <option value="1">⭐ Ruim (1 estrela)</option>
-          </select>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Sua Nota *</label>
+          <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2">
+            <div class="flex items-center gap-1" id="starRatingContainer">
+              <button type="button" onclick="setReviewRating(1)" class="star-btn p-1 transition transform active:scale-90" data-val="1">
+                <svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <button type="button" onclick="setReviewRating(2)" class="star-btn p-1 transition transform active:scale-90" data-val="2">
+                <svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <button type="button" onclick="setReviewRating(3)" class="star-btn p-1 transition transform active:scale-90" data-val="3">
+                <svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <button type="button" onclick="setReviewRating(4)" class="star-btn p-1 transition transform active:scale-90" data-val="4">
+                <svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <button type="button" onclick="setReviewRating(5)" class="star-btn p-1 transition transform active:scale-90" data-val="5">
+                <svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+            </div>
+            <span id="starRatingLabel" class="text-[11px] font-extrabold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg">Excelente (5)</span>
+            <input type="hidden" id="revRating" value="5">
+          </div>
         </div>
+
         <div>
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sua Opinião ou Recomendação *</label>
-          <textarea id="revComment" required rows="2" placeholder="Ex: Atendimento excelente, entrega rápida e lanche delicioso!" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Sua Opinião ou Recomendação *</label>
+          <textarea id="revComment" required rows="2" placeholder="Ex: Atendimento excelente, entrega rápida e lanche delicioso!" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 resize-none"></textarea>
         </div>
-        <button type="submit" id="revSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
+
+        <button type="submit" id="revSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
           <i data-lucide="send" class="w-3.5 h-3.5"></i> Publicar Avaliação
         </button>
       </form>
@@ -1495,10 +1516,38 @@
     // ================= MODAL DE AVALIAÇÕES E COMENTÁRIOS DOS MORADORES =================
     let currentReviewStoreId = null;
 
+    function setReviewRating(rating) {
+      const inputEl = document.getElementById('revRating');
+      if (inputEl) inputEl.value = rating;
+
+      const labels = {
+        5: 'Excelente (5)',
+        4: 'Muito bom (4)',
+        3: 'Bom (3)',
+        2: 'Regular (2)',
+        1: 'Ruim (1)'
+      };
+      const labelEl = document.getElementById('starRatingLabel');
+      if (labelEl) labelEl.innerText = labels[rating] || `${rating} estrelas`;
+
+      document.querySelectorAll('#starRatingContainer .star-btn').forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-val'), 10);
+        const svg = btn.querySelector('svg');
+        if (svg) {
+          if (val <= rating) {
+            svg.setAttribute('class', 'w-7 h-7 fill-amber-400 text-amber-400');
+          } else {
+            svg.setAttribute('class', 'w-7 h-7 fill-slate-200 text-slate-200');
+          }
+        }
+      });
+    }
+
     async function openReviewsModal(storeId, storeName) {
       currentReviewStoreId = storeId;
       document.getElementById('revStoreId').value = storeId;
-      document.getElementById('reviewsStoreTitle').innerText = `Opiniões • ${storeName}`;
+      document.getElementById('reviewsStoreTitle').innerText = storeName;
+      setReviewRating(5);
       document.getElementById('reviewsModal').classList.remove('hidden');
       await loadStoreReviews(storeId);
       lucide.createIcons();
@@ -1538,10 +1587,10 @@
 
       if (!reviews || reviews.length === 0) {
         listEl.innerHTML = `
-          <div class="text-center py-6 px-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <i data-lucide="message-square-plus" class="w-7 h-7 mx-auto text-slate-300 mb-1.5"></i>
+          <div class="text-center py-5 px-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <i data-lucide="message-square-plus" class="w-6 h-6 mx-auto text-emerald-500 mb-1.5"></i>
             <p class="text-xs font-bold text-slate-700">Seja o primeiro a avaliar!</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Conte para os moradores de Pilar como foi sua experiência.</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Dê sua nota de 1 a 5 estrelas e ajude os moradores de Pilar.</p>
           </div>
         `;
         lucide.createIcons();
@@ -1549,13 +1598,18 @@
       }
       
       listEl.innerHTML = reviews.map(rev => `
-        <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-2xl">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-slate-800">${escapeHtml(rev.author_name)}</span>
-            <span class="text-[11px] text-amber-500">${'⭐'.repeat(Math.max(1, Math.min(5, rev.rating || 5)))}</span>
+        <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-2xl flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+            ${escapeHtml((rev.author_name || 'M').charAt(0).toUpperCase())}
           </div>
-          <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(rev.comment)}</p>
-          <span class="text-[9px] text-slate-400 block mt-1.5">${rev.created_at ? new Date(rev.created_at).toLocaleDateString('pt-BR') : 'Hoje'}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-0.5">
+              <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(rev.author_name)}</span>
+              <span class="text-[11px] text-amber-500 shrink-0">${'⭐'.repeat(Math.max(1, Math.min(5, rev.rating || 5)))}</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(rev.comment)}</p>
+            <span class="text-[9px] text-slate-400 block mt-1">${rev.created_at ? new Date(rev.created_at).toLocaleDateString('pt-BR') : 'Hoje'}</span>
+          </div>
         </div>
       `).join('');
     }
