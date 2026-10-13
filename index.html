@@ -252,11 +252,20 @@
           </div>
         </div>
 
-        <!-- QR CODE PIX OFICIAL -->
+        <!-- QR CODE PIX OFICIAL COM STATUS EM TEMPO REAL -->
         <div class="my-3 flex justify-center">
-          <div class="p-2 bg-white rounded-2xl border-2 border-slate-200 shadow-2xs inline-block">
+          <div class="p-2 bg-white rounded-2xl border-2 border-slate-200 shadow-2xs inline-block relative">
             <img id="pixQrImg" src="" alt="QR Code PIX" class="w-32 h-32 rounded-lg block">
+            <div id="pixLoadingSpinner" class="hidden absolute inset-0 bg-white/95 rounded-xl flex flex-col items-center justify-center gap-1 z-10">
+              <i data-lucide="loader" class="w-6 h-6 text-emerald-600 animate-spin"></i>
+              <span class="text-[10px] font-bold text-slate-600">Gerando Pix...</span>
+            </div>
           </div>
+        </div>
+
+        <div id="pixStatusBanner" class="mb-2 py-1.5 px-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center gap-1.5 text-[11px] text-emerald-800 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <span id="pixStatusText">Aguardando pagamento no app do banco...</span>
         </div>
 
         <!-- ÁREA DO CÓDIGO PIX COPIA E COLA OFICIAL (PADRÃO BACEN) -->
@@ -1761,16 +1770,88 @@
       return payload + getCrc16Pix(payload);
     }
 
-    function updatePixModalDisplay() {
-      const code = buildPixCopiaCola(currentPixAmount);
-      const txt = document.getElementById('pixCopiaColaDisplay');
-      if (txt) txt.value = code;
+    let currentPixPaymentId = null;
+    let pixPollingInterval = null;
 
-      const img = document.getElementById('pixQrImg');
-      if (img) {
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(code)}`;
+    function stopPixPolling() {
+      if (pixPollingInterval) {
+        clearInterval(pixPollingInterval);
+        pixPollingInterval = null;
+      }
+    }
+
+    function startPixPolling(paymentId) {
+      stopPixPolling();
+      if (!paymentId) return;
+
+      const startTime = Date.now();
+      const MAX_POLLING_TIME = 10 * 60 * 1000; // 10 minutos de monitoramento ativo
+
+      pixPollingInterval = setInterval(async () => {
+        try {
+          if (Date.now() - startTime > MAX_POLLING_TIME) {
+            stopPixPolling();
+            return;
+          }
+
+          const res = await fetch(`/api/check-pix-status?paymentId=${paymentId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === "approved" || data.isApproved) {
+              stopPixPolling();
+              // CONFIRMAÇÃO AUTOMÁTICA EM TEMPO REAL IGUAL AO SIM, ACEITO!
+              confirmPixSent();
+            }
+          }
+        } catch(e) {
+          console.warn('Verificação de Pix em background:', e);
+        }
+      }, 3500);
+    }
+
+    async function loadDynamicPix(amount) {
+      const spinner = document.getElementById('pixLoadingSpinner');
+      if (spinner) spinner.classList.remove('hidden');
+
+      const targetAmt = (amount && Number(amount) > 0) ? Number(amount) : 5;
+
+      try {
+        const res = await fetch('/api/create-pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: targetAmt, name: 'Apoiador Achei em Pilar' })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.paymentId && (data.qrCode || data.qrCodeBase64)) {
+            currentPixPaymentId = data.paymentId;
+
+            const txt = document.getElementById('pixCopiaColaDisplay');
+            if (txt) txt.value = data.qrCode;
+
+            const img = document.getElementById('pixQrImg');
+            if (img) {
+              img.src = data.qrCodeBase64
+                ? `data:image/png;base64,${data.qrCodeBase64}`
+                : `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data.qrCode)}`;
+            }
+
+            if (spinner) spinner.classList.add('hidden');
+            startPixPolling(data.paymentId);
+            return true;
+          }
+        }
+      } catch(err) {
+        console.warn('Fallback para Pix estático local:', err);
       }
 
+      if (spinner) spinner.classList.add('hidden');
+      return false;
+    }
+
+    async function updatePixModalDisplay() {
+      // Atualizar botões de valor
       [0, 2, 5, 10].forEach(val => {
         const btn = document.getElementById('pixBtn' + val);
         if (btn) {
@@ -1781,6 +1862,21 @@
           }
         }
       });
+
+      // Tentar gerar Pix dinâmico com confirmação automática pelo Mercado Pago
+      const success = await loadDynamicPix(currentPixAmount);
+
+      // Fallback estático caso a API esteja sem conexão imediata
+      if (!success) {
+        const code = buildPixCopiaCola(currentPixAmount);
+        const txt = document.getElementById('pixCopiaColaDisplay');
+        if (txt) txt.value = code;
+
+        const img = document.getElementById('pixQrImg');
+        if (img) {
+          img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(code)}`;
+        }
+      }
     }
 
     function selectPixAmount(val) {
@@ -1794,12 +1890,13 @@
       const successScreen = document.getElementById('donateSuccessScreen');
       if (paymentScreen) paymentScreen.classList.remove('hidden');
       if (successScreen) successScreen.classList.add('hidden');
-      updatePixModalDisplay();
       if (modal) modal.classList.remove('hidden');
+      updatePixModalDisplay();
       lucide.createIcons();
     }
 
     function closeDonateModal() {
+      stopPixPolling();
       const modal = document.getElementById('donateModal');
       if (modal) modal.classList.add('hidden');
       try { sessionStorage.setItem('pilar_donate_seen', '1'); } catch(e) {}
