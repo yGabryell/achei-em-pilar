@@ -3542,7 +3542,18 @@ ${details}
     async function syncSupabaseData() {
       if (!supabaseClient) return;
       try {
-        const { data: stats } = await supabaseClient.from('store_stats').select('*');
+        const [statsRes, reviewsRes, visitsRes] = await Promise.all([
+          supabaseClient.from('store_stats').select('*'),
+          supabaseClient.from('store_reviews').select('*'),
+          supabaseClient.from('site_visits').select('id', { count: 'exact', head: true })
+        ]);
+
+        if (visitsRes && typeof visitsRes.count === 'number') {
+          let curr = parseInt(localStorage.getItem('pilar_total_visits') || '0', 10);
+          localStorage.setItem('pilar_total_visits', Math.max(curr, visitsRes.count));
+        }
+
+        const stats = statsRes.data;
         if (stats) {
           stats.forEach(row => {
             localStatsCache[row.store_id] = {
@@ -3555,7 +3566,7 @@ ${details}
           localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
         }
         
-        const { data: reviews } = await supabaseClient.from('store_reviews').select('*');
+        const reviews = reviewsRes.data;
         if (reviews) {
           const grouped = {};
           reviews.forEach(r => {

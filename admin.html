@@ -1307,13 +1307,43 @@
     }
 
     // MÉTRICAS
-    function renderMetricsTab() {
+    async function renderMetricsTab() {
       let statsCache = {};
       try {
         statsCache = JSON.parse(localStorage.getItem('pilar_stats_cache') || '{}');
       } catch(e) {}
 
       let totalVisits = Number(localStorage.getItem('pilar_total_visits') || 0);
+
+      // Carregar métricas reais e contagem de acessos direto do Supabase
+      if (supabaseClient) {
+        try {
+          const [visitsRes, statsRes] = await Promise.all([
+            supabaseClient.from('site_visits').select('id', { count: 'exact', head: true }),
+            supabaseClient.from('store_stats').select('*')
+          ]);
+
+          if (visitsRes && typeof visitsRes.count === 'number') {
+            totalVisits = Math.max(totalVisits, visitsRes.count);
+            localStorage.setItem('pilar_total_visits', totalVisits);
+          }
+
+          if (statsRes && statsRes.data) {
+            statsRes.data.forEach(row => {
+              statsCache[row.store_id] = {
+                whatsapp: Math.max(row.whatsapp_clicks || 0, statsCache[row.store_id]?.whatsapp || 0),
+                instagram: Math.max(row.instagram_clicks || 0, statsCache[row.store_id]?.instagram || 0),
+                maps: Math.max(row.maps_clicks || 0, statsCache[row.store_id]?.maps || 0),
+                likes: Math.max(row.likes || 0, statsCache[row.store_id]?.likes || 0)
+              };
+            });
+            localStorage.setItem('pilar_stats_cache', JSON.stringify(statsCache));
+          }
+        } catch(err) {
+          console.warn('Erro ao carregar métricas da nuvem:', err);
+        }
+      }
+
       let totalZap = 0;
       let totalInsta = 0;
       let totalLikes = 0;
@@ -1325,10 +1355,14 @@
         totalLikes += (stat.likes || s.likes || 0);
       });
 
-      document.getElementById('statVisitsCount').innerText = totalVisits;
-      document.getElementById('statZapCount').innerText = totalZap;
-      document.getElementById('statInstaCount').innerText = totalInsta;
-      document.getElementById('statLikesCount').innerText = totalLikes;
+      const visitsEl = document.getElementById('statVisitsCount');
+      if (visitsEl) visitsEl.innerText = totalVisits;
+      const zapEl = document.getElementById('statZapCount');
+      if (zapEl) zapEl.innerText = totalZap;
+      const instaEl = document.getElementById('statInstaCount');
+      if (instaEl) instaEl.innerText = totalInsta;
+      const likesEl = document.getElementById('statLikesCount');
+      if (likesEl) likesEl.innerText = totalLikes;
 
       const tbody = document.getElementById('metricsTableBody');
       const sorted = [...storesData].sort((a, b) => {
