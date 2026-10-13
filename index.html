@@ -204,8 +204,8 @@
     <p class="mt-2 text-[11px] text-slate-500 font-medium">Desenvolvido por Gabriel Alves</p>
   </footer>
 
-  <!-- ================= BOTÃO FLUTUANTE DE DOAÇÃO (FAB) ================= -->
-  <div id="floatingDonateBtn" class="fixed bottom-5 right-4 sm:right-6 z-40">
+  <!-- ================= BOTÃO FLUTUANTE DE DOAÇÃO (FAB - CANTO ESQUERDO PARA NÃO BATER NO NETLIFY) ================= -->
+  <div id="floatingDonateBtn" class="fixed bottom-5 left-4 sm:left-6 z-40">
     <button onclick="openDonateModal()" class="group bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs sm:text-sm pl-3.5 pr-4 py-3 rounded-full shadow-2xl shadow-orange-600/40 border-2 border-white/90 flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
       <span class="flex h-2.5 w-2.5 relative">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -302,12 +302,9 @@
           <p class="text-[11px] text-emerald-800">Seu incentivo ajuda a custear hospedagem, banco de dados e a expansão de novos comércios.</p>
         </div>
 
-        <div class="mt-5 space-y-2">
-          <button onclick="sendReceiptWhatsapp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold py-3 rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Enviar Comprovante no WhatsApp (Opcional)
-          </button>
-          <button onclick="closeDonateModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition cursor-pointer">
-            Concluir e Voltar ao Guia
+        <div class="mt-5">
+          <button onclick="closeDonateModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold py-3 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="check" class="w-4 h-4"></i> Concluir e Voltar ao Guia
           </button>
         </div>
       </div>
