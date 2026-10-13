@@ -2712,6 +2712,7 @@ ${details}
       raw = raw || '';
       let likes = 0;
       let dislikes = 0;
+      let replies = [];
       
       const reactMatch = raw.match(/\n*\s*\[REACTIONS:(\d+),(\d+)\]/);
       if (reactMatch) {
@@ -2720,29 +2721,44 @@ ${details}
         raw = raw.replace(reactMatch[0], '');
       }
 
+      const repliesMatch = raw.match(/\n*\s*\[REPLIES_START\]([\s\S]*?)\[REPLIES_END\]/);
+      if (repliesMatch) {
+        try {
+          replies = JSON.parse(repliesMatch[1]) || [];
+        } catch(e) {
+          replies = [];
+        }
+        raw = raw.replace(repliesMatch[0], '');
+      }
+
+      // Suporte legado a "[RESPOSTA DO ESTABELECIMENTO]: ..."
       const delimiter = '\n\n[RESPOSTA DO ESTABELECIMENTO]: ';
       if (raw.includes(delimiter)) {
         const parts = raw.split(delimiter);
-        return {
-          userComment: parts[0].trim(),
-          replyText: (parts[1] || '').trim(),
-          likes,
-          dislikes
-        };
+        const legacyText = (parts[1] || '').trim();
+        if (legacyText && replies.length === 0) {
+          replies.push({
+            author: 'Estabelecimento',
+            is_owner: true,
+            text: legacyText,
+            date: ''
+          });
+        }
+        raw = parts[0];
       }
 
       return {
         userComment: raw.trim(),
-        replyText: '',
+        replies,
         likes,
         dislikes
       };
     }
 
-    function buildReviewComment(userComment, replyText, likes, dislikes) {
+    function buildReviewComment(userComment, replies, likes, dislikes) {
       let result = (userComment || '').trim();
-      if (replyText && replyText.trim()) {
-        result += '\n\n[RESPOSTA DO ESTABELECIMENTO]: ' + replyText.trim();
+      if (Array.isArray(replies) && replies.length > 0) {
+        result += '\n\n[REPLIES_START]' + JSON.stringify(replies) + '[REPLIES_END]';
       }
       if (likes > 0 || dislikes > 0) {
         result += '\n\n[REACTIONS:' + Math.max(0, likes) + ',' + Math.max(0, dislikes) + ']';
@@ -2786,7 +2802,7 @@ ${details}
         targetReview = localReviewsCache[storeId].find(item => String(item.id) === String(reviewId));
       }
       const rawComment = targetReview ? (targetReview.comment || '') : '';
-      let { userComment, replyText, likes, dislikes } = parseReviewComment(rawComment);
+      let { userComment, replies, likes, dislikes } = parseReviewComment(rawComment);
 
       if (type === 'up') {
         if (currentVote === 'up') {
@@ -2814,12 +2830,13 @@ ${details}
 
       localStorage.setItem('pilar_review_votes', JSON.stringify(localReviewVotes));
 
-      const updatedComment = buildReviewComment(userComment, replyText, likes, dislikes);
+      const updatedComment = buildReviewComment(userComment, replies, likes, dislikes);
 
       if (targetReview) {
         targetReview.comment = updatedComment;
         targetReview.likes = likes;
         targetReview.dislikes = dislikes;
+        targetReview.replies = replies;
         localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
       }
 
@@ -2843,32 +2860,69 @@ ${details}
         box.classList.toggle('hidden');
         if (!box.classList.contains('hidden')) {
           if (window.lucide) lucide.createIcons();
+          const authorInput = document.getElementById(`replyAuthor-${reviewId}`);
+          if (authorInput && !authorInput.value) {
+            authorInput.value = localStorage.getItem('pilar_user_name') || '';
+          }
           const txt = document.getElementById(`replyText-${reviewId}`);
           if (txt) setTimeout(() => txt.focus(), 80);
         }
       }
     }
 
-    async function submitStoreReply(reviewId, storeId) {
+    function toggleReplyRoleNotice(reviewId) {
+      const roleSelect = document.getElementById(`replyRole-${reviewId}`);
+      const notice = document.getElementById(`replyRoleNotice-${reviewId}`);
+      if (roleSelect && notice) {
+        if (roleSelect.value === 'owner') {
+          notice.classList.remove('hidden');
+        } else {
+          notice.classList.add('hidden');
+        }
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function submitReviewReply(reviewId, storeId) {
+      const authorInput = document.getElementById(`replyAuthor-${reviewId}`);
+      const roleSelect = document.getElementById(`replyRole-${reviewId}`);
       const textarea = document.getElementById(`replyText-${reviewId}`);
+
+      const authorName = authorInput ? authorInput.value.trim() : '';
+      const isOwner = roleSelect ? (roleSelect.value === 'owner') : false;
       const replyText = textarea ? textarea.value.trim() : '';
-      if (!replyText) {
-        alert('Por favor, escreva a resposta do estabelecimento.');
+
+      if (!authorName) {
+        alert('Por favor, informe seu nome para responder.');
+        if (authorInput) authorInput.focus();
         return;
       }
 
-      // Verificar autorização do proprietário / administrador
-      const token = sessionStorage.getItem('pilar_admin_token');
-      const isLogged = token || isAdminLoggedIn;
+      if (!replyText) {
+        alert('Por favor, escreva a sua resposta.');
+        if (textarea) textarea.focus();
+        return;
+      }
 
-      if (!isLogged) {
-        const pass = prompt('Confirme a senha de administrador ou do estabelecimento para publicar a resposta:');
-        if (pass === null) return;
-        const inputHash = await hashAdminPassword((pass || '').trim());
-        const targetHash = getStoredAdminHash();
-        if (inputHash !== targetHash && (pass || '').trim() !== 'Gabriel@Pilar2026') {
-          alert('Senha incorreta! Apenas o estabelecimento ou administrador pode responder.');
-          return;
+      // Lembrar o nome do morador no navegador para próximas respostas
+      if (!isOwner) {
+        localStorage.setItem('pilar_user_name', authorName);
+      }
+
+      // Se marcou que é o Estabelecimento/Proprietário, validar autorização
+      if (isOwner) {
+        const token = sessionStorage.getItem('pilar_admin_token');
+        const isLogged = token || isAdminLoggedIn;
+
+        if (!isLogged) {
+          const pass = prompt('Confirme a senha de administrador ou do estabelecimento para publicar como Estabelecimento:');
+          if (pass === null) return;
+          const inputHash = await hashAdminPassword((pass || '').trim());
+          const targetHash = getStoredAdminHash();
+          if (inputHash !== targetHash && (pass || '').trim() !== 'Gabriel@Pilar2026') {
+            alert('Senha incorreta! Se você é um morador ou cliente, selecione a opção "Sou Morador / Cliente".');
+            return;
+          }
         }
       }
 
@@ -2878,7 +2932,16 @@ ${details}
       }
       const rawComment = targetReview ? (targetReview.comment || '') : '';
       const parsed = parseReviewComment(rawComment);
-      const updatedComment = buildReviewComment(parsed.userComment, replyText, parsed.likes, parsed.dislikes);
+
+      const newReply = {
+        author: authorName,
+        is_owner: isOwner,
+        text: replyText,
+        date: new Date().toLocaleDateString('pt-BR')
+      };
+
+      const replies = Array.isArray(parsed.replies) ? [...parsed.replies, newReply] : [newReply];
+      const updatedComment = buildReviewComment(parsed.userComment, replies, parsed.likes, parsed.dislikes);
 
       // 1. Atualizar no Supabase
       if (supabaseClient && !String(reviewId).startsWith('local_')) {
@@ -2895,13 +2958,14 @@ ${details}
       // 2. Atualizar no cache local
       if (targetReview) {
         targetReview.comment = updatedComment;
-        targetReview.reply_text = replyText;
+        targetReview.replies = replies;
         localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
       }
 
-      alert('Resposta do estabelecimento publicada com sucesso!');
+      alert(isOwner ? 'Resposta oficial do estabelecimento publicada com sucesso!' : 'Sua resposta foi publicada com sucesso!');
       await loadStoreReviews(storeId);
     }
+    const submitStoreReply = submitReviewReply;
 
     function closeReviewsModal() {
       document.getElementById('reviewsModal').classList.add('hidden');
@@ -2949,8 +3013,7 @@ ${details}
       
       listEl.innerHTML = reviews.map(rev => {
         const rawComment = rev.comment || '';
-        const { userComment, replyText: parsedReply, likes, dislikes } = parseReviewComment(rawComment);
-        const replyBody = rev.reply_text || parsedReply;
+        const { userComment, replies, likes, dislikes } = parseReviewComment(rawComment);
         const revIdStr = String(rev.id || '');
         const userVote = localReviewVotes[rev.id];
 
@@ -2990,38 +3053,64 @@ ${details}
                     <span id="countVoteDown-${escapeHtml(revIdStr)}">${dislikes > 0 ? dislikes : ''}</span>
                   </button>
 
-                  <!-- BOTÃO RESPONDER -->
-                  ${!replyBody ? `
-                    <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[10.5px] font-bold text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg transition flex items-center gap-1 cursor-pointer ml-1" title="Responder avaliação">
-                      <i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-600"></i> Responder
-                    </button>
-                  ` : ''}
+                  <!-- BOTÃO RESPONDER (SEMPRE DISPONÍVEL) -->
+                  <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[10.5px] font-bold text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg transition flex items-center gap-1 cursor-pointer ml-1" title="Responder ou comentar nesta avaliação">
+                    <i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-600"></i> Responder
+                  </button>
                 </div>
               </div>
 
-              <!-- RESPOSTA DO ESTABELECIMENTO -->
-              ${replyBody ? `
-                <div class="mt-2.5 ml-1 pl-2.5 border-l-2 border-emerald-500 bg-emerald-50/70 rounded-r-xl p-2.5">
-                  <div class="flex items-center justify-between text-[11px] mb-1">
-                    <span class="font-extrabold text-emerald-800 flex items-center gap-1">
-                      <i data-lucide="corner-down-right" class="w-3.5 h-3.5 text-emerald-600"></i> Resposta do Estabelecimento
-                    </span>
-                    <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[10px] text-emerald-700 hover:underline font-bold" title="Editar Resposta">
-                      Editar
-                    </button>
-                  </div>
-                  <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(replyBody)}</p>
+              <!-- LISTA DE RESPOSTAS (ESTABELECIMENTO E MORADORES) -->
+              ${replies && replies.length > 0 ? `
+                <div class="mt-2.5 space-y-2">
+                  ${replies.map(rep => {
+                    const isOwn = !!rep.is_owner;
+                    return `
+                      <div class="ml-1 pl-2.5 border-l-2 ${isOwn ? 'border-emerald-500 bg-emerald-50/80' : 'border-sky-400 bg-sky-50/70'} rounded-r-xl p-2.5">
+                        <div class="flex items-center justify-between text-[11px] mb-1">
+                          <span class="font-extrabold ${isOwn ? 'text-emerald-900' : 'text-slate-800'} flex items-center gap-1.5">
+                            <i data-lucide="${isOwn ? 'badge-check' : 'message-circle'}" class="w-3.5 h-3.5 ${isOwn ? 'text-emerald-600' : 'text-sky-600'}"></i>
+                            <span>${escapeHtml(rep.author || (isOwn ? 'Estabelecimento' : 'Morador'))}</span>
+                            <span class="text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider ${isOwn ? 'bg-emerald-200 text-emerald-800' : 'bg-sky-100 text-sky-800'}">
+                              ${isOwn ? 'Estabelecimento' : 'Morador / Cliente'}
+                            </span>
+                          </span>
+                          <span class="text-[9px] ${isOwn ? 'text-emerald-700/70' : 'text-slate-400'}">${escapeHtml(rep.date || '')}</span>
+                        </div>
+                        <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(rep.text || '')}</p>
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
               ` : ''}
 
               <!-- FORMULÁRIO DE RESPOSTA EXPANSÍVEL -->
-              <div id="replyBox-${escapeHtml(revIdStr)}" class="hidden mt-2 pt-2 border-t border-slate-200">
-                <textarea id="replyText-${escapeHtml(revIdStr)}" rows="2" placeholder="Escreva a resposta do estabelecimento para ${escapeHtml(rev.author_name)}..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed resize-none">${escapeHtml(replyBody)}</textarea>
-                <div class="flex items-center justify-end gap-1.5 mt-1.5">
-                  <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[11px] font-bold text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-lg cursor-pointer">Cancelar</button>
-                  <button type="button" onclick="submitStoreReply('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-xl transition active:scale-95 shadow-2xs cursor-pointer flex items-center gap-1">
-                    <i data-lucide="send" class="w-3 h-3"></i> Publicar Resposta
-                  </button>
+              <div id="replyBox-${escapeHtml(revIdStr)}" class="hidden mt-2.5 pt-2.5 border-t border-slate-200">
+                <div class="bg-white border border-slate-200 rounded-xl p-2.5 shadow-2xs space-y-2">
+                  <div>
+                    <label class="block text-[10.5px] font-bold text-slate-700 mb-1">Quem está respondendo?</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      <input type="text" id="replyAuthor-${escapeHtml(revIdStr)}" placeholder="Seu nome..." value="${escapeHtml(localStorage.getItem('pilar_user_name') || '')}" class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                      <select id="replyRole-${escapeHtml(revIdStr)}" onchange="toggleReplyRoleNotice('${escapeHtml(revIdStr)}')" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-700 cursor-pointer">
+                        <option value="client">👤 Morador / Cliente</option>
+                        <option value="owner">🏪 Estabelecimento / Dono</option>
+                      </select>
+                    </div>
+                    <p id="replyRoleNotice-${escapeHtml(revIdStr)}" class="hidden text-[10px] text-amber-600 mt-1 font-semibold flex items-center gap-1">
+                      <i data-lucide="shield-alert" class="w-3 h-3"></i> Resposta como estabelecimento requer a senha de confirmação.
+                    </p>
+                  </div>
+
+                  <div>
+                    <textarea id="replyText-${escapeHtml(revIdStr)}" rows="2" placeholder="Escreva sua resposta para ${escapeHtml(rev.author_name)} (concordando, opinando ou respondendo)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed resize-none"></textarea>
+                  </div>
+
+                  <div class="flex items-center justify-end gap-1.5 pt-0.5">
+                    <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[11px] font-bold text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onclick="submitReviewReply('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-xl transition active:scale-95 shadow-2xs cursor-pointer flex items-center gap-1">
+                      <i data-lucide="send" class="w-3 h-3"></i> Publicar Resposta
+                    </button>
+                  </div>
                 </div>
               </div>
 
