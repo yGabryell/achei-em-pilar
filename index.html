@@ -479,7 +479,7 @@
         </div>
         <div>
           <h3 class="text-base font-extrabold text-slate-900 leading-tight">Sugerir Edição</h3>
-          <p class="text-xs text-slate-400 font-medium">Estilo Google: Mantenha os dados atualizados</p>
+          <p class="text-xs text-slate-400 font-medium">Mantenha os dados do estabelecimento atualizados</p>
         </div>
       </div>
 
@@ -1464,7 +1464,7 @@
 
               <!-- BARRA DE AVALIAÇÕES E SUGERIR EDIÇÃO (ESTILO GOOGLE MAPS) -->
               <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-                <button onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 px-2 py-1 rounded-xl transition border border-slate-200/60" title="Ver avaliações no estilo Google">
+                <button onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 px-2 py-1 rounded-xl transition border border-slate-200/60" title="Ver avaliações dos clientes">
                   <svg class="w-3.5 h-3.5 ${ratingData.count > 0 ? 'fill-[#FBBC04] text-[#FBBC04]' : 'fill-slate-300 text-slate-300'} shrink-0" viewBox="0 0 24 24">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                   </svg>
@@ -2497,11 +2497,8 @@
       const details = document.getElementById('suggestDetails').value.trim();
 
       const admZap = "5582991008045";
-      const texto = `Olá, Gabriel! Gostaria de sugerir uma alteração de dados no *Achei em Pilar* (estilo Google):
-
-` +
-                    `🏢 *Estabelecimento:* ${storeName}
-` +
+      const texto = `Olá, Gabriel! Gostaria de sugerir uma alteração de dados no *Achei em Pilar*:\n\n` +
+                    `🏢 *Estabelecimento:* ${storeName}\n` +
                     `👤 *Solicitante:* ${author} (${role})
 ` +
                     `📝 *O que atualizar:* 
