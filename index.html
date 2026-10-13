@@ -386,6 +386,7 @@
             <h3 class="font-heading font-extrabold text-base text-slate-900">Painel de Gerenciamento</h3>
             <span class="text-[11px] text-emerald-700 font-bold">Modo Administrador Ativo</span>
           </div>
+          <div class="flex items-center gap-1.5 flex-wrap">
             <button onclick="syncAllStoresToSupabase()" id="btnSyncCloud" class="text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1" title="Subir catálogo para a nuvem do Supabase">
               <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> Salvar na Nuvem
             </button>
@@ -1206,12 +1207,22 @@
       } else {
         document.getElementById('adminLoginSection').classList.remove('hidden');
         document.getElementById('adminDashboardSection').classList.add('hidden');
+        const passInput = document.getElementById('adminPassInput');
+        if (passInput) {
+          passInput.value = '';
+          setTimeout(() => passInput.focus(), 150);
+        }
       }
       lucide.createIcons();
     }
 
     function closeAdminModal() {
       document.getElementById('adminModal').classList.add('hidden');
+      isAdminLoggedIn = false;
+      const passInput = document.getElementById('adminPassInput');
+      if (passInput) passInput.value = '';
+      document.getElementById('adminLoginSection').classList.remove('hidden');
+      document.getElementById('adminDashboardSection').classList.add('hidden');
     }
 
     function getAdminPin() {
