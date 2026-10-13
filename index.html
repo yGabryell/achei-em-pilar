@@ -1691,13 +1691,35 @@
         return;
       }
 
+      // 1. Tentar autenticação segura no backend Vercel (com Variáveis de Ambiente)
+      try {
+        const authRes = await fetch('/api/admin-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          if (authData.token) {
+            sessionStorage.setItem('pilar_admin_token', authData.token);
+            failedAdminAttempts = 0;
+            isAdminLoggedIn = true;
+            try { localStorage.removeItem('pilar_admin_pin'); } catch(e) {}
+            showAdminDashboard();
+            return;
+          }
+        }
+      } catch(apiErr) {
+        console.warn('Backend auth offline, usando fallback local com hash:', apiErr);
+      }
+
+      // 2. Fallback de validação local por SHA-256 salted hash
       const inputHash = await hashAdminPassword(pass);
       const targetHash = getStoredAdminHash();
 
       if (inputHash === targetHash) {
         failedAdminAttempts = 0;
         isAdminLoggedIn = true;
-        // Limpar vestígios da senha antiga insegura do localStorage caso existissem
         try { localStorage.removeItem('pilar_admin_pin'); } catch(e) {}
         showAdminDashboard();
       } else {
@@ -2203,12 +2225,30 @@
     }
 
     async function saveStoreToCloud(store) {
+      const token = sessionStorage.getItem('pilar_admin_token');
+      // 1. Tentar salvar via backend seguro (/api/admin-store)
+      if (token) {
+        try {
+          const res = await fetch('/api/admin-store', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ action: 'save', store })
+          });
+          if (res.ok) return true;
+        } catch(apiErr) {
+          console.warn('Falha no salvamento via backend seguro, tentando fallback direto:', apiErr);
+        }
+      }
+
+      // 2. Fallback direto cliente-servidor (Supabase)
       if (!supabaseClient) return false;
       try {
         let payload = cleanStoreForSupabase(store, true);
         let { error } = await supabaseClient.from('stores').upsert([payload]);
         if (error && (error.code === 'PGRST204' || String(error.message || '').includes('column'))) {
-          // Fallback seguro caso as colunas site/maps_url ainda não existam no Supabase
           payload = cleanStoreForSupabase(store, false);
           const retry = await supabaseClient.from('stores').upsert([payload]);
           error = retry.error;
@@ -2239,7 +2279,25 @@
         stores = stores.filter(s => String(s.id) !== String(id));
         saveStores(stores);
 
-        if (supabaseClient) {
+        const token = sessionStorage.getItem('pilar_admin_token');
+        let deletedViaApi = false;
+        if (token) {
+          try {
+            const apiRes = await fetch('/api/admin-store', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ action: 'delete', storeId: id })
+            });
+            if (apiRes.ok) deletedViaApi = true;
+          } catch(apiErr) {
+            console.warn('Falha na deleção via backend seguro:', apiErr);
+          }
+        }
+
+        if (!deletedViaApi && supabaseClient) {
           try {
             await supabaseClient.from('stores').delete().eq('id', id);
           } catch(e) {
