@@ -1291,7 +1291,7 @@
       const desc = document.getElementById('pubDescricao').value;
 
       // Mensagem que será enviada direto para o WhatsApp do Gabriel (Administrador)
-      const admZap = "5582999990000"; // Seu número oficial!
+      const admZap = "5582991008045"; // Número oficial de Gabriel Alves!
       const texto = `Olá! Gostaria de cadastrar meu negócio no *Achei em Pilar*:\n\n` +
                     `🏢 *Nome:* ${nome}\n` +
                     `📁 *Categoria:* ${categoria}\n` +
@@ -1476,7 +1476,7 @@
     }
 
     function sendReceiptWhatsapp() {
-      const zap = '5582999990000';
+      const zap = '5582991008045';
       const valText = currentPixAmount > 0 ? ` no valor de R$ ${currentPixAmount},00` : '';
       const msg = `Olá Gabriel! Acabei de enviar uma doação PIX${valText} para apoiar o Achei em Pilar! ❤️ Segue o comprovante:`;
       window.open(`https://wa.me/${zap}?text=${encodeURIComponent(msg)}`, '_blank');
