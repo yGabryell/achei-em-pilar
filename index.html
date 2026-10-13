@@ -353,14 +353,18 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp com DDD (somente números) *</label>
-            <input type="tel" id="pubWhatsapp" required placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+            <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp com DDD</label>
+            <input type="tel" id="pubWhatsapp" placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (@da_loja - opcional)</label>
-            <input type="text" id="pubInstagram" placeholder="Ex: @minhaloja_pilar" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-rose-500 outline-none">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Site / Link (opcional)</label>
+            <input type="text" id="pubSite" placeholder="Ex: www.minhaloja.com" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (opcional)</label>
+            <input type="text" id="pubInstagram" placeholder="Ex: @minhaloja_pilar" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-rose-500 outline-none">
           </div>
         </div>
 
@@ -581,27 +585,31 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">WhatsApp (DDD + Número) *</label>
-                  <input type="tel" id="admWhatsapp" required placeholder="82999990000" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">WhatsApp (DDD + Número)</label>
+                  <input type="tel" id="admWhatsapp" placeholder="82999990000" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Site / Link Externo (Opcional)</label>
+                  <input type="url" id="admSite" placeholder="https://sualoja.com.br" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
                 </div>
                 <div>
                   <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Instagram (@usuario)</label>
                   <input type="text" id="admInstagram" placeholder="@nomedaloja" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
                 </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
                   <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Horário / Funcionamento</label>
                   <input type="text" id="admHorario" placeholder="Ex: 18h às 23h" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
                 </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
                   <input type="text" id="admEndereco" placeholder="Ex: R. Dr. José Lages Filho, 111" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
                 </div>
                 <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Link Direto do Google Maps (Opcional)</label>
-                  <input type="url" id="admMapsUrl" placeholder="https://maps.app.goo.gl/... ou em branco" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Link Direto Google Maps</label>
+                  <input type="url" id="admMapsUrl" placeholder="https://maps.app.goo.gl/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
                 </div>
               </div>
 
@@ -1040,6 +1048,16 @@
       return '';
     }
 
+    function formatWebUrl(url) {
+      if (!url) return '';
+      let trimmed = url.trim();
+      if (!trimmed) return '';
+      if (!/^https?:\/\//i.test(trimmed)) {
+        trimmed = 'https://' + trimmed;
+      }
+      return sanitizeUrl(trimmed);
+    }
+
     // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS (VERSÃO 5 COM FOTOS REAIS DO INSTAGRAM)
     function getStores() {
       const stored = localStorage.getItem('pilar_stores_data_v6');
@@ -1094,7 +1112,7 @@
     function getStoreClicks(storeId) {
       const s = localStatsCache[storeId];
       if (!s) return 0;
-      return (s.whatsapp_clicks || 0) + (s.instagram_clicks || 0) + (s.maps_clicks || 0);
+      return (s.whatsapp_clicks || 0) + (s.site_clicks || 0) + (s.instagram_clicks || 0) + (s.maps_clicks || 0);
     }
 
     function getStoreGoogleRating(store) {
@@ -1251,6 +1269,10 @@
         const zapCleanDigits = (store.whatsapp || '').replace(/\D/g, '');
         const zapLink = `https://wa.me/${zapCleanDigits}?text=${zapMsg}`;
 
+        // Link do Site / Cardápio Online (sanitizado e formatado)
+        const rawSite = store.site || store.website || '';
+        const siteClean = formatWebUrl(rawSite);
+
         // Link do Instagram (Apenas se tiver usuário real preenchido, sanitizado contra caracteres perigosos)
         const rawInsta = store.instagram ? store.instagram.replace('@', '').trim() : '';
         const instaClean = rawInsta.replace(/[^a-zA-Z0-9._]/g, '');
@@ -1342,17 +1364,44 @@
               </div>
             </div>
 
-            <!-- BOTÕES DE AÇÃO COM LOGOS OFICIAIS: WHATSAPP, INSTAGRAM E GOOGLE MAPS (TOUCH TARGET 44PX) -->
+            <!-- BOTÕES DE AÇÃO COM LOGOS OFICIAIS: WHATSAPP, SITE, INSTAGRAM E GOOGLE MAPS (TOUCH TARGET 44PX) -->
             <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2">
-              <!-- BOTÃO WHATSAPP OFICIAL -->
-              <a href="${zapLink}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'whatsapp')" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
-                <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                </svg>
-                <span>WhatsApp</span>
-              </a>
+              ${zapCleanDigits ? `
+                <!-- BOTÃO WHATSAPP OFICIAL -->
+                <a href="${zapLink}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'whatsapp')" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
+                  <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                  </svg>
+                  <span>WhatsApp</span>
+                </a>
+              ` : (siteClean ? `
+                <!-- CASO NÃO TENHA WHATSAPP, O SITE ASSUME O BOTÃO PRINCIPAL -->
+                <a href="${siteClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'site')" class="flex-1 min-h-[44px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Acessar Site / Cardápio Online">
+                  <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  <span>Acessar Site</span>
+                </a>
+              ` : `
+                <div class="flex-1 min-h-[44px] bg-slate-100 text-slate-400 text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5">
+                  <span>Sem contato direto</span>
+                </div>
+              `)}
 
-              <!-- BOTÃO INSTAGRAM OFICIAL (APENAS SE TIVER PERFIL VERIFICADO) -->
+              <!-- BOTÃO SITE / CARDÁPIO ONLINE (SE JÁ POSSUI WHATSAPP) -->
+              ${zapCleanDigits && siteClean ? `
+              <a href="${siteClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'site')" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Acessar Site / Cardápio Online">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </a>
+              ` : ''}
+
+              <!-- BOTÃO INSTAGRAM OFICIAL -->
               ${instaClean ? `
               <a href="https://instagram.com/${instaClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'instagram')" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Ver Instagram (@${instaClean})">
                 <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
@@ -1423,10 +1472,16 @@
       const nome = document.getElementById('pubNome').value;
       const categoria = document.getElementById('pubCategoria').value;
       const bairro = document.getElementById('pubBairro').value;
-      const zap = document.getElementById('pubWhatsapp').value;
+      const zap = document.getElementById('pubWhatsapp').value.trim();
+      const site = document.getElementById('pubSite') ? document.getElementById('pubSite').value.trim() : '';
       const insta = document.getElementById('pubInstagram').value.trim();
       const endereco = document.getElementById('pubEndereco').value;
       const desc = document.getElementById('pubDescricao').value;
+
+      if (!zap && !site) {
+        alert('Por favor, informe ao menos uma forma de contato (WhatsApp ou Site/Link).');
+        return;
+      }
 
       // Mensagem que será enviada direto para o WhatsApp do Gabriel (Administrador)
       const admZap = "5582991008045"; // Número oficial de Gabriel Alves!
@@ -1434,7 +1489,8 @@
                     `🏢 *Nome:* ${nome}\n` +
                     `📁 *Categoria:* ${categoria}\n` +
                     `📍 *Bairro:* ${bairro}\n` +
-                    `📞 *WhatsApp:* ${zap}\n` +
+                    `📞 *WhatsApp:* ${zap || 'Não informado'}\n` +
+                    `🌐 *Site:* ${site || 'Não informado'}\n` +
                     `📸 *Instagram:* ${insta || 'Não informado'}\n` +
                     `🏠 *Endereço:* ${endereco}\n` +
                     `📝 *Detalhes:* ${desc}`;
@@ -1735,6 +1791,7 @@
       document.getElementById('admCategoria').value = store.categoria || 'delivery';
       document.getElementById('admBairro').value = store.bairro || 'Chã do Pilar';
       document.getElementById('admWhatsapp').value = store.whatsapp || '';
+      document.getElementById('admSite').value = store.site || store.website || '';
       document.getElementById('admInstagram').value = store.instagram || '';
       document.getElementById('admHorario').value = store.horario || '';
       document.getElementById('admEndereco').value = store.endereco || '';
@@ -1758,6 +1815,7 @@
       document.getElementById('admEditId').value = '';
       document.querySelector('#admFormContainer form').reset();
       document.getElementById('admMapsUrl').value = '';
+      document.getElementById('admSite').value = '';
       document.getElementById('admFormTitle').innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento`;
       document.getElementById('admEditingBadge').classList.add('hidden');
       document.getElementById('admSubmitBtnText').innerText = 'Salvar e Publicar Estabelecimento';
@@ -1773,12 +1831,18 @@
       const categoria = document.getElementById('admCategoria').value.trim();
       const bairro = document.getElementById('admBairro').value.trim();
       const whatsapp = document.getElementById('admWhatsapp').value.trim();
+      const site = document.getElementById('admSite').value.trim();
       const instagram = document.getElementById('admInstagram').value.trim();
       const horario = document.getElementById('admHorario').value.trim();
       const endereco = document.getElementById('admEndereco').value.trim();
       const maps_url = document.getElementById('admMapsUrl').value.trim();
       const descricao = document.getElementById('admDescricao').value.trim();
       const vip = document.getElementById('admVip').checked;
+
+      if (!whatsapp && !site) {
+        alert('Por favor, informe ao menos uma forma de contato para o estabelecimento (WhatsApp ou Site/Link).');
+        return;
+      }
 
       const stores = getStores();
 
@@ -1793,13 +1857,14 @@
             categoria,
             bairro,
             whatsapp,
+            site: site || undefined,
             instagram,
             horario,
             endereco,
             maps_url: maps_url || undefined,
             descricao,
             vip,
-            keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
+            keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase()
           };
           saveStores(stores);
 
@@ -1822,13 +1887,14 @@
           categoria,
           bairro,
           whatsapp,
+          site: site || undefined,
           instagram,
           horario,
           endereco,
           maps_url: maps_url || undefined,
           descricao,
           vip,
-          keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
+          keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase()
         };
         stores.unshift(newStore);
         saveStores(stores);
@@ -1959,9 +2025,10 @@
     async function trackStoreClick(storeId, type) {
       try {
         if (!localStatsCache[storeId]) {
-          localStatsCache[storeId] = { whatsapp_clicks: 0, instagram_clicks: 0, maps_clicks: 0, likes: 0 };
+          localStatsCache[storeId] = { whatsapp_clicks: 0, site_clicks: 0, instagram_clicks: 0, maps_clicks: 0, likes: 0 };
         }
         if (type === 'whatsapp') localStatsCache[storeId].whatsapp_clicks = (localStatsCache[storeId].whatsapp_clicks || 0) + 1;
+        if (type === 'site') localStatsCache[storeId].site_clicks = (localStatsCache[storeId].site_clicks || 0) + 1;
         if (type === 'instagram') localStatsCache[storeId].instagram_clicks = (localStatsCache[storeId].instagram_clicks || 0) + 1;
         if (type === 'maps') localStatsCache[storeId].maps_clicks = (localStatsCache[storeId].maps_clicks || 0) + 1;
         localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
@@ -2194,6 +2261,7 @@
             statsRes.data.forEach(row => {
               localStatsCache[row.store_id] = {
                 whatsapp_clicks: Math.max(row.whatsapp_clicks || 0, localStatsCache[row.store_id]?.whatsapp_clicks || 0),
+                site_clicks: Math.max(row.site_clicks || 0, localStatsCache[row.store_id]?.site_clicks || 0),
                 instagram_clicks: Math.max(row.instagram_clicks || 0, localStatsCache[row.store_id]?.instagram_clicks || 0),
                 maps_clicks: Math.max(row.maps_clicks || 0, localStatsCache[row.store_id]?.maps_clicks || 0),
                 likes: Math.max(row.likes || 0, localStatsCache[row.store_id]?.likes || 0)
@@ -2242,6 +2310,7 @@
       
       tableEl.innerHTML = sorted.map(st => {
         const zap = localStatsCache[st.id]?.whatsapp_clicks || 0;
+        const site = localStatsCache[st.id]?.site_clicks || 0;
         const insta = localStatsCache[st.id]?.instagram_clicks || 0;
         const likes = localStatsCache[st.id]?.likes || 0;
         
@@ -2254,6 +2323,7 @@
               </div>
               <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-0.5">
                 <span class="text-emerald-700 font-bold flex items-center gap-0.5"><i data-lucide="message-circle" class="w-3 h-3"></i> ${zap} zap</span>
+                ${site > 0 ? `<span class="text-blue-600 font-bold flex items-center gap-0.5"><i data-lucide="globe" class="w-3 h-3"></i> ${site} site</span>` : ''}
                 <span class="text-pink-600 font-bold flex items-center gap-0.5"><i data-lucide="instagram" class="w-3 h-3"></i> ${insta} insta</span>
                 <span class="text-rose-600 font-bold flex items-center gap-0.5"><i data-lucide="heart" class="w-3 h-3"></i> ${likes} likes</span>
               </div>
@@ -2305,16 +2375,18 @@
       if (!st) return;
       
       const zap = localStatsCache[storeId]?.whatsapp_clicks || 0;
+      const site = localStatsCache[storeId]?.site_clicks || 0;
       const insta = localStatsCache[storeId]?.instagram_clicks || 0;
       const likes = localStatsCache[storeId]?.likes || 0;
-      const total = zap + insta;
+      const total = zap + site + insta;
       
       const phone = (st.whatsapp || '').replace(/\D/g, '');
       const texto = `Olá, pessoal da *${st.nome}*! Tudo bem?\n\n` +
         `Aqui é o Gabriel do *Achei em Pilar* (achei-em-pilar.netlify.app).\n\n` +
         `Passando para compartilhar os números do seu negócio no nosso portal:\n` +
-        `📲 *${zap} cliques diretos no seu WhatsApp*\n` +
-        `📸 *${insta} visitas no seu perfil do Instagram*\n` +
+        (zap > 0 ? `📲 *${zap} cliques diretos no seu WhatsApp*\n` : '') +
+        (site > 0 ? `🌐 *${site} visitas no seu site/cardápio*\n` : '') +
+        (insta > 0 ? `📸 *${insta} visitas no seu perfil do Instagram*\n` : '') +
         `❤️ *${likes} curtidas de moradores de Pilar*\n` +
         `🔥 *Total de ${total} clientes interessados gerados!*\n\n` +
         `O Achei em Pilar está crescendo todos os dias. Vamos manter seu destaque VIP ativo por apenas R$ 29/mês?`;
