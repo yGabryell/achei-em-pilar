@@ -525,6 +525,24 @@
     </div>
   </div>
 
+    <!-- ================= MODAL LIGHTBOX DE FOTOS EM TELA CHEIA ================= -->
+  <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-3 sm:p-6" onclick="closeLightbox(event)">
+    <div class="relative max-w-2xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+      <div class="w-full flex items-center justify-between pb-3 text-white">
+        <div class="min-w-0 pr-4">
+          <span class="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider">Achei em Pilar • Galeria</span>
+          <h4 id="lightboxTitle" class="font-bold text-sm sm:text-base text-white truncate"></h4>
+        </div>
+        <button onclick="closeLightbox()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 text-white flex items-center justify-center transition cursor-pointer shrink-0" title="Fechar (ESC)">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="w-full max-h-[75vh] flex items-center justify-center rounded-2xl overflow-hidden bg-black/50 border border-white/10 shadow-2xl">
+        <img id="lightboxImg" src="" alt="Foto do local" class="max-h-[75vh] max-w-full object-contain">
+      </div>
+    </div>
+  </div>
+
   <!-- ================= PAINEL DO ADMINISTRADOR (ADM) ================= -->
   <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
@@ -807,6 +825,11 @@
         whatsapp: "5582999990001",
         instagram: "@pilar.grill", // VERIFICADO
         descricao: "Pizzas de forno a lenha, refeições completas, petiscos e açaí com entrega em toda a cidade.",
+        fotos: [
+          "Fotos/343301552_699263475374770_5545125744583860051_n.jpg",
+          "Fotos/366452553_847757226949704_2074801412532591448_n.jpg",
+          "Fotos/373236002_735855511885126_6998145342914866896_n.jpg"
+        ],
         horario: "Aberto das 18h às 23h • Delivery Ativo",
         logo: "data:image/jpeg;base64,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",
         vip: true,
@@ -821,6 +844,10 @@
         whatsapp: "5582996943148", // WHATSAPP REAL VERIFICADO
         instagram: "@caetanos.burguer", // VERIFICADO
         descricao: "Hambúrgueres artesanais suculentos, combos especiais, batata frita e entrega rápida.",
+        fotos: [
+          "Fotos/373236002_735855511885126_6998145342914866896_n.jpg",
+          "Fotos/452346547_3732106737100283_4708188934294071355_n.jpg"
+        ],
         horario: "Quarta a Domingo das 18h às 00h",
         logo: "data:image/jpeg;base64,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",
         vip: true,
@@ -835,6 +862,10 @@
         whatsapp: "5582988392755", // WHATSAPP REAL VERIFICADO
         instagram: "@_limapizzaria", // VERIFICADO
         descricao: "Pizzas tradicionais e especiais com massa crocante, borda recheada e refrigerante gelado.",
+        fotos: [
+          "Fotos/469257140_1113141227016609_4079611873170702731_n.jpg",
+          "Fotos/473993420_904257744882650_1760190424913474141_n.jpg"
+        ],
         horario: "Terça a Domingo das 18h às 00h",
         logo: "data:image/jpeg;base64,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",
         vip: true,
@@ -1113,6 +1144,10 @@
         maps_url: "https://maps.app.goo.gl/YeWEqC3wQUVqY3mY9",
         instagram: "@boladaoacaiteria",
         descricao: "O melhor açaí da cidade com cremes especiais, barcas, diversos acompanhamentos e entrega rápida.",
+        fotos: [
+          "Fotos/528694267_18171310441354017_5021224052855313548_n.jpg",
+          "Fotos/540499038_17842406136565927_5958517892441571546_n.jpg"
+        ],
         horario: "Aberto das 14h às 22h • Delivery Ativo",
         logo: "Fotos/528694267_18171310441354017_5021224052855313548_n.jpg",
         vip: false,
@@ -1169,7 +1204,16 @@
       const stored = localStorage.getItem('pilar_stores_data_v9');
       if (stored) {
         try {
-          return JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            parsed.forEach(s => {
+              const init = INITIAL_STORES.find(i => String(i.id) === String(s.id));
+              if (init && init.fotos && (!s.fotos || s.fotos.length === 0)) {
+                s.fotos = init.fotos;
+              }
+            });
+            return parsed;
+          }
         } catch(e) {
           console.error(e);
         }
@@ -1327,6 +1371,92 @@
     }
 
     // RENDERIZAR LOJAS NA TELA (COM PROTEÇÃO XSS COMPLETA E BOTÕES TOUCH 44PX)
+    
+    // ================= CARROSSEL DE FOTOS DO LOCAL (SWIPE MOBILE & LIGHTBOX) =================
+    function renderStorePhotosCarousel(store, mapsLink) {
+      const photos = Array.isArray(store.fotos) ? store.fotos.filter(Boolean) : [];
+      const hasPhotos = photos.length > 0;
+      const hasMaps = Boolean(mapsLink && !mapsLink.includes('undefined'));
+
+      if (!hasPhotos && !hasMaps) return '';
+
+      if (!hasPhotos && hasMaps) {
+        return `
+          <div class="mt-2.5">
+            <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50/80 hover:bg-blue-100 border border-blue-200/80 px-2.5 py-1 rounded-xl transition shadow-2xs">
+              <i data-lucide="map-pin" class="w-3 h-3 text-blue-600"></i>
+              <span>Ver fotos e localização no Google Maps ↗</span>
+            </a>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="mt-3 pt-2.5 border-t border-slate-100/90">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-1.5 px-0.5">
+            <span class="flex items-center gap-1.5 text-slate-700">
+              <i data-lucide="images" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Fotos do Local & Produtos</span>
+            </span>
+            ${hasMaps ? `
+              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="text-[10.5px] text-blue-600 hover:text-blue-800 flex items-center gap-0.5 font-bold transition">
+                <span>Ver no Maps</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            ` : ''}
+          </div>
+          
+          <!-- CARROSSEL TOUCH SWIPE DESLIZÁVEL COM O DEDO -->
+          <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 pt-0.5 snap-x scroll-smooth -mx-1 px-1">
+            ${photos.map((foto, fIdx) => `
+              <div onclick="openLightbox('${escapeHtml(store.nome)}', '${escapeHtml(foto)}')" class="h-20 w-28 min-w-[110px] rounded-xl overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs snap-start cursor-pointer hover:opacity-95 active:scale-95 transition relative group bg-slate-100">
+                <img src="${escapeHtml(foto)}" alt="Foto ${fIdx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" onerror="this.parentElement.style.display='none'">
+                <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition"></div>
+                <div class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs text-white text-[9px] px-1 rounded flex items-center gap-0.5">
+                  <i data-lucide="zoom-in" class="w-2.5 h-2.5"></i>
+                </div>
+              </div>
+            `).join('')}
+
+            ${hasMaps ? `
+              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="h-20 min-w-[115px] w-28 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200/80 rounded-xl flex flex-col items-center justify-center text-center p-2 snap-start shrink-0 active:scale-95 transition group cursor-pointer shadow-2xs">
+                <svg class="w-5 h-5 mb-1 group-hover:scale-110 transition shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <path fill="#EA4335" d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V7.71C8 4.56 10.56 2 13.71 2H12z"/>
+                  <path fill="#FBBC05" d="M16 14.74c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7h1.71C16.88 2 19 4.12 19 6.71v8.03z"/>
+                  <path fill="#34A853" d="M12 22s-7-7.75-7-13c0-.73.11-1.43.32-2.1L12 22z"/>
+                  <circle cx="12" cy="9" r="2.5" fill="#FFFFFF"/>
+                </svg>
+                <span class="text-[10px] font-extrabold text-blue-700 leading-tight">Mais fotos no Google Maps</span>
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function openLightbox(storeName, photoUrl) {
+      const modal = document.getElementById('lightboxModal');
+      const title = document.getElementById('lightboxTitle');
+      const img = document.getElementById('lightboxImg');
+      if (title) title.innerText = storeName;
+      if (img) img.src = photoUrl;
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLightbox(e) {
+      if (e && e.target && e.target.closest && e.target.closest('#lightboxImg')) return;
+      const modal = document.getElementById('lightboxModal');
+      if (modal) modal.classList.add('hidden');
+      const img = document.getElementById('lightboxImg');
+      if (img) img.src = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
     function renderStores() {
       const stores = getStores();
       const grid = document.getElementById('storesGrid');
@@ -1458,6 +1588,9 @@
                   <span>${escapeHtml(store.horario)}</span>
                 </div>
               ` : ''}
+
+              <!-- CARROSSEL DESLIZÁVEL DE FOTOS DO LOCAL & PRODUTOS -->
+              ${renderStorePhotosCarousel(store, mapsLink)}
 
               <!-- BARRA DE AVALIAÇÕES E SUGERIR EDIÇÃO (ESTILO GOOGLE MAPS) -->
               <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
@@ -2201,6 +2334,7 @@
       if (includeExtended) {
         if (store.site) payload.site = store.site;
         if (store.maps_url) payload.maps_url = store.maps_url;
+        if (Array.isArray(store.fotos)) payload.fotos = store.fotos;
       }
       return payload;
     }

@@ -102,7 +102,9 @@ module.exports = async (req, res) => {
       if (store.site) payload.site = String(store.site).trim();
       if (store.maps_url) payload.maps_url = String(store.maps_url).trim();
 
-      const saveRes = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
+      if (Array.isArray(store.fotos)) payload.fotos = store.fotos;
+
+      let saveRes = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
         method: 'POST',
         headers: {
           ...headers,
@@ -110,6 +112,19 @@ module.exports = async (req, res) => {
         },
         body: JSON.stringify([payload])
       });
+
+      if (!saveRes.ok && payload.fotos) {
+        // Fallback seguro caso a coluna fotos ainda não tenha sido criada no Supabase
+        delete payload.fotos;
+        saveRes = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Prefer': 'resolution=merge-duplicates,return=representation'
+          },
+          body: JSON.stringify([payload])
+        });
+      }
 
       if (!saveRes.ok) {
         const errText = await saveRes.text();
