@@ -84,6 +84,12 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'Dados do comércio inválidos.' });
       }
 
+      const fotos = Array.isArray(store.fotos) ? store.fotos : [];
+      let cleanKeywords = String(store.keywords || '').replace(/\n*\[FOTOS_START\].*?\[FOTOS_END\]/gs, '').trim();
+      if (fotos.length > 0) {
+        cleanKeywords += '\n[FOTOS_START]' + JSON.stringify(fotos) + '[FOTOS_END]';
+      }
+
       // Higienizar dados no backend antes de salvar
       const payload = {
         id: String(store.id),
@@ -97,12 +103,12 @@ module.exports = async (req, res) => {
         horario: String(store.horario || '').trim(),
         logo: String(store.logo || '').trim(),
         vip: !!store.vip,
-        keywords: String(store.keywords || '').trim(),
+        keywords: cleanKeywords,
       };
       if (store.site) payload.site = String(store.site).trim();
       if (store.maps_url) payload.maps_url = String(store.maps_url).trim();
 
-      if (Array.isArray(store.fotos)) payload.fotos = store.fotos;
+      if (fotos.length > 0) payload.fotos = fotos;
 
       let saveRes = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
         method: 'POST',

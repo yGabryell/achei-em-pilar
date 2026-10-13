@@ -717,16 +717,81 @@
     // GERENCIAMENTO DE LOJAS
     let storesData = [];
 
+    function extractStoreFotos(store) {
+      if (!store) return [];
+      if (Array.isArray(store.fotos) && store.fotos.length > 0) {
+        return store.fotos;
+      }
+      if (store.keywords && typeof store.keywords === 'string' && store.keywords.includes('[FOTOS_START]')) {
+        try {
+          const match = store.keywords.match(/\[FOTOS_START\](.*?)\[FOTOS_END\]/s);
+          if (match && match[1]) {
+            const parsed = JSON.parse(match[1]);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch(e) {}
+      }
+      return [];
+    }
+
+    function packStoreFotosIntoKeywords(keywords, fotos) {
+      let cleanKw = (keywords || '').replace(/\n*\[FOTOS_START\].*?\[FOTOS_END\]/gs, '').trim();
+      if (Array.isArray(fotos) && fotos.length > 0) {
+        cleanKw += '\n[FOTOS_START]' + JSON.stringify(fotos) + '[FOTOS_END]';
+      }
+      return cleanKw;
+    }
+
+    function compressImageFile(file, maxWidth = 1000, maxHeight = 800, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = () => resolve(e.target.result);
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     function getLocalStores() {
       try {
         const stored = localStorage.getItem('pilar_stores_data_v9');
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            return parsed.map(s => {
+              if (s) s.fotos = extractStoreFotos(s);
+              return s;
+            });
+          }
+        }
       } catch(e) {}
       return [];
     }
 
     function saveLocalStores(stores) {
-      localStorage.setItem('pilar_stores_data_v9', JSON.stringify(stores));
+      try {
+        localStorage.setItem('pilar_stores_data_v9', JSON.stringify(stores));
+      } catch(e) {
+        console.warn('Erro ao salvar localmente:', e);
+      }
       storesData = stores;
     }
 
@@ -738,8 +803,11 @@
         try {
           const { data, error } = await supabaseClient.from('stores').select('*').order('nome');
           if (!error && Array.isArray(data) && data.length > 0) {
-            storesData = data;
-            saveLocalStores(data);
+            storesData = data.map(s => {
+              s.fotos = extractStoreFotos(s);
+              return s;
+            });
+            saveLocalStores(storesData);
           }
         } catch(e) {
           console.warn('Erro ao carregar do Supabase:', e);
@@ -906,20 +974,24 @@
       showToast('Foto adicionada à galeria!', 'success');
     }
 
-    function handleGalleryFileUpload(input) {
+    async function handleGalleryFileUpload(input) {
       if (input.files && input.files[0]) {
         if (currentStoreGallery.length >= 6) {
           alert('Limite máximo de 6 fotos por estabelecimento.');
           return;
         }
         const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          currentStoreGallery.push(e.target.result);
+        try {
+          showToast('Otimizando foto...', 'info');
+          const compressed = await compressImageFile(file, 1000, 800, 0.75);
+          currentStoreGallery.push(compressed);
           renderFormGallery();
-          showToast('Foto carregada na galeria!', 'success');
-        };
-        reader.readAsDataURL(file);
+          showToast('Foto adicionada à galeria!', 'success');
+        } catch(e) {
+          console.error(e);
+          showToast('Erro ao carregar a foto.', 'error');
+        }
+        input.value = '';
       }
     }
 
@@ -965,7 +1037,8 @@
       document.getElementById('formLogo').value = store.logo || '';
 
       updateFormLogoPreview();
-      currentStoreGallery = Array.isArray(store.fotos) ? [...store.fotos] : [];
+      const fotosFromStore = extractStoreFotos(store);
+      currentStoreGallery = Array.isArray(fotosFromStore) ? [...fotosFromStore] : [];
       renderFormGallery();
 
       document.getElementById('formBadgeMode').innerText = 'Modo Edição';
@@ -998,18 +1071,20 @@
       }
     }
 
-    function handleFormLogoUpload(input) {
+    async function handleFormLogoUpload(input) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('formLogo').value = e.target.result;
+        try {
+          showToast('Otimizando logo...', 'info');
+          const compressed = await compressImageFile(file, 400, 400, 0.8);
+          document.getElementById('formLogo').value = compressed;
           updateFormLogoPreview();
-      currentStoreGallery = Array.isArray(store.fotos) ? [...store.fotos] : [];
-      renderFormGallery();
-          showToast('Foto carregada com sucesso!', 'success');
-        };
-        reader.readAsDataURL(file);
+          showToast('Logo carregada com sucesso!', 'success');
+        } catch(e) {
+          console.error(e);
+          showToast('Erro ao carregar a logo.', 'error');
+        }
+        input.value = '';
       }
     }
 
@@ -1039,6 +1114,10 @@
       const originalText = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...`;
 
+      const fotosList = [...currentStoreGallery];
+      const rawKw = `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase();
+      const packedKeywords = packStoreFotosIntoKeywords(rawKw, fotosList);
+
       const storePayload = {
         id: editId || Date.now().toString(),
         nome,
@@ -1053,8 +1132,8 @@
         descricao,
         logo,
         vip,
-        fotos: [...currentStoreGallery],
-        keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase()
+        fotos: fotosList,
+        keywords: packedKeywords
       };
 
       if (editId) {
@@ -1065,6 +1144,7 @@
       }
 
       saveLocalStores(storesData);
+      renderAdminStores();
 
       // Salvar na Nuvem (Vercel API com fallback Supabase)
       await sendStoreToCloud(storePayload);
@@ -1077,6 +1157,13 @@
     }
 
     async function sendStoreToCloud(store) {
+      const fotos = Array.isArray(store.fotos) ? store.fotos : [];
+      const packedKeywords = packStoreFotosIntoKeywords(store.keywords, fotos);
+      const payload = {
+        ...store,
+        keywords: packedKeywords
+      };
+
       const token = sessionStorage.getItem('pilar_admin_token');
       if (token) {
         try {
@@ -1086,7 +1173,7 @@
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ action: 'save', store })
+            body: JSON.stringify({ action: 'save', store: payload })
           });
           if (res.ok) return true;
         } catch(e) { console.warn('Api save fallback:', e); }
@@ -1094,7 +1181,9 @@
 
       if (supabaseClient) {
         try {
-          await supabaseClient.from('stores').upsert([store]);
+          const directPayload = { ...payload };
+          delete directPayload.fotos;
+          await supabaseClient.from('stores').upsert([directPayload]);
         } catch(e) { console.warn('Supabase save error:', e); }
       }
     }
