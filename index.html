@@ -72,7 +72,7 @@
   <!-- ================= CABEÇALHO / NAVBAR ================= -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-3.5 sm:py-4">
     <div class="max-w-4xl mx-auto px-4 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5 min-w-0">
+      <div class="flex items-center gap-2.5 min-w-0 cursor-pointer select-none" onclick="handleSecretLogoClick()" title="Achei em Pilar">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
           P
         </div>
@@ -90,9 +90,9 @@
           <span class="sm:hidden">Cadastrar</span>
         </button>
 
-        <!-- BOTÃO ACESSO ADM -->
-        <button onclick="openAdminModal()" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 w-9 h-9 rounded-xl border border-slate-200 transition flex items-center justify-center shrink-0" title="Painel Administrativo">
-          <i data-lucide="lock" class="w-4 h-4"></i>
+        <!-- BOTÃO ACESSO ADM (OCULTO PARA VISITANTES COMUNS) -->
+        <button id="btnAdminAccess" onclick="openAdminModal()" class="hidden bg-slate-900 hover:bg-black active:scale-95 text-white w-9 h-9 rounded-xl border border-slate-800 transition flex items-center justify-center shrink-0 shadow-xs cursor-pointer" title="Painel Administrativo">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
         </button>
       </div>
     </div>
@@ -1631,13 +1631,19 @@
       document.getElementById('adminDashboardSection').classList.add('hidden');
     }
 
-    function getAdminPin() {
-      const pin = localStorage.getItem('pilar_admin_pin');
-      if (!pin || pin === '1234') {
-        localStorage.setItem('pilar_admin_pin', 'Pilar@Adm2026');
-        return 'Pilar@Adm2026';
-      }
-      return pin;
+    // HASH CRIPTOGRÁFICO SHA-256 COM SALT - NENHUMA SENHA FICA GRAVADA EM TEXTO PURO NO HTML
+    const DEFAULT_ADMIN_HASH = "813e2b69ca2a2b29b5a109481b0cf67b3dbed1194e464fe901de68f034c949dc"; // Senha mestre protegida
+    let failedAdminAttempts = 0;
+    let adminLockoutUntil = 0;
+
+    async function hashAdminPassword(str) {
+      const enc = new TextEncoder().encode(str + "_pilar_salt_2026_xyz");
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function getStoredAdminHash() {
+      return localStorage.getItem('pilar_admin_hash_v2') || DEFAULT_ADMIN_HASH;
     }
 
     function toggleAdminPassVisibility() {
@@ -1653,29 +1659,55 @@
       lucide.createIcons();
     }
 
-    function checkAdminPassword() {
+    async function checkAdminPassword() {
+      const now = Date.now();
+      if (now < adminLockoutUntil) {
+        const remaining = Math.ceil((adminLockoutUntil - now) / 60000);
+        alert(`Muitas tentativas incorretas. Acesso bloqueado por segurança. Tente novamente em ${remaining} minuto(s).`);
+        return;
+      }
+
       const pass = (document.getElementById('adminPassInput').value || '').trim();
-      if (pass === getAdminPin()) {
+      if (!pass) {
+        alert('Por favor, digite a senha de administrador.');
+        return;
+      }
+
+      const inputHash = await hashAdminPassword(pass);
+      const targetHash = getStoredAdminHash();
+
+      if (inputHash === targetHash) {
+        failedAdminAttempts = 0;
         isAdminLoggedIn = true;
+        // Limpar vestígios da senha antiga insegura do localStorage caso existissem
+        try { localStorage.removeItem('pilar_admin_pin'); } catch(e) {}
         showAdminDashboard();
       } else {
-        alert('Senha incorreta! Digite a senha cadastrada para o painel.');
+        failedAdminAttempts++;
+        if (failedAdminAttempts >= 3) {
+          adminLockoutUntil = Date.now() + (15 * 60 * 1000); // 15 minutos de bloqueio
+          alert('Senha incorreta! 3 tentativas falhas detectadas. O acesso foi bloqueado por segurança por 15 minutos.');
+        } else {
+          alert(`Senha incorreta! Tentativa ${failedAdminAttempts} de 3.`);
+        }
       }
     }
 
-    function changeAdminPin() {
+    async function changeAdminPin() {
       const current = prompt('Digite a senha atual de Administrador:');
       if (current === null) return;
-      if (current.trim() !== getAdminPin()) {
+      const currentHash = await hashAdminPassword(current.trim());
+      if (currentHash !== getStoredAdminHash()) {
         alert('Senha atual incorreta!');
         return;
       }
-      const nova = prompt('Digite a nova senha desejada (mínimo 4 caracteres):');
-      if (nova && nova.trim().length >= 4) {
-        localStorage.setItem('pilar_admin_pin', nova.trim());
-        alert('Senha de Administrador alterada com sucesso!');
+      const nova = prompt('Digite a nova senha desejada (mínimo 6 caracteres):');
+      if (nova && nova.trim().length >= 6) {
+        const newHash = await hashAdminPassword(nova.trim());
+        localStorage.setItem('pilar_admin_hash_v2', newHash);
+        alert('Senha de Administrador alterada com sucesso! Apenas o hash criptográfico foi gravado.');
       } else {
-        alert('Senha inválida. Digite pelo menos 4 caracteres.');
+        alert('Senha inválida. Digite pelo menos 6 caracteres.');
       }
     }
 
@@ -2683,10 +2715,51 @@ ${details}
     }
 
     // INICIALIZAÇÃO
+
+    // ACESSO SECRETO AO PAINEL ADM (SEGURANÇA POR OCULTAÇÃO)
+    let secretLogoClicks = 0;
+    let lastSecretClickTime = 0;
+
+    function handleSecretLogoClick() {
+      const now = Date.now();
+      if (now - lastSecretClickTime > 1500) {
+        secretLogoClicks = 1;
+      } else {
+        secretLogoClicks++;
+      }
+      lastSecretClickTime = now;
+
+      if (secretLogoClicks >= 4) {
+        secretLogoClicks = 0;
+        document.getElementById('btnAdminAccess')?.classList.remove('hidden');
+        openAdminModal();
+      }
+    }
+
+    // Atalho de teclado secreto: Ctrl + Shift + A
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        document.getElementById('btnAdminAccess')?.classList.remove('hidden');
+        openAdminModal();
+      }
+    });
+
+    function checkAdminUrlTrigger() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('admin') || params.has('painel') || params.has('adm')) {
+          document.getElementById('btnAdminAccess')?.classList.remove('hidden');
+          openAdminModal();
+        }
+      } catch(e) {}
+    }
+
     window.onload = function() {
       trackSiteVisit();
       renderStores();
       syncSupabaseData();
+      checkAdminUrlTrigger();
       lucide.createIcons();
 
       // Exibe de cara ao entrar no site (com opção imediata de fechar no X)
