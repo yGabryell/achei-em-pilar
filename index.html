@@ -224,7 +224,8 @@
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="text-center pt-1">
+      <!-- ETAPA 1: TELA DE PAGAMENTO PIX -->
+      <div id="donatePaymentScreen" class="text-center pt-1">
         <div class="w-13 h-13 rounded-2xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center mb-2.5 shadow-xs">
           <i data-lucide="coffee" class="w-6 h-6"></i>
         </div>
@@ -272,10 +273,43 @@
           </div>
         </div>
 
+        <!-- BOTÃO PARA CONFIRMAR PAGAMENTO APÓS ENVIO -->
+        <button onclick="confirmPixSent()" id="btnConfirmPixSent" class="w-full mt-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white text-xs font-extrabold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-200"></i> Já fiz o PIX! Confirmar Doação
+        </button>
+
         <!-- BOTÃO DE FECHAR / CONTINUAR -->
-        <button onclick="closeDonateModal()" class="w-full mt-3 text-slate-500 hover:text-slate-800 text-xs font-semibold py-1 transition cursor-pointer">
+        <button onclick="closeDonateModal()" class="w-full mt-2.5 text-slate-500 hover:text-slate-800 text-xs font-semibold py-1 transition cursor-pointer">
           Continuar navegando no Guia ✕
         </button>
+      </div>
+
+      <!-- ETAPA 2: TELA DE CONFIRMAÇÃO DE SUCESSO -->
+      <div id="donateSuccessScreen" class="hidden text-center py-4 px-1">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-inner">
+          <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-600"></i>
+        </div>
+        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-2">
+          Doação Confirmada com Sucesso! 🎉
+        </span>
+        <h3 class="font-heading font-extrabold text-xl text-slate-900 leading-snug">Muito Obrigado pelo Apoio! ❤️</h3>
+        <p class="text-xs text-slate-600 mt-2 leading-relaxed max-w-xs mx-auto">
+          Sua contribuição faz toda a diferença para manter o <strong>Achei em Pilar</strong> 100% gratuito, rápido e atualizado para toda a nossa cidade.
+        </p>
+
+        <div class="mt-4 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-xs text-emerald-950 space-y-1 text-left">
+          <p class="font-bold flex items-center gap-1.5"><i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i> Gratidão de Gabriel Alves & Moradores de Pilar!</p>
+          <p class="text-[11px] text-emerald-800">Seu incentivo ajuda a custear hospedagem, banco de dados e a expansão de novos comércios.</p>
+        </div>
+
+        <div class="mt-5 space-y-2">
+          <button onclick="sendReceiptWhatsapp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold py-3 rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Enviar Comprovante no WhatsApp (Opcional)
+          </button>
+          <button onclick="closeDonateModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition cursor-pointer">
+            Concluir e Voltar ao Guia
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1421,6 +1455,10 @@
 
     function openDonateModal() {
       const modal = document.getElementById('donateModal');
+      const paymentScreen = document.getElementById('donatePaymentScreen');
+      const successScreen = document.getElementById('donateSuccessScreen');
+      if (paymentScreen) paymentScreen.classList.remove('hidden');
+      if (successScreen) successScreen.classList.add('hidden');
       updatePixModalDisplay();
       if (modal) modal.classList.remove('hidden');
       lucide.createIcons();
@@ -1430,6 +1468,22 @@
       const modal = document.getElementById('donateModal');
       if (modal) modal.classList.add('hidden');
       try { sessionStorage.setItem('pilar_donate_seen', '1'); } catch(e) {}
+    }
+
+    function confirmPixSent() {
+      const paymentScreen = document.getElementById('donatePaymentScreen');
+      const successScreen = document.getElementById('donateSuccessScreen');
+      if (paymentScreen) paymentScreen.classList.add('hidden');
+      if (successScreen) successScreen.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function sendReceiptWhatsapp() {
+      const zap = '5582999990000';
+      const valText = currentPixAmount > 0 ? ` no valor de R$ ${currentPixAmount},00` : '';
+      const msg = `Olá Gabriel! Acabei de enviar uma doação PIX${valText} para apoiar o Achei em Pilar! ❤️ Segue o comprovante:`;
+      window.open(`https://wa.me/${zap}?text=${encodeURIComponent(msg)}`, '_blank');
+      closeDonateModal();
     }
 
     async function copyPixCopiaCola() {
