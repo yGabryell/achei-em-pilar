@@ -683,8 +683,8 @@
               </div>
 
               <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Descrição / Especialidades</label>
-                <input type="text" id="admDescricao" placeholder="Hambúrguer artesanal na brasa, batata frita e entrega rápida..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Descrição / Especialidades (Pode pular linhas com Enter)</label>
+                <textarea id="admDescricao" rows="3" placeholder="Ex:&#10;✂️ Cortes masculinos e barba na navalha&#10;🧼 Toalha quente e acabamento premium&#10;❄️ Ambiente climatizado" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-emerald-500 transition resize-y leading-relaxed"></textarea>
               </div>
 
               <!-- CHECKBOX VIP / DESTAQUE -->
@@ -1439,8 +1439,8 @@
                 </button>
               </div>
 
-              <!-- DESCRIÇÃO DO SERVIÇO / PRODUTO -->
-              <p class="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+              <!-- DESCRIÇÃO DO SERVIÇO / PRODUTO (COM QUEBRAS DE LINHA PRESERVADAS) -->
+              <p class="text-xs text-slate-600 mt-3 whitespace-pre-line leading-relaxed">
                 ${escapeHtml(store.descricao)}
               </p>
 
