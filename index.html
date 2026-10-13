@@ -170,11 +170,8 @@
     </div>
 
     <!-- ================= CONTADOR DE RESULTADOS ================= -->
-    <div class="mt-4 flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
-      <span id="resultsCount">Carregando estabelecimentos...</span>
-      <span class="text-emerald-700 flex items-center gap-1">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Atualizado recentemente
-      </span>
+    <div class="mt-4 flex items-center text-xs text-slate-500 font-semibold px-1">
+      <span id="resultsCount" class="whitespace-nowrap">Carregando estabelecimentos...</span>
     </div>
 
     <!-- ================= GRADE DE LOJAS / ESTABELECIMENTOS ================= -->
@@ -1124,7 +1121,9 @@
       // Ordenar: VIPs aparecem primeiro!
       filtered.sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0));
 
-      document.getElementById('resultsCount').innerText = `${filtered.length} estabelecimentos encontrados`;
+      document.getElementById('resultsCount').innerText = filtered.length === 1 
+        ? '1 estabelecimento encontrado' 
+        : `${filtered.length} estabelecimentos encontrados`;
       document.getElementById('noResults').classList.toggle('hidden', filtered.length > 0);
 
       grid.innerHTML = filtered.map(store => {
