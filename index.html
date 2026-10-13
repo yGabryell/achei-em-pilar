@@ -1173,10 +1173,10 @@
       }
 
       const rawEndereco = (store.endereco || '').trim();
-      const rawBairro = (store.bairro || 'Chã do Pilar').trim();
+      const rawBairro = /centro/i.test(store.bairro || '') ? 'Centro' : 'Chã do Pilar';
 
-      // Se endereço for vazio ou genérico de delivery
-      if (!rawEndereco || rawEndereco.length < 3 || /^(delivery|online)/i.test(rawEndereco)) {
+      // Se endereço for vago, vazio ou for serviço delivery/itinerante
+      if (!rawEndereco || rawEndereco.length < 3 || /\b(delivery|online|atendimento|todo|toda)\b/i.test(rawEndereco)) {
         return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${rawBairro}, Pilar - AL`)}`;
       }
 
@@ -1189,9 +1189,16 @@
       clean = clean.replace(/\b(n[úu]mero|num\.?)\s*/gi, '');
       clean = clean.replace(/\s+/g, ' ').trim();
 
-      // Montar busca focada na rua e número reais em Pilar - AL
-      // (SEM o nome fantasia da loja para o Google Maps não desviar para outro local com mesmo nome)
-      const query = `${clean}, ${rawBairro}, Pilar - AL`;
+      // Montar busca focada na rua e número reais em Pilar - AL (sem duplicar bairro se já estiver no nome)
+      let query;
+      if (clean.toLowerCase() === rawBairro.toLowerCase() || clean.toLowerCase() === 'pilar centro') {
+        query = `${rawBairro}, Pilar - AL`;
+      } else if (clean.toLowerCase().includes(rawBairro.toLowerCase())) {
+        query = `${clean}, Pilar - AL`;
+      } else {
+        query = `${clean}, ${rawBairro}, Pilar - AL`;
+      }
+
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     }
 
