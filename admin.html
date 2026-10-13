@@ -319,9 +319,9 @@
             <!-- SEÇÃO 3: CONTATOS & REDES -->
             <div class="pt-4 border-t border-slate-100">
               <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <i data-lucide="phone-call" class="w-3.5 h-3.5 text-emerald-600"></i> Contatos & Redes Sociais
+                <i data-lucide="phone-call" class="w-3.5 h-3.5 text-emerald-600"></i> Contatos, Redes Sociais & Segurança
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp (DDD + Número)</label>
                   <input type="tel" id="formWhatsapp" placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
@@ -334,6 +334,14 @@
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (com @)</label>
                   <input type="text" id="formInstagram" placeholder="Ex: @pilar.grill" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-pink-500 bg-slate-50/50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                    <span>PIN da Loja (4 dígitos)</span>
+                    <button type="button" onclick="generateRandomStorePin()" class="text-[10px] text-emerald-600 hover:text-emerald-800 font-bold hover:underline cursor-pointer">Gerar Novo</button>
+                  </label>
+                  <input type="text" id="formPin" maxlength="4" placeholder="Ex: 4521" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 font-mono tracking-widest font-black text-center">
+                  <span class="text-[10px] text-slate-400 mt-0.5 block">PIN para responder avaliações. Padrão: final do WhatsApp.</span>
                 </div>
               </div>
             </div>
@@ -739,6 +747,36 @@
       return cleanKw;
     }
 
+    function extractStorePin(store) {
+      if (!store) return '1234';
+      if (store.pin && /^\d{4}$/.test(String(store.pin).trim())) {
+        return String(store.pin).trim();
+      }
+      if (store.keywords && typeof store.keywords === 'string') {
+        const match = store.keywords.match(/\[PIN:(\d{4})\]/);
+        if (match) return match[1];
+      }
+      const digits = (store.whatsapp || '').replace(/\D/g, '');
+      if (digits.length >= 4) {
+        return digits.slice(-4);
+      }
+      return '1234';
+    }
+
+    function packStorePinIntoKeywords(keywords, pin) {
+      let cleanKw = (keywords || '').replace(/\n*\[PIN:\d{4}\]/g, '').trim();
+      if (pin && /^\d{4}$/.test(String(pin).trim())) {
+        cleanKw += '\n[PIN:' + String(pin).trim() + ']';
+      }
+      return cleanKw;
+    }
+
+    function generateRandomStorePin() {
+      const pin = Math.floor(1000 + Math.random() * 9000).toString();
+      const input = document.getElementById('formPin');
+      if (input) input.value = pin;
+    }
+
     function compressImageFile(file, maxWidth = 1000, maxHeight = 800, quality = 0.75) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1032,6 +1070,7 @@
       document.getElementById('formMapsUrl').value = store.maps_url || '';
       document.getElementById('formDescricao').value = store.descricao || '';
       document.getElementById('formLogo').value = store.logo || '';
+      document.getElementById('formPin').value = extractStorePin(store);
 
       updateFormLogoPreview();
       const fotosFromStore = extractStoreFotos(store);
@@ -1112,8 +1151,12 @@
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...`;
 
       const fotosList = [...currentStoreGallery];
+      const pin = (document.getElementById('formPin').value || '').trim();
       const rawKw = `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase();
-      const packedKeywords = packStoreFotosIntoKeywords(rawKw, fotosList);
+      let packedKeywords = packStoreFotosIntoKeywords(rawKw, fotosList);
+      if (pin && /^\d{4}$/.test(pin)) {
+        packedKeywords = packStorePinIntoKeywords(packedKeywords, pin);
+      }
 
       const storePayload = {
         id: editId || Date.now().toString(),
@@ -1129,6 +1172,7 @@
         descricao,
         logo,
         vip,
+        pin: pin || undefined,
         fotos: fotosList,
         keywords: packedKeywords
       };

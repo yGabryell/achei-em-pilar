@@ -1221,6 +1221,30 @@
       return cleanKw;
     }
 
+    function extractStorePin(store) {
+      if (!store) return '1234';
+      if (store.pin && /^\d{4}$/.test(String(store.pin).trim())) {
+        return String(store.pin).trim();
+      }
+      if (store.keywords && typeof store.keywords === 'string') {
+        const match = store.keywords.match(/\[PIN:(\d{4})\]/);
+        if (match) return match[1];
+      }
+      const digits = (store.whatsapp || '').replace(/\D/g, '');
+      if (digits.length >= 4) {
+        return digits.slice(-4);
+      }
+      return '1234';
+    }
+
+    function packStorePinIntoKeywords(keywords, pin) {
+      let cleanKw = (keywords || '').replace(/\n*\[PIN:\d{4}\]/g, '').trim();
+      if (pin && /^\d{4}$/.test(String(pin).trim())) {
+        cleanKw += '\n[PIN:' + String(pin).trim() + ']';
+      }
+      return cleanKw;
+    }
+
     // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS
     function getStores() {
       const stored = localStorage.getItem('pilar_stores_data_v9');
@@ -2947,14 +2971,26 @@ ${details}
       }
     }
 
-    function toggleReplyRoleNotice(reviewId) {
+    function toggleReplyRoleNotice(reviewId, storeId) {
       const roleSelect = document.getElementById(`replyRole-${reviewId}`);
-      const notice = document.getElementById(`replyRoleNotice-${reviewId}`);
-      if (roleSelect && notice) {
+      const pinContainer = document.getElementById(`replyOwnerPinContainer-${reviewId}`);
+      const authorInput = document.getElementById(`replyAuthor-${reviewId}`);
+      
+      if (roleSelect) {
         if (roleSelect.value === 'owner') {
-          notice.classList.remove('hidden');
+          if (pinContainer) pinContainer.classList.remove('hidden');
+          const stores = getStores();
+          const targetStore = stores.find(s => String(s.id) === String(storeId));
+          if (targetStore && authorInput && (!authorInput.value || authorInput.value === localStorage.getItem('pilar_user_name'))) {
+            authorInput.value = targetStore.nome;
+          }
+          const pinInput = document.getElementById(`replyPin-${reviewId}`);
+          if (pinInput) setTimeout(() => pinInput.focus(), 80);
         } else {
-          notice.classList.add('hidden');
+          if (pinContainer) pinContainer.classList.add('hidden');
+          if (authorInput && authorInput.value) {
+            authorInput.value = localStorage.getItem('pilar_user_name') || '';
+          }
         }
       }
       if (window.lucide) lucide.createIcons();
@@ -2986,18 +3022,33 @@ ${details}
         localStorage.setItem('pilar_user_name', authorName);
       }
 
-      // Se marcou que é o Estabelecimento/Proprietário, validar autorização
+      // Se marcou que é o Estabelecimento/Proprietário, validar PIN de 4 dígitos ou sessão de admin
       if (isOwner) {
         const token = sessionStorage.getItem('pilar_admin_token');
         const isLogged = token || isAdminLoggedIn;
 
         if (!isLogged) {
-          const pass = prompt('Confirme a senha de administrador ou do estabelecimento para publicar como Estabelecimento:');
-          if (pass === null) return;
-          const inputHash = await hashAdminPassword((pass || '').trim());
-          const targetHash = getStoredAdminHash();
-          if (inputHash !== targetHash && (pass || '').trim() !== 'Gabriel@Pilar2026') {
-            alert('Senha incorreta! Se você é um morador ou cliente, selecione a opção "Sou Morador / Cliente".');
+          const pinInput = document.getElementById(`replyPin-${reviewId}`);
+          const enteredPin = pinInput ? pinInput.value.trim() : '';
+
+          if (!enteredPin) {
+            alert('Por favor, digite o PIN de 4 dígitos da sua loja para publicar como estabelecimento.');
+            if (pinInput) pinInput.focus();
+            return;
+          }
+
+          const stores = getStores();
+          const targetStore = stores.find(s => String(s.id) === String(storeId));
+          const storePin = extractStorePin(targetStore);
+
+          const isValid = (enteredPin === storePin || enteredPin === 'Gabriel@Pilar2026');
+
+          if (!isValid) {
+            alert(`PIN incorreto para ${targetStore ? targetStore.nome : 'este comércio'}!\n\nDica: O PIN padrão são os 4 últimos dígitos do WhatsApp cadastrado da sua loja.`);
+            if (pinInput) {
+              pinInput.focus();
+              pinInput.select();
+            }
             return;
           }
         }
@@ -3185,14 +3236,37 @@ ${details}
                     <label class="block text-[10.5px] font-bold text-slate-700 mb-1">Quem está respondendo?</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       <input type="text" id="replyAuthor-${escapeHtml(revIdStr)}" placeholder="Seu nome..." value="${escapeHtml(localStorage.getItem('pilar_user_name') || '')}" class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
-                      <select id="replyRole-${escapeHtml(revIdStr)}" onchange="toggleReplyRoleNotice('${escapeHtml(revIdStr)}')" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-700 cursor-pointer">
+                      <select id="replyRole-${escapeHtml(revIdStr)}" onchange="toggleReplyRoleNotice('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-700 cursor-pointer">
                         <option value="client">👤 Morador / Cliente</option>
                         <option value="owner">🏪 Estabelecimento / Dono</option>
                       </select>
                     </div>
-                    <p id="replyRoleNotice-${escapeHtml(revIdStr)}" class="hidden text-[10px] text-amber-600 mt-1 font-semibold flex items-center gap-1">
-                      <i data-lucide="shield-alert" class="w-3 h-3"></i> Resposta como estabelecimento requer a senha de confirmação.
-                    </p>
+
+                    <!-- CAMPO DO PIN DE 4 DÍGITOS EXCLUSIVO DA LOJA (OPÇÃO 2) -->
+                    <div id="replyOwnerPinContainer-${escapeHtml(revIdStr)}" class="hidden mt-2 p-2.5 bg-emerald-50/90 border border-emerald-300 rounded-xl space-y-1.5">
+                      <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-extrabold text-emerald-900 flex items-center gap-1">
+                          <i data-lucide="key-round" class="w-3.5 h-3.5 text-emerald-700"></i>
+                          PIN de 4 dígitos da Loja:
+                        </label>
+                        <a href="https://wa.me/5582991008045?text=${encodeURIComponent('Olá Gabriel, sou o proprietário de ' + (currentStore?.nome || 'minha loja') + ' no Achei em Pilar e gostaria de saber o PIN da minha loja para responder avaliações.')}" target="_blank" class="text-[10px] text-emerald-700 hover:text-emerald-900 underline font-bold" title="Ajuda ou esqueci o PIN">
+                          Esqueci meu PIN
+                        </a>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <input 
+                          type="password" 
+                          inputmode="numeric" 
+                          maxlength="4" 
+                          id="replyPin-${escapeHtml(revIdStr)}" 
+                          placeholder="••••" 
+                          class="w-24 text-center tracking-widest font-black text-sm bg-white border border-emerald-400 rounded-lg px-2.5 py-1 outline-none focus:ring-2 focus:ring-emerald-600 shadow-2xs"
+                        >
+                        <span class="text-[10.5px] text-slate-600 leading-tight">
+                          Dica: O PIN padrão são os <strong>4 últimos dígitos do WhatsApp</strong> da sua loja.
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   <div>
