@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo — Achei em Pilar</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#065f46">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            pilar: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- ================= TELA DE LOGIN (QUANDO NÃO AUTENTICADO) ================= -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-950">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 relative text-center">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center mb-4 shadow-inner">
+        <i data-lucide="shield-check" class="w-9 h-9 text-emerald-700"></i>
+      </div>
+      <h2 class="font-heading font-extrabold text-2xl text-slate-900">Achei em Pilar</h2>
+      <p class="text-xs text-slate-500 font-semibold mt-1">Painel de Controle do Administrador</p>
+
+      <div class="mt-6 space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Senha Mestra de Acesso</label>
+          <div class="relative">
+            <input type="password" id="loginPasswordInput" onkeydown="if(event.key==='Enter') executeLogin()" placeholder="Digite a senha de administrador" class="w-full border border-slate-200 rounded-xl px-4 pr-11 py-3 text-sm font-semibold tracking-wider focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 transition">
+            <button type="button" onclick="toggleLoginPassVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1.5 transition cursor-pointer" title="Ver/Ocultar Senha">
+              <i data-lucide="eye" id="loginEyeIcon" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button onclick="executeLogin()" id="btnLoginSubmit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm py-3.5 rounded-xl transition shadow-md shadow-emerald-700/20 flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+          <span>Entrar no Painel</span>
+        </button>
+
+        <div class="pt-2 text-center">
+          <a href="/" class="text-xs font-bold text-slate-400 hover:text-slate-700 transition inline-flex items-center gap-1.5">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Voltar ao Guia Comercial Público
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAINEL DO ADMINISTRADOR (APÓS LOGIN) ================= -->
+  <div id="dashboardScreen" class="hidden flex-1 flex flex-col min-h-screen">
+    
+    <!-- HEADER SUPERIOR -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/20">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-heading font-extrabold text-slate-900 text-base sm:text-lg leading-tight">Achei em Pilar</h1>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Administrador</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Gestão do Guia Comercial & Estatísticas de Acesso</p>
+          </div>
+        </div>
+
+        <!-- AÇÕES RÁPIDAS NO HEADER -->
+        <div class="flex items-center gap-2">
+          <a href="/" target="_blank" class="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 px-3 py-1.5 rounded-xl transition">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver Guia Público
+          </a>
+          <button onclick="syncAllStoresToSupabase()" id="btnHeaderSync" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition cursor-pointer" title="Sincronizar dados com a Nuvem">
+            <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Salvar na</span> Nuvem
+          </button>
+          <button onclick="executeLogout()" class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition cursor-pointer">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair
+          </button>
+        </div>
+      </div>
+
+      <!-- BARRA DE NAVEGAÇÃO POR ABAS -->
+      <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 overflow-x-auto custom-scrollbar py-2">
+          
+          <button onclick="switchTab('stores')" id="tabBtn-stores" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer">
+            <i data-lucide="store" class="w-4 h-4 text-emerald-600"></i>
+            <span>Estabelecimentos</span>
+            <span id="badgeTotalStores" class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.2 rounded-full font-extrabold">0</span>
+          </button>
+
+          <button onclick="switchTab('form')" id="tabBtn-form" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
+            <span id="tabFormTitle">Cadastrar Novo</span>
+          </button>
+
+          <button onclick="switchTab('metrics')" id="tabBtn-metrics" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-600"></i>
+            <span>Cliques & Métricas</span>
+          </button>
+
+          <button onclick="switchTab('settings')" id="tabBtn-settings" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+            <i data-lucide="settings-2" class="w-4 h-4 text-amber-600"></i>
+            <span>Configurações & Nuvem</span>
+          </button>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL (COM ABAS) -->
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1">
+      
+      <!-- ================= ABA 1: LISTA DE ESTABELECIMENTOS ================= -->
+      <section id="tabContent-stores" class="space-y-4">
+        
+        <!-- BARRA DE FERRAMENTAS E FILTROS -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+          
+          <!-- CAMPO DE BUSCA -->
+          <div class="relative flex-1 max-w-md">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" oninput="filterAdminStores()" placeholder="Buscar por nome, telefone, rua ou categoria..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm outline-none focus:border-emerald-500 focus:bg-white transition">
+          </div>
+
+          <!-- FILTROS DROPDOWN -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <select id="filterCategory" onchange="filterAdminStores()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer">
+              <option value="">Todas as Categorias</option>
+              <option value="delivery">Lanches & Delivery</option>
+              <option value="bolos">Bolos & Doces</option>
+              <option value="roupas">Roupas & Calçados</option>
+              <option value="beleza">Salão & Barbearia</option>
+              <option value="servicos">Fretes & Serviços</option>
+              <option value="utilidades">Variedades & Móveis</option>
+              <option value="saude">Farmácia & Saúde</option>
+            </select>
+
+            <select id="filterBairro" onchange="filterAdminStores()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-500 cursor-pointer">
+              <option value="">Todos os Bairros</option>
+              <option value="Chã do Pilar">Chã do Pilar</option>
+              <option value="Pilar Centro">Pilar Centro</option>
+              <option value="Imburi">Imburi</option>
+            </select>
+
+            <button onclick="prepareNewStoreForm()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer ml-auto md:ml-0">
+              <i data-lucide="plus" class="w-4 h-4"></i> Nova Loja
+            </button>
+          </div>
+        </div>
+
+        <!-- LISTA EM CARDS/GRID MODERNO -->
+        <div id="storesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- Preenchido via JavaScript -->
+        </div>
+
+        <div id="storesEmptyState" class="hidden text-center py-12 bg-white rounded-3xl border border-slate-200">
+          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-2">
+            <i data-lucide="search-x" class="w-6 h-6"></i>
+          </div>
+          <h4 class="font-bold text-sm text-slate-700">Nenhum estabelecimento encontrado</h4>
+          <p class="text-xs text-slate-400 mt-0.5">Tente buscar com outro termo ou limpe os filtros.</p>
+        </div>
+
+      </section>
+
+      <!-- ================= ABA 2: FORMULÁRIO DE CADASTRO / EDIÇÃO ================= -->
+      <section id="tabContent-form" class="hidden max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 sm:p-8">
+          
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+            <div>
+              <span id="formBadgeMode" class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 block">Novo Cadastro</span>
+              <h3 id="formHeaderTitle" class="font-heading font-extrabold text-xl text-slate-900 leading-tight">Cadastrar Estabelecimento</h3>
+            </div>
+            <button type="button" id="btnCancelEdit" onclick="cancelFormEdit()" class="hidden text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl transition cursor-pointer">
+              Cancelar Edição
+            </button>
+          </div>
+
+          <form onsubmit="handleSaveStoreForm(event)" class="space-y-6">
+            <input type="hidden" id="formEditId" value="">
+
+            <!-- SEÇÃO 1: DADOS BÁSICOS -->
+            <div>
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-600"></i> Dados Principais
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Loja / Estabelecimento *</label>
+                  <input type="text" id="formNome" required placeholder="Ex: Pizzaria Robson Lima" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50/50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Categoria *</label>
+                  <select id="formCategoria" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 cursor-pointer">
+                    <option value="delivery">Lanches & Delivery</option>
+                    <option value="bolos">Bolos & Doces</option>
+                    <option value="roupas">Roupas & Calçados</option>
+                    <option value="beleza">Salão & Barbearia</option>
+                    <option value="servicos">Fretes & Serviços</option>
+                    <option value="utilidades">Variedades & Móveis</option>
+                    <option value="saude">Farmácia & Saúde</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Bairro em Pilar *</label>
+                  <select id="formBairro" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 cursor-pointer">
+                    <option value="Chã do Pilar">Chã do Pilar</option>
+                    <option value="Pilar Centro">Pilar Centro</option>
+                    <option value="Imburi">Imburi</option>
+                    <option value="Outro">Outro Bairro</option>
+                  </select>
+                </div>
+                <div class="flex items-center gap-2 pt-6">
+                  <input type="checkbox" id="formVip" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                  <label for="formVip" class="text-xs sm:text-sm font-bold text-amber-800 flex items-center gap-1.5 cursor-pointer">
+                    ⭐ Marcar como Cliente VIP / Destaque Recomendado
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 2: LOGO / FOTO COM PREVIEW -->
+            <div class="pt-4 border-t border-slate-100">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i data-lucide="image" class="w-3.5 h-3.5 text-blue-600"></i> Identidade Visual / Foto
+              </h4>
+              <div class="flex flex-col sm:flex-row items-center gap-4">
+                <!-- BOX DE PREVIEW -->
+                <div class="w-24 h-24 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden shrink-0 relative shadow-inner">
+                  <img id="formLogoPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                  <div id="formLogoPlaceholder" class="text-center text-slate-400 p-2">
+                    <i data-lucide="image" class="w-6 h-6 mx-auto mb-1"></i>
+                    <span class="text-[10px] font-bold block">Sem Foto</span>
+                  </div>
+                </div>
+
+                <div class="flex-1 w-full space-y-2">
+                  <label class="block text-xs font-bold text-slate-700">URL da Foto ou Envio de Arquivo</label>
+                  <div class="flex gap-2">
+                    <input type="text" id="formLogo" oninput="updateFormLogoPreview()" placeholder="Ex: Fotos/minha_foto.jpg ou https://..." class="flex-1 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                    <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition cursor-pointer shrink-0 border border-slate-200" title="Escolher arquivo do computador">
+                      <i data-lucide="upload" class="w-4 h-4"></i>
+                      <span>Subir Foto</span>
+                      <input type="file" id="formLogoFile" accept="image/*" class="hidden" onchange="handleFormLogoUpload(this)">
+                    </label>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Você pode colar o caminho local (ex: Fotos/logo.jpg), uma URL da internet ou subir uma imagem direto do computador.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 3: CONTATOS & REDES -->
+            <div class="pt-4 border-t border-slate-100">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i data-lucide="phone-call" class="w-3.5 h-3.5 text-emerald-600"></i> Contatos & Redes Sociais
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp (DDD + Número)</label>
+                  <input type="tel" id="formWhatsapp" placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                  <span class="text-[10px] text-slate-400 mt-0.5 block">Deixe em branco se a loja só tiver site/Instagram.</span>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Site / Cardápio Online (Opcional)</label>
+                  <input type="url" id="formSite" placeholder="Ex: https://loja.anota.ai/..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (com @)</label>
+                  <input type="text" id="formInstagram" placeholder="Ex: @pilar.grill" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-pink-500 bg-slate-50/50">
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 4: LOCALIZAÇÃO & HORÁRIOS -->
+            <div class="pt-4 border-t border-slate-100">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-500"></i> Endereço, Google Maps & Horário
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Horário de Funcionamento</label>
+                  <input type="text" id="formHorario" placeholder="Ex: Terça a Domingo das 18h às 23h" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Endereço Completo</label>
+                  <input type="text" id="formEndereco" placeholder="Ex: R. Dr. José Lages Filho, 111" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Link Direto Google Maps</label>
+                  <input type="url" id="formMapsUrl" placeholder="Ex: https://maps.app.goo.gl/..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50">
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 5: DESCRIÇÃO COM ENTER -->
+            <div class="pt-4 border-t border-slate-100">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-600"></i> Descrição & Especialidades
+              </h4>
+              <p class="text-[11px] text-slate-500 mb-2 font-medium">Você pode pular linhas com <strong>Enter</strong> para criar tópicos ou listar produtos com emojis!</p>
+              <textarea id="formDescricao" rows="4" placeholder="Ex:&#10;🍕 Pizzas artesanais com massa fininha&#10;🥤 Refrigerante 2L grátis na compra de 2 pizzas&#10;🛵 Entrega rápida em toda a cidade" class="w-full border border-slate-200 rounded-2xl p-3.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 resize-y leading-relaxed"></textarea>
+            </div>
+
+            <!-- BOTÕES DE SUBMIT -->
+            <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
+              <button type="button" onclick="cancelFormEdit()" class="text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-5 py-3 rounded-xl transition cursor-pointer">
+                Limpar Campos
+              </button>
+              <button type="submit" id="btnFormSubmit" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs sm:text-sm px-7 py-3 rounded-xl transition shadow-md shadow-emerald-700/20 flex items-center gap-2 cursor-pointer">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span id="btnFormSubmitText">Salvar e Publicar Estabelecimento</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= ABA 3: CLIQUES & MÉTRICAS ================= -->
+      <section id="tabContent-metrics" class="hidden space-y-6">
+        
+        <!-- CARDS DE TOTALIZADORES -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <i data-lucide="eye" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Visitas no Site</p>
+              <h3 id="statVisitsCount" class="text-2xl font-black text-slate-900 leading-tight mt-0.5">0</h3>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <i data-lucide="message-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cliques WhatsApp</p>
+              <h3 id="statZapCount" class="text-2xl font-black text-slate-900 leading-tight mt-0.5">0</h3>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shrink-0">
+              <i data-lucide="instagram" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cliques Instagram</p>
+              <h3 id="statInstaCount" class="text-2xl font-black text-slate-900 leading-tight mt-0.5">0</h3>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+              <i data-lucide="heart" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Curtidas Totais</p>
+              <h3 id="statLikesCount" class="text-2xl font-black text-slate-900 leading-tight mt-0.5">0</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABELA DE RANKING DAS LOJAS MAIS POPULARES -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+            <div>
+              <h3 class="font-heading font-extrabold text-base text-slate-900">Lojas Mais Acessadas pelos Moradores</h3>
+              <p class="text-xs text-slate-500">Classificação por engajamento e cliques nos canais de contato</p>
+            </div>
+            <button onclick="resetAllMetrics()" class="text-xs font-bold text-slate-400 hover:text-rose-600 transition flex items-center gap-1 cursor-pointer">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Zerar Métricas
+            </button>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-100">
+                  <th class="pb-3 font-extrabold uppercase"># Posição</th>
+                  <th class="pb-3 font-extrabold uppercase">Estabelecimento</th>
+                  <th class="pb-3 font-extrabold uppercase">Categoria</th>
+                  <th class="pb-3 font-extrabold uppercase text-center">WhatsApp</th>
+                  <th class="pb-3 font-extrabold uppercase text-center">Instagram</th>
+                  <th class="pb-3 font-extrabold uppercase text-center">Curtidas</th>
+                  <th class="pb-3 font-extrabold uppercase text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="metricsTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= ABA 4: CONFIGURAÇÕES & NUVEM ================= -->
+      <section id="tabContent-settings" class="hidden max-w-4xl mx-auto space-y-6">
+        
+        <!-- CARD 1: NUVEM SUPABASE -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                <i data-lucide="cloud" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-heading font-extrabold text-base text-slate-900">Banco de Dados em Nuvem (Supabase)</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Sincronize todos os comércios locais para a nuvem para que os moradores vejam atualizações em tempo real.</p>
+              </div>
+            </div>
+            <button onclick="syncAllStoresToSupabase()" id="btnSettingsSync" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer shrink-0">
+              <i data-lucide="upload-cloud" class="w-4 h-4"></i> Subir Tudo para a Nuvem
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: CHAVE PIX DE DOAÇÃO -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+              <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-heading font-extrabold text-base text-slate-900">Chave PIX de Doação</h3>
+              <p class="text-xs text-slate-500">Essa chave é usada no botão 'Apoie o site' para receber contribuições dos moradores.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 items-center">
+            <input type="text" id="settingPixKeyInput" placeholder="Chave Pix (E-mail, CPF ou Telefone)" class="flex-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50/50">
+            <button onclick="saveSettingsPixKey()" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i data-lucide="save" class="w-4 h-4"></i> Salvar Chave
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 3: ALTERAR SENHA -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+              <i data-lucide="key-round" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-heading font-extrabold text-base text-slate-900">Segurança do Administrador</h3>
+              <p class="text-xs text-slate-500">Altere a senha mestra de acesso a este painel administrativo.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 items-center">
+            <input type="password" id="settingNewPassInput" placeholder="Digite a nova senha (mínimo 6 caracteres)" class="flex-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+            <button onclick="saveSettingsNewPassword()" class="w-full sm:w-auto bg-slate-900 hover:bg-black active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i data-lucide="lock" class="w-4 h-4"></i> Atualizar Senha
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 4: BACKUP & RESTAURAÇÃO -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+              <i data-lucide="database" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-heading font-extrabold text-base text-slate-900">Backup & Recuperação de Dados</h3>
+              <p class="text-xs text-slate-500">Baixe uma cópia de segurança de todas as lojas cadastradas ou restaure se necessário.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3 items-center">
+            <button onclick="exportDataJSON()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs px-4 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-2 cursor-pointer">
+              <i data-lucide="download" class="w-4 h-4"></i> Baixar Backup (.json)
+            </button>
+
+            <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs px-4 py-2.5 rounded-xl transition border border-slate-200 flex items-center gap-2 cursor-pointer">
+              <i data-lucide="upload" class="w-4 h-4"></i> Restaurar Backup (.json)
+              <input type="file" accept=".json" class="hidden" onchange="importDataJSON(this)">
+            </label>
+
+            <button onclick="resetStoresToDefault()" class="text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 font-extrabold text-xs px-4 py-2.5 rounded-xl transition border border-rose-200 flex items-center gap-2 cursor-pointer ml-auto">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Restaurar Padrão de Fábrica
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- TOAST DE NOTIFICAÇÃO FLUTUANTE -->
+  <div id="toastBox" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toastContent" class="bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-slate-800">
+      <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+      <span id="toastMessage">Ação realizada!</span>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT DO PAINEL ================= -->
+  <script>
+    // CONFIGURAÇÃO SUPABASE
+    const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
+    
+    let supabaseClient = null;
+    if (window.supabase) {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch(e) { console.warn('Supabase:', e); }
+    }
+
+    // AUTENTICAÇÃO E SESSÃO
+    const DEFAULT_ADMIN_HASH = "813e2b69ca2a2b29b5a109481b0cf67b3dbed1194e464fe901de68f034c949dc";
+    let failedAttempts = 0;
+    let lockoutUntil = 0;
+
+    async function hashAdminPassword(str) {
+      const enc = new TextEncoder().encode(str + "_pilar_salt_2026_xyz");
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function toggleLoginPassVisibility() {
+      const input = document.getElementById('loginPasswordInput');
+      const icon = document.getElementById('loginEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    async function executeLogin() {
+      const now = Date.now();
+      if (now < lockoutUntil) {
+        const remaining = Math.ceil((lockoutUntil - now) / 60000);
+        showToast(`Muitas tentativas. Bloqueado por mais ${remaining} minuto(s).`, 'error');
+        return;
+      }
+
+      const pass = (document.getElementById('loginPasswordInput').value || '').trim();
+      if (!pass) {
+        showToast('Digite a senha de administrador.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btnLoginSubmit');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Verificando...`;
+
+      // 1. Tentar validar via backend serverless na Vercel
+      try {
+        const res = await fetch('/api/admin-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.token) {
+            sessionStorage.setItem('pilar_admin_token', data.token);
+            sessionStorage.setItem('pilar_admin_logged', '1');
+            failedAttempts = 0;
+            enterDashboard();
+            return;
+          }
+        }
+      } catch(e) {
+        console.warn('Backend auth fallback:', e);
+      }
+
+      // 2. Fallback de validação local por SHA-256
+      const inputHash = await hashAdminPassword(pass);
+      const storedHash = localStorage.getItem('pilar_admin_hash_v2') || DEFAULT_ADMIN_HASH;
+
+      if (inputHash === storedHash) {
+        sessionStorage.setItem('pilar_admin_logged', '1');
+        failedAttempts = 0;
+        enterDashboard();
+      } else {
+        failedAttempts++;
+        btn.innerHTML = originalText;
+        lucide.createIcons();
+        if (failedAttempts >= 3) {
+          lockoutUntil = Date.now() + (15 * 60 * 1000);
+          showToast('Senha incorreta! 3 tentativas falhas. Bloqueado por 15 minutos.', 'error');
+        } else {
+          showToast(`Senha incorreta! Tentativa ${failedAttempts} de 3.`, 'error');
+        }
+      }
+    }
+
+    function enterDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+      loadAllStores();
+      loadSettingsTab();
+      lucide.createIcons();
+      showToast('Bem-vindo ao Painel Administrativo!', 'success');
+    }
+
+    function executeLogout() {
+      sessionStorage.removeItem('pilar_admin_token');
+      sessionStorage.removeItem('pilar_admin_logged');
+      document.getElementById('dashboardScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      const pass = document.getElementById('loginPasswordInput');
+      if (pass) pass.value = '';
+      lucide.createIcons();
+    }
+
+    // NAVEGAÇÃO DE ABAS
+    let currentActiveTab = 'stores';
+    function switchTab(tabId) {
+      currentActiveTab = tabId;
+      const tabs = ['stores', 'form', 'metrics', 'settings'];
+      tabs.forEach(t => {
+        const content = document.getElementById(`tabContent-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabId) {
+          if (content) content.classList.remove('hidden');
+          if (btn) {
+            btn.className = 'tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer';
+          }
+        } else {
+          if (content) content.classList.add('hidden');
+          if (btn) {
+            btn.className = 'tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
+          }
+        }
+      });
+
+      if (tabId === 'metrics') {
+        renderMetricsTab();
+      } else if (tabId === 'stores') {
+        renderAdminStores();
+      }
+      lucide.createIcons();
+    }
+
+    // GERENCIAMENTO DE LOJAS
+    let storesData = [];
+
+    function getLocalStores() {
+      try {
+        const stored = localStorage.getItem('pilar_stores_data_v9');
+        if (stored) return JSON.parse(stored);
+      } catch(e) {}
+      return [];
+    }
+
+    function saveLocalStores(stores) {
+      localStorage.setItem('pilar_stores_data_v9', JSON.stringify(stores));
+      storesData = stores;
+    }
+
+    async function loadAllStores() {
+      storesData = getLocalStores();
+      
+      // Tentar atualizar a partir do Supabase caso exista conexão
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('stores').select('*').order('nome');
+          if (!error && Array.isArray(data) && data.length > 0) {
+            storesData = data;
+            saveLocalStores(data);
+          }
+        } catch(e) {
+          console.warn('Erro ao carregar do Supabase:', e);
+        }
+      }
+
+      renderAdminStores();
+    }
+
+    function renderAdminStores() {
+      const container = document.getElementById('storesListContainer');
+      const emptyState = document.getElementById('storesEmptyState');
+      const badgeTotal = document.getElementById('badgeTotalStores');
+      
+      const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('filterCategory').value;
+      const bairro = document.getElementById('filterBairro').value;
+
+      const filtered = storesData.filter(store => {
+        const matchSearch = !search || (
+          (store.nome || '').toLowerCase().includes(search) ||
+          (store.bairro || '').toLowerCase().includes(search) ||
+          (store.categoria || '').toLowerCase().includes(search) ||
+          (store.whatsapp || '').includes(search) ||
+          (store.endereco || '').toLowerCase().includes(search)
+        );
+        const matchCat = !cat || store.categoria === cat;
+        const matchBairro = !bairro || store.bairro === bairro;
+        return matchSearch && matchCat && matchBairro;
+      });
+
+      if (badgeTotal) badgeTotal.innerText = storesData.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      container.innerHTML = filtered.map(store => {
+        const hasZap = store.whatsapp && !/^0+$/.test(String(store.whatsapp).replace(/\D/g, ''));
+        const zapClean = hasZap ? String(store.whatsapp).replace(/\D/g, '') : '';
+        const logoSrc = store.logo || '';
+        
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition flex flex-col justify-between gap-3 relative group">
+            
+            <div class="flex items-start gap-3">
+              <!-- LOGO -->
+              <div class="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden relative">
+                ${logoSrc ? `
+                  <img src="${logoSrc}" alt="${escapeHtml(store.nome)}" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-black text-slate-400 text-lg\\'>${store.nome.charAt(0)}</span>';">
+                ` : `
+                  <span class="font-black text-slate-400 text-lg">${store.nome.charAt(0)}</span>
+                `}
+              </div>
+
+              <!-- INFO -->
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-bold text-sm text-slate-900 truncate">${escapeHtml(store.nome)}</h4>
+                  ${store.vip ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-1.5 py-0.2 rounded-md">VIP</span>` : ''}
+                </div>
+                
+                <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 flex-wrap">
+                  <span class="bg-slate-100 px-2 py-0.5 rounded-md font-semibold">${escapeHtml(store.categoria || 'Geral')}</span>
+                  <span>•</span>
+                  <span>${escapeHtml(store.bairro || 'Pilar')}</span>
+                </div>
+
+                ${store.endereco ? `
+                  <p class="text-[11px] text-slate-400 truncate mt-1" title="${escapeHtml(store.endereco)}">
+                    ${escapeHtml(store.endereco)}
+                  </p>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- BADGES DE CONTATO & BOTÕES DE AÇÃO -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <!-- LINKS DE CONTATO -->
+              <div class="flex items-center gap-1.5 text-slate-400">
+                ${hasZap ? `
+                  <a href="https://wa.me/55${zapClean}" target="_blank" class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition" title="WhatsApp: ${store.whatsapp}">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+                ${store.instagram ? `
+                  <a href="https://instagram.com/${store.instagram.replace('@','')}" target="_blank" class="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-100 transition" title="Instagram: ${store.instagram}">
+                    <i data-lucide="instagram" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+                ${store.maps_url ? `
+                  <a href="${store.maps_url}" target="_blank" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition" title="Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+                ${store.site ? `
+                  <a href="${store.site}" target="_blank" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 transition" title="Site/Link">
+                    <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+              </div>
+
+              <!-- BOTÕES EDITAR E EXCLUIR -->
+              <div class="flex items-center gap-1">
+                <button onclick="startEditingStore('${escapeHtml(store.id)}')" class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-xl transition cursor-pointer" title="Editar Dados">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                </button>
+                <button onclick="confirmDeleteStore('${escapeHtml(store.id)}', '${escapeHtml(store.nome)}')\" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-1.5 rounded-xl transition cursor-pointer" title="Excluir Loja">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function filterAdminStores() {
+      renderAdminStores();
+    }
+
+    // FORMULÁRIO: CADASTRAR OU EDITAR
+    function prepareNewStoreForm() {
+      document.getElementById('formEditId').value = '';
+      document.querySelector('#tabContent-form form').reset();
+      document.getElementById('formLogoPreview').classList.add('hidden');
+      document.getElementById('formLogoPlaceholder').classList.remove('hidden');
+      document.getElementById('formBadgeMode').innerText = 'Novo Cadastro';
+      document.getElementById('formBadgeMode').className = 'text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 block';
+      document.getElementById('formHeaderTitle').innerText = 'Cadastrar Estabelecimento';
+      document.getElementById('tabFormTitle').innerText = 'Cadastrar Novo';
+      document.getElementById('btnFormSubmitText').innerText = 'Salvar e Publicar Estabelecimento';
+      document.getElementById('btnCancelEdit').classList.add('hidden');
+      switchTab('form');
+    }
+
+    function startEditingStore(id) {
+      const store = storesData.find(s => String(s.id) === String(id));
+      if (!store) return;
+
+      document.getElementById('formEditId').value = store.id;
+      document.getElementById('formNome').value = store.nome || '';
+      document.getElementById('formCategoria').value = store.categoria || 'delivery';
+      document.getElementById('formBairro').value = store.bairro || 'Chã do Pilar';
+      document.getElementById('formVip').checked = !!store.vip;
+
+      const cleanZap = (store.whatsapp || '').replace(/\D/g, '');
+      document.getElementById('formWhatsapp').value = /^0+$/.test(cleanZap) ? '' : (store.whatsapp || '');
+      document.getElementById('formSite').value = store.site || store.website || '';
+      document.getElementById('formInstagram').value = store.instagram || '';
+      document.getElementById('formHorario').value = store.horario || '';
+      document.getElementById('formEndereco').value = store.endereco || '';
+      document.getElementById('formMapsUrl').value = store.maps_url || '';
+      document.getElementById('formDescricao').value = store.descricao || '';
+      document.getElementById('formLogo').value = store.logo || '';
+
+      updateFormLogoPreview();
+
+      document.getElementById('formBadgeMode').innerText = 'Modo Edição';
+      document.getElementById('formBadgeMode').className = 'text-[11px] font-extrabold uppercase tracking-wider text-blue-700 block';
+      document.getElementById('formHeaderTitle').innerText = `Editar: ${store.nome}`;
+      document.getElementById('tabFormTitle').innerText = `✏️ Editando Loja`;
+      document.getElementById('btnFormSubmitText').innerText = 'Salvar Alterações';
+      document.getElementById('btnCancelEdit').classList.remove('hidden');
+
+      switchTab('form');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelFormEdit() {
+      prepareNewStoreForm();
+    }
+
+    function updateFormLogoPreview() {
+      const url = (document.getElementById('formLogo').value || '').trim();
+      const img = document.getElementById('formLogoPreview');
+      const placeholder = document.getElementById('formLogoPlaceholder');
+      if (url) {
+        img.src = url;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.src = '';
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    function handleFormLogoUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('formLogo').value = e.target.result;
+          updateFormLogoPreview();
+          showToast('Foto carregada com sucesso!', 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function handleSaveStoreForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('formEditId').value.trim();
+      const nome = document.getElementById('formNome').value.trim();
+      const categoria = document.getElementById('formCategoria').value.trim();
+      const bairro = document.getElementById('formBairro').value.trim();
+      let whatsapp = document.getElementById('formWhatsapp').value.trim();
+      if (/^0+$/.test(whatsapp.replace(/\D/g, ''))) whatsapp = '';
+      const site = document.getElementById('formSite').value.trim();
+      const instagram = document.getElementById('formInstagram').value.trim();
+      const horario = document.getElementById('formHorario').value.trim();
+      const endereco = document.getElementById('formEndereco').value.trim();
+      const maps_url = document.getElementById('formMapsUrl').value.trim();
+      const descricao = document.getElementById('formDescricao').value.trim();
+      const logo = document.getElementById('formLogo').value.trim();
+      const vip = document.getElementById('formVip').checked;
+
+      if (!whatsapp && !site) {
+        alert('Por favor, informe ao menos uma forma de contato (WhatsApp ou Site/Cardápio).');
+        return;
+      }
+
+      const btn = document.getElementById('btnFormSubmit');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando...`;
+
+      const storePayload = {
+        id: editId || Date.now().toString(),
+        nome,
+        categoria,
+        bairro,
+        whatsapp,
+        site: site || undefined,
+        instagram,
+        horario,
+        endereco,
+        maps_url: maps_url || undefined,
+        descricao,
+        logo,
+        vip,
+        keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase()
+      };
+
+      if (editId) {
+        const idx = storesData.findIndex(s => String(s.id) === String(editId));
+        if (idx !== -1) storesData[idx] = storePayload;
+      } else {
+        storesData.unshift(storePayload);
+      }
+
+      saveLocalStores(storesData);
+
+      // Salvar na Nuvem (Vercel API com fallback Supabase)
+      await sendStoreToCloud(storePayload);
+
+      btn.innerHTML = originalText;
+      lucide.createIcons();
+      showToast(`Estabelecimento "${nome}" salvo com sucesso!`, 'success');
+      prepareNewStoreForm();
+      switchTab('stores');
+    }
+
+    async function sendStoreToCloud(store) {
+      const token = sessionStorage.getItem('pilar_admin_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/admin-store', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ action: 'save', store })
+          });
+          if (res.ok) return true;
+        } catch(e) { console.warn('Api save fallback:', e); }
+      }
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('stores').upsert([store]);
+        } catch(e) { console.warn('Supabase save error:', e); }
+      }
+    }
+
+    async function confirmDeleteStore(id, nome) {
+      if (!confirm(`Tem certeza que deseja excluir permanentemente o estabelecimento "${nome}"?`)) {
+        return;
+      }
+
+      storesData = storesData.filter(s => String(s.id) !== String(id));
+      saveLocalStores(storesData);
+      renderAdminStores();
+
+      const token = sessionStorage.getItem('pilar_admin_token');
+      let deletedViaApi = false;
+      if (token) {
+        try {
+          const res = await fetch('/api/admin-store', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ action: 'delete', storeId: id })
+          });
+          if (res.ok) deletedViaApi = true;
+        } catch(e) { console.warn(e); }
+      }
+
+      if (!deletedViaApi && supabaseClient) {
+        try {
+          await supabaseClient.from('stores').delete().eq('id', id);
+        } catch(e) {}
+      }
+
+      showToast(`Estabelecimento "${nome}" excluído!`, 'success');
+    }
+
+    // SINCRONIZAR TUDO COM SUPABASE
+    async function syncAllStoresToSupabase() {
+      if (!supabaseClient) {
+        alert('Supabase não configurado!');
+        return;
+      }
+
+      const btn = document.getElementById('btnHeaderSync');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Sincronizando...`;
+
+      try {
+        const payloads = storesData.map(s => ({
+          id: String(s.id),
+          nome: s.nome || '',
+          categoria: s.categoria || 'delivery',
+          bairro: s.bairro || 'Chã do Pilar',
+          endereco: s.endereco || '',
+          whatsapp: s.whatsapp || '',
+          site: s.site || '',
+          instagram: s.instagram || '',
+          descricao: s.descricao || '',
+          horario: s.horario || '',
+          maps_url: s.maps_url || '',
+          logo: s.logo || '',
+          vip: !!s.vip,
+          keywords: s.keywords || ''
+        }));
+
+        const { error } = await supabaseClient.from('stores').upsert(payloads);
+        if (error) {
+          alert('Erro ao sincronizar com Supabase: ' + error.message);
+        } else {
+          showToast(`Todas as ${payloads.length} lojas sincronizadas na Nuvem!`, 'success');
+        }
+      } catch(err) {
+        alert('Erro: ' + err.message);
+      }
+
+      btn.innerHTML = originalText;
+      lucide.createIcons();
+    }
+
+    // MÉTRICAS
+    function renderMetricsTab() {
+      let statsCache = {};
+      try {
+        statsCache = JSON.parse(localStorage.getItem('pilar_stats_cache') || '{}');
+      } catch(e) {}
+
+      let totalVisits = Number(localStorage.getItem('pilar_total_visits') || 0);
+      let totalZap = 0;
+      let totalInsta = 0;
+      let totalLikes = 0;
+
+      storesData.forEach(s => {
+        const stat = statsCache[s.id] || {};
+        totalZap += (stat.whatsapp || 0);
+        totalInsta += (stat.instagram || 0);
+        totalLikes += (stat.likes || s.likes || 0);
+      });
+
+      document.getElementById('statVisitsCount').innerText = totalVisits;
+      document.getElementById('statZapCount').innerText = totalZap;
+      document.getElementById('statInstaCount').innerText = totalInsta;
+      document.getElementById('statLikesCount').innerText = totalLikes;
+
+      const tbody = document.getElementById('metricsTableBody');
+      const sorted = [...storesData].sort((a, b) => {
+        const sa = statsCache[a.id] || {};
+        const sb = statsCache[b.id] || {};
+        const scoreA = (sa.whatsapp || 0) + (sa.instagram || 0) + (sa.likes || 0);
+        const scoreB = (sb.whatsapp || 0) + (sb.instagram || 0) + (sb.likes || 0);
+        return scoreB - scoreA;
+      });
+
+      tbody.innerHTML = sorted.map((s, idx) => {
+        const stat = statsCache[s.id] || {};
+        const zap = stat.whatsapp || 0;
+        const insta = stat.instagram || 0;
+        const likes = stat.likes || s.likes || 0;
+        const total = zap + insta + likes;
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 font-extrabold text-slate-400">#${idx + 1}</td>
+            <td class="py-3 font-bold text-slate-900">${escapeHtml(s.nome)}</td>
+            <td class="py-3 text-slate-500">${escapeHtml(s.categoria || '-')}</td>
+            <td class="py-3 text-center text-emerald-600 font-bold">${zap}</td>
+            <td class="py-3 text-center text-pink-600 font-bold">${insta}</td>
+            <td class="py-3 text-center text-rose-600 font-bold">${likes}</td>
+            <td class="py-3 text-right font-black text-slate-900">${total}</td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function resetAllMetrics() {
+      if (!confirm('Deseja zerar os contadores de cliques e visitas do painel?')) return;
+      localStorage.removeItem('pilar_stats_cache');
+      localStorage.removeItem('pilar_total_visits');
+      renderMetricsTab();
+      showToast('Métricas zeradas com sucesso!', 'success');
+    }
+
+    // CONFIGURAÇÕES
+    function loadSettingsTab() {
+      const pix = localStorage.getItem('pilar_pix_key') || 'gabriell.alvess399@gmail.com';
+      const pixInput = document.getElementById('settingPixKeyInput');
+      if (pixInput) pixInput.value = pix;
+    }
+
+    function saveSettingsPixKey() {
+      const val = (document.getElementById('settingPixKeyInput').value || '').trim();
+      if (!val) {
+        showToast('Digite uma chave PIX válida.', 'error');
+        return;
+      }
+      localStorage.setItem('pilar_pix_key', val);
+      showToast('Chave PIX atualizada!', 'success');
+    }
+
+    async function saveSettingsNewPassword() {
+      const pass = (document.getElementById('settingNewPassInput').value || '').trim();
+      if (pass.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres.');
+        return;
+      }
+      const newHash = await hashAdminPassword(pass);
+      localStorage.setItem('pilar_admin_hash_v2', newHash);
+      document.getElementById('settingNewPassInput').value = '';
+      showToast('Senha de Administrador alterada com sucesso!', 'success');
+    }
+
+    // BACKUP E RESTAURAÇÃO
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storesData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "achei_em_pilar_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Backup exportado com sucesso!', 'success');
+    }
+
+    function importDataJSON(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported) && imported.length > 0) {
+              storesData = imported;
+              saveLocalStores(imported);
+              renderAdminStores();
+              showToast(`${imported.length} comércios restaurados com sucesso!`, 'success');
+            } else {
+              alert('Arquivo inválido ou sem comércios.');
+            }
+          } catch(err) {
+            alert('Erro ao ler arquivo JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(input.files[0]);
+      }
+    }
+
+    function resetStoresToDefault() {
+      if (!confirm('Deseja restaurar a lista inicial padrão de comércios? Suas alterações recentes locais serão substituídas.')) return;
+      localStorage.removeItem('pilar_stores_data_v9');
+      location.reload();
+    }
+
+    // UTILITÁRIOS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toastBox');
+      const msg = document.getElementById('toastMessage');
+      if (!toast || !msg) return;
+      msg.innerText = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+
+    // AUTO-LOGIN SE JÁ TIVER SESSÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      const token = sessionStorage.getItem('pilar_admin_token');
+      const logged = sessionStorage.getItem('pilar_admin_logged');
+      if (token || logged === '1') {
+        enterDashboard();
+      }
+    });
+  </script>
+</body>
+</html>

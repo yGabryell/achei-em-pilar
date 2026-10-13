@@ -1621,19 +1621,11 @@
     let isAdminLoggedIn = false;
 
     function openAdminModal() {
-      document.getElementById('adminModal').classList.remove('hidden');
-      if (isAdminLoggedIn) {
-        showAdminDashboard();
+      if (window.location.protocol === 'file:') {
+        window.location.href = 'admin.html';
       } else {
-        document.getElementById('adminLoginSection').classList.remove('hidden');
-        document.getElementById('adminDashboardSection').classList.add('hidden');
-        const passInput = document.getElementById('adminPassInput');
-        if (passInput) {
-          passInput.value = '';
-          setTimeout(() => passInput.focus(), 150);
-        }
+        window.location.href = '/admin';
       }
-      lucide.createIcons();
     }
 
     function closeAdminModal() {
