@@ -594,9 +594,15 @@
                 </div>
               </div>
 
-              <div>
-                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
-                <input type="text" id="admEndereco" placeholder="Rua Joaquina Rosa da Silva..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Endereço Completo</label>
+                  <input type="text" id="admEndereco" placeholder="Ex: R. Dr. José Lages Filho, 111" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Link Direto do Google Maps (Opcional)</label>
+                  <input type="url" id="admMapsUrl" placeholder="https://maps.app.goo.gl/... ou em branco" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
+                </div>
               </div>
 
               <div>
@@ -1152,6 +1158,43 @@
     let currentCategory = 'all';
     let currentBairro = 'all';
 
+    // GERADOR DE LINK DO GOOGLE MAPS COM ALTA PRECISÃO GEOGRÁFICA
+    function buildMapsLink(store) {
+      if (!store) return 'https://www.google.com/maps/search/?api=1&query=Pilar+-+AL';
+
+      // 1. Se foi cadastrado um link direto ou de compartilhamento do Maps
+      if (store.maps_url && /^(https?:\/\/)/i.test(store.maps_url.trim())) {
+        return sanitizeUrl(store.maps_url.trim()) || 'https://www.google.com/maps/search/?api=1&query=Pilar+-+AL';
+      }
+
+      // 2. Se o próprio campo de endereço for uma URL do Maps
+      if (store.endereco && /^(https?:\/\/)/i.test(store.endereco.trim())) {
+        return sanitizeUrl(store.endereco.trim()) || 'https://www.google.com/maps/search/?api=1&query=Pilar+-+AL';
+      }
+
+      const rawEndereco = (store.endereco || '').trim();
+      const rawBairro = (store.bairro || 'Chã do Pilar').trim();
+
+      // Se endereço for vazio ou genérico de delivery
+      if (!rawEndereco || rawEndereco.length < 3 || /^(delivery|online)/i.test(rawEndereco)) {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${rawBairro}, Pilar - AL`)}`;
+      }
+
+      // Limpar texto complementar entre parênteses para não quebrar a busca de ruas do Google Maps
+      // Ex: "(próx. ao Mercado)", "(Lot. Manguaba)"
+      let clean = rawEndereco.replace(/\([^)]*\)/g, '').trim();
+
+      // Limpar prefixos de número como N°, Nº, n°, nº, número, num.
+      clean = clean.replace(/\b[nN][°º]\s*/g, '');
+      clean = clean.replace(/\b(n[úu]mero|num\.?)\s*/gi, '');
+      clean = clean.replace(/\s+/g, ' ').trim();
+
+      // Montar busca focada na rua e número reais em Pilar - AL
+      // (SEM o nome fantasia da loja para o Google Maps não desviar para outro local com mesmo nome)
+      const query = `${clean}, ${rawBairro}, Pilar - AL`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
     // RENDERIZAR LOJAS NA TELA (COM PROTEÇÃO XSS COMPLETA E BOTÕES TOUCH 44PX)
     function renderStores() {
       const stores = getStores();
@@ -1205,8 +1248,8 @@
         const rawInsta = store.instagram ? store.instagram.replace('@', '').trim() : '';
         const instaClean = rawInsta.replace(/[^a-zA-Z0-9._]/g, '');
 
-        // Link do Google Maps
-        const mapsLink = `https://maps.google.com/?q=${encodeURIComponent(store.nome + ' ' + store.endereco + ' Pilar AL')}`;
+        // Link do Google Maps de Alta Precisão (ou link direto)
+        const mapsLink = buildMapsLink(store);
 
         // Avaliações reais da plataforma no layout do Google
         const ratingData = getStoreGoogleRating(store);
@@ -1688,6 +1731,7 @@
       document.getElementById('admInstagram').value = store.instagram || '';
       document.getElementById('admHorario').value = store.horario || '';
       document.getElementById('admEndereco').value = store.endereco || '';
+      document.getElementById('admMapsUrl').value = store.maps_url || '';
       document.getElementById('admDescricao').value = store.descricao || '';
       document.getElementById('admVip').checked = !!store.vip;
 
@@ -1706,6 +1750,7 @@
     function cancelAdminEdit() {
       document.getElementById('admEditId').value = '';
       document.querySelector('#admFormContainer form').reset();
+      document.getElementById('admMapsUrl').value = '';
       document.getElementById('admFormTitle').innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento`;
       document.getElementById('admEditingBadge').classList.add('hidden');
       document.getElementById('admSubmitBtnText').innerText = 'Salvar e Publicar Estabelecimento';
@@ -1724,6 +1769,7 @@
       const instagram = document.getElementById('admInstagram').value.trim();
       const horario = document.getElementById('admHorario').value.trim();
       const endereco = document.getElementById('admEndereco').value.trim();
+      const maps_url = document.getElementById('admMapsUrl').value.trim();
       const descricao = document.getElementById('admDescricao').value.trim();
       const vip = document.getElementById('admVip').checked;
 
@@ -1743,6 +1789,7 @@
             instagram,
             horario,
             endereco,
+            maps_url: maps_url || undefined,
             descricao,
             vip,
             keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
@@ -1771,6 +1818,7 @@
           instagram,
           horario,
           endereco,
+          maps_url: maps_url || undefined,
           descricao,
           vip,
           keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
