@@ -2795,6 +2795,73 @@ ${details}
       if (window.lucide) lucide.createIcons();
     }
 
+    function extractReviewsMeta(keywords) {
+      if (!keywords) return {};
+      const match = (keywords || '').match(/\[REVIEWS_META_START\]([\s\S]*?)\[REVIEWS_META_END\]/);
+      if (!match) return {};
+      try {
+        return JSON.parse(match[1]) || {};
+      } catch(e) {
+        return {};
+      }
+    }
+
+    function embedReviewsMeta(keywords, metaObj) {
+      let clean = (keywords || '').replace(/\n*\[REVIEWS_META_START\][\s\S]*?\[REVIEWS_META_END\]/g, '').trim();
+      if (metaObj && Object.keys(metaObj).length > 0) {
+        clean += '\n[REVIEWS_META_START]' + JSON.stringify(metaObj) + '[REVIEWS_META_END]';
+      }
+      return clean;
+    }
+
+    async function persistReviewMetaToCloud(reviewId, storeId, updatedComment, meta) {
+      // 1. Tentar salvar no endpoint serverless oficial (/api/review-action)
+      try {
+        fetch('/api/review-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reviewId, storeId, updatedComment, meta })
+        }).catch(() => {});
+      } catch(e) {}
+
+      // 2. Atualizar no store local e sincronizar com a tabela 'stores' no Supabase
+      const stores = getStores();
+      const st = stores.find(s => String(s.id) === String(storeId));
+      if (st) {
+        const metaObj = extractReviewsMeta(st.keywords);
+        metaObj[String(reviewId)] = {
+          likes: Number(meta.likes || 0),
+          dislikes: Number(meta.dislikes || 0),
+          replies: Array.isArray(meta.replies) ? meta.replies : []
+        };
+        st.keywords = embedReviewsMeta(st.keywords, metaObj);
+        saveStores(stores);
+
+        if (supabaseClient) {
+          try {
+            await supabaseClient
+              .from('stores')
+              .update({ keywords: st.keywords })
+              .eq('id', storeId);
+          } catch(err) {
+            console.warn('Erro ao sincronizar metadados na tabela stores:', err);
+          }
+        }
+      }
+
+      // 3. Tentar também atualizar store_reviews caso tenha permissão direta
+      if (supabaseClient && !String(reviewId).startsWith('local_')) {
+        try {
+          await supabaseClient
+            .from('store_reviews')
+            .update({ comment: updatedComment })
+            .eq('id', reviewId);
+        } catch(err) {
+          console.warn('Erro ao atualizar store_reviews diretamente:', err);
+        }
+      }
+    }
+
     async function voteReview(reviewId, storeId, type) {
       const currentVote = localReviewVotes[reviewId]; // 'up', 'down' ou undefined
       
@@ -2804,6 +2871,19 @@ ${details}
       }
       const rawComment = targetReview ? (targetReview.comment || '') : '';
       let { userComment, replies, likes, dislikes } = parseReviewComment(rawComment);
+
+      // Também verificar se há metadados mais recentes na loja para este review
+      const stores = getStores();
+      const st = stores.find(s => String(s.id) === String(storeId));
+      const reviewsMeta = extractReviewsMeta(st?.keywords);
+      const meta = reviewsMeta[String(reviewId)];
+      if (meta) {
+        if (typeof meta.likes === 'number') likes = Math.max(likes, meta.likes);
+        if (typeof meta.dislikes === 'number') dislikes = Math.max(dislikes, meta.dislikes);
+        if (Array.isArray(meta.replies) && meta.replies.length > 0 && replies.length === 0) {
+          replies = meta.replies;
+        }
+      }
 
       if (type === 'up') {
         if (currentVote === 'up') {
@@ -2843,16 +2923,12 @@ ${details}
 
       updateReviewVoteUI(reviewId, likes, dislikes, localReviewVotes[reviewId]);
 
-      if (supabaseClient && !String(reviewId).startsWith('local_')) {
-        try {
-          await supabaseClient
-            .from('store_reviews')
-            .update({ comment: updatedComment })
-            .eq('id', reviewId);
-        } catch(err) {
-          console.warn('Erro ao atualizar votos no Supabase:', err);
-        }
-      }
+      // Sincronizar na nuvem de forma persistente (Supabase e Vercel)
+      persistReviewMetaToCloud(reviewId, storeId, updatedComment, {
+        likes,
+        dislikes,
+        replies
+      });
     }
 
     function toggleReplyBox(reviewId) {
@@ -2944,24 +3020,19 @@ ${details}
       const replies = Array.isArray(parsed.replies) ? [...parsed.replies, newReply] : [newReply];
       const updatedComment = buildReviewComment(parsed.userComment, replies, parsed.likes, parsed.dislikes);
 
-      // 1. Atualizar no Supabase
-      if (supabaseClient && !String(reviewId).startsWith('local_')) {
-        try {
-          await supabaseClient
-            .from('store_reviews')
-            .update({ comment: updatedComment })
-            .eq('id', reviewId);
-        } catch(err) {
-          console.warn('Erro ao atualizar resposta no Supabase:', err);
-        }
-      }
-
-      // 2. Atualizar no cache local
+      // 1. Atualizar no cache local
       if (targetReview) {
         targetReview.comment = updatedComment;
         targetReview.replies = replies;
         localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
       }
+
+      // 2. Sincronizar na nuvem de forma persistente (Supabase e Vercel)
+      await persistReviewMetaToCloud(reviewId, storeId, updatedComment, {
+        likes: parsed.likes,
+        dislikes: parsed.dislikes,
+        replies
+      });
 
       alert(isOwner ? 'Resposta oficial do estabelecimento publicada com sucesso!' : 'Sua resposta foi publicada com sucesso!');
       await loadStoreReviews(storeId);
@@ -3011,12 +3082,34 @@ ${details}
         lucide.createIcons();
         return;
       }
+
+      // Carregar metadados da nuvem da loja correspondente
+      const stores = getStores();
+      const currentStore = stores.find(s => String(s.id) === String(storeId));
+      const reviewsMeta = extractReviewsMeta(currentStore?.keywords || '');
       
       listEl.innerHTML = reviews.map(rev => {
         const rawComment = rev.comment || '';
-        const { userComment, replies, likes, dislikes } = parseReviewComment(rawComment);
+        let { userComment, replies, likes, dislikes } = parseReviewComment(rawComment);
         const revIdStr = String(rev.id || '');
         const userVote = localReviewVotes[rev.id];
+
+        // Mesclar metadados persistentes da nuvem (se existirem na loja)
+        const meta = reviewsMeta[revIdStr];
+        if (meta) {
+          if (typeof meta.likes === 'number') likes = Math.max(likes, meta.likes);
+          if (typeof meta.dislikes === 'number') dislikes = Math.max(dislikes, meta.dislikes);
+          if (Array.isArray(meta.replies) && meta.replies.length > 0) {
+            const existingReplies = new Set(replies.map(r => (r.text || '') + '||' + (r.author || '')));
+            meta.replies.forEach(r => {
+              const key = (r.text || '') + '||' + (r.author || '');
+              if (!existingReplies.has(key)) {
+                replies.push(r);
+                existingReplies.add(key);
+              }
+            });
+          }
+        }
 
         return `
           <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-2xl flex items-start gap-2.5">
