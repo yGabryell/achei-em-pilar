@@ -248,7 +248,7 @@
         <!-- QR CODE PIX OFICIAL COM STATUS EM TEMPO REAL -->
         <div class="my-3 flex justify-center">
           <div class="p-2 bg-white rounded-2xl border-2 border-slate-200 shadow-2xs inline-block relative">
-            <img id="pixQrImg" src="" alt="QR Code PIX" class="w-32 h-32 rounded-lg block">
+            <img id="pixQrImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="QR Code PIX" class="w-32 h-32 rounded-lg block">
             <div id="pixLoadingSpinner" class="hidden absolute inset-0 bg-white/95 rounded-xl flex flex-col items-center justify-center gap-1 z-10">
               <i data-lucide="loader" class="w-6 h-6 text-emerald-600 animate-spin"></i>
               <span class="text-[10px] font-bold text-slate-600">Gerando Pix...</span>
@@ -538,7 +538,7 @@
         </button>
       </div>
       <div class="w-full max-h-[75vh] flex items-center justify-center rounded-2xl overflow-hidden bg-black/50 border border-white/10 shadow-2xl">
-        <img id="lightboxImg" src="" alt="Foto do local" class="max-h-[75vh] max-w-full object-contain">
+        <img id="lightboxImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Foto do local" class="max-h-[75vh] max-w-full object-contain">
       </div>
     </div>
   </div>
@@ -1252,12 +1252,32 @@
 
     let localReviewsCache = {};
     try {
-      localReviewsCache = JSON.parse(localStorage.getItem('pilar_reviews_cache') || '{}');
+      const rawCache = localStorage.getItem('pilar_reviews_cache');
+      const parsedReviews = rawCache ? JSON.parse(rawCache) : {};
+      if (Array.isArray(parsedReviews)) {
+        localReviewsCache = {};
+        parsedReviews.forEach(r => {
+          if (r && r.store_id) {
+            const sid = String(r.store_id);
+            if (!localReviewsCache[sid]) localReviewsCache[sid] = [];
+            localReviewsCache[sid].push(r);
+          }
+        });
+      } else if (parsedReviews && typeof parsedReviews === 'object') {
+        localReviewsCache = parsedReviews;
+      } else {
+        localReviewsCache = {};
+      }
     } catch(e) { localReviewsCache = {}; }
 
     let localReviewVotes = {};
     try {
-      localReviewVotes = JSON.parse(localStorage.getItem('pilar_review_votes') || '{}');
+      const parsedVotes = JSON.parse(localStorage.getItem('pilar_review_votes') || '{}');
+      if (parsedVotes && typeof parsedVotes === 'object' && !Array.isArray(parsedVotes)) {
+        localReviewVotes = parsedVotes;
+      } else {
+        localReviewVotes = {};
+      }
     } catch(e) { localReviewVotes = {}; }
 
     function getStoreLikes(storeId) {
@@ -1272,7 +1292,14 @@
 
     function getStoreGoogleRating(store) {
       if (!store) return { score: '0.0', count: 0, stars: 0 };
-      const userReviews = localReviewsCache[store.id] || [];
+      let userReviews = [];
+      const sid = String(store.id || '');
+      if (localReviewsCache && typeof localReviewsCache === 'object' && !Array.isArray(localReviewsCache)) {
+        userReviews = localReviewsCache[sid] || localReviewsCache[store.id];
+      }
+      if (!Array.isArray(userReviews)) {
+        userReviews = [];
+      }
       const count = userReviews.length;
 
       if (count === 0) {
@@ -1283,7 +1310,7 @@
         };
       }
 
-      const totalStars = userReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+      const totalStars = userReviews.reduce((sum, r) => sum + (Number(r && r.rating) || 5), 0);
       const avg = totalStars / count;
 
       return {
@@ -1321,7 +1348,9 @@
     }
 
     function getStoreReviewCount(storeId) {
-      return (localReviewsCache[storeId] || []).length;
+      if (!localReviewsCache || typeof localReviewsCache !== 'object' || Array.isArray(localReviewsCache)) return 0;
+      const list = localReviewsCache[String(storeId)] || localReviewsCache[storeId];
+      return Array.isArray(list) ? list.length : 0;
     }
 
     function isStoreLiked(storeId) {
@@ -1463,45 +1492,58 @@
     });
 
     function renderStores() {
-      const stores = getStores();
-      const grid = document.getElementById('storesGrid');
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      try {
+        const rawStores = getStores();
+        const stores = Array.isArray(rawStores) ? rawStores : INITIAL_STORES;
+        const grid = document.getElementById('storesGrid');
+        if (!grid) return;
+        const searchInput = document.getElementById('searchInput');
+        const query = searchInput ? (searchInput.value || '').toLowerCase().trim() : '';
 
-      // Filtrar
-      const filtered = stores.filter(store => {
-        const matchCat = (currentCategory === 'all' || store.categoria === currentCategory);
-        const matchBairro = (currentBairro === 'all' || store.bairro === currentBairro);
-        
-        const searchable = `${store.nome} ${store.descricao} ${store.keywords || ''} ${store.bairro} ${store.endereco} ${store.instagram || ''}`.toLowerCase();
-        const matchQuery = !query || searchable.includes(query);
+        // Filtrar
+        const filtered = stores.filter(store => {
+          if (!store) return false;
+          const matchCat = (currentCategory === 'all' || store.categoria === currentCategory);
+          const matchBairro = (currentBairro === 'all' || store.bairro === currentBairro);
+          
+          const searchable = `${store.nome || ''} ${store.descricao || ''} ${store.keywords || ''} ${store.bairro || ''} ${store.endereco || ''} ${store.instagram || ''}`.toLowerCase();
+          const matchQuery = !query || searchable.includes(query);
 
-        return matchCat && matchBairro && matchQuery;
-      });
+          return matchCat && matchBairro && matchQuery;
+        });
 
-      // ORDENAÇÃO DINÂMICA:
-      // Quanto mais avaliações o comércio tiver, mais ele SOBE na lista!
-      // (VIPs mantêm destaque prioritário no topo, e dentro do seu grupo também sobem pelas avaliações)
-      filtered.sort((a, b) => {
-        if (b.vip !== a.vip) {
-          return (b.vip ? 1 : 0) - (a.vip ? 1 : 0);
+        // ORDENAÇÃO DINÂMICA
+        filtered.sort((a, b) => {
+          try {
+            if (Boolean(b.vip) !== Boolean(a.vip)) {
+              return (b.vip ? 1 : 0) - (a.vip ? 1 : 0);
+            }
+            const ratingA = getStoreGoogleRating(a);
+            const ratingB = getStoreGoogleRating(b);
+            if (ratingB.count !== ratingA.count) {
+              return ratingB.count - ratingA.count;
+            }
+            if (ratingB.stars !== ratingA.stars) {
+              return ratingB.stars - ratingA.stars;
+            }
+            return getStoreLikes(b.id) - getStoreLikes(a.id);
+          } catch(e) {
+            return 0;
+          }
+        });
+
+        const countEl = document.getElementById('resultsCount');
+        if (countEl) {
+          countEl.innerText = filtered.length === 1 
+            ? '1 estabelecimento encontrado' 
+            : `${filtered.length} estabelecimentos encontrados`;
         }
-        const ratingA = getStoreGoogleRating(a);
-        const ratingB = getStoreGoogleRating(b);
-        if (ratingB.count !== ratingA.count) {
-          return ratingB.count - ratingA.count;
+        const noResultsEl = document.getElementById('noResults');
+        if (noResultsEl) {
+          noResultsEl.classList.toggle('hidden', filtered.length > 0);
         }
-        if (ratingB.stars !== ratingA.stars) {
-          return ratingB.stars - ratingA.stars;
-        }
-        return getStoreLikes(b.id) - getStoreLikes(a.id);
-      });
 
-      document.getElementById('resultsCount').innerText = filtered.length === 1 
-        ? '1 estabelecimento encontrado' 
-        : `${filtered.length} estabelecimentos encontrados`;
-      document.getElementById('noResults').classList.toggle('hidden', filtered.length > 0);
-
-      grid.innerHTML = filtered.map(store => {
+        grid.innerHTML = filtered.map(store => {
         const defaultLogo = "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80";
         const rawLogo = store.logo && store.logo.trim() ? store.logo : defaultLogo;
         const logoUrl = sanitizeUrl(rawLogo) || defaultLogo;
@@ -1674,6 +1716,9 @@
       }).join('');
 
       lucide.createIcons();
+      } catch(err) {
+        console.error('Erro em renderStores:', err);
+      }
     }
 
     // FILTRO DE CATEGORIAS (PADRONIZAÇÃO UNIFORME DE CORES)
@@ -3322,12 +3367,26 @@ ${details}
       } catch(e) {}
     }
 
+    function initApp() {
+      try {
+        trackSiteVisit();
+        renderStores();
+        checkAdminUrlTrigger();
+        if (window.lucide) lucide.createIcons();
+      } catch(e) {
+        console.error('Erro na inicialização:', e);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+
     window.onload = function() {
-      trackSiteVisit();
-      renderStores();
+      initApp();
       syncSupabaseData();
-      checkAdminUrlTrigger();
-      lucide.createIcons();
 
       // Exibe de cara ao entrar no site (com opção imediata de fechar no X)
       setTimeout(() => {
