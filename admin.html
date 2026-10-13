@@ -108,9 +108,6 @@
           <a href="/" target="_blank" class="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 px-3 py-1.5 rounded-xl transition">
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver Guia Público
           </a>
-          <button onclick="syncAllStoresToSupabase()" id="btnHeaderSync" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition cursor-pointer" title="Sincronizar dados com a Nuvem">
-            <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Salvar na</span> Nuvem
-          </button>
           <button onclick="executeLogout()" class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition cursor-pointer">
             <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair
           </button>
@@ -1229,9 +1226,9 @@
         return;
       }
 
-      const btn = document.getElementById('btnHeaderSync');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Sincronizando...`;
+      const btn = document.getElementById('btnSettingsSync') || document.getElementById('btnHeaderSync');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Sincronizando...`;
 
       try {
         const payloads = storesData.map(s => ({
@@ -1261,7 +1258,7 @@
         alert('Erro: ' + err.message);
       }
 
-      btn.innerHTML = originalText;
+      if (btn) btn.innerHTML = originalText;
       lucide.createIcons();
     }
 
