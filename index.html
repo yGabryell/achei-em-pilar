@@ -76,6 +76,12 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- BOTÃO APOIAR / DOAR -->
+        <button onclick="openDonateModal()" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-bold px-3 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0" title="Apoiar com Doação">
+          <i data-lucide="coffee" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Apoiar</span>
+        </button>
+
         <!-- BOTÃO CADASTRAR LOJA -->
         <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -196,8 +202,55 @@
   <!-- ================= RODAPÉ ================= -->
   <footer class="mt-12 text-center text-xs text-slate-400 pb-8 px-4">
     <p>© 2026 Achei em Pilar — O Guia Comercial de Chã do Pilar & Pilar Centro • AL</p>
-    <p class="mt-1 text-[11px] text-slate-500 font-medium">Desenvolvido por Gabriel Alves</p>
+    <div class="mt-2.5 flex items-center justify-center">
+      <button onclick="openDonateModal()" class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs">
+        <i data-lucide="coffee" class="w-3.5 h-3.5 text-amber-600"></i> Apoie o site com qualquer valor via PIX
+      </button>
+    </div>
+    <p class="mt-2 text-[11px] text-slate-500 font-medium">Desenvolvido por Gabriel Alves</p>
   </footer>
+
+  <!-- ================= MODAL DE DOAÇÃO PIX ================= -->
+  <div id="donateModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative">
+      <button onclick="closeDonateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center">
+        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
+          <i data-lucide="coffee" class="w-7 h-7"></i>
+        </div>
+        <h3 class="font-heading font-extrabold text-lg text-slate-900">Apoie o Achei em Pilar ❤️</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          Este guia é <strong>100% gratuito</strong> para todos os comerciantes e moradores da nossa cidade.
+        </p>
+        <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+          Se este site te ajudou ou você quer incentivar a manter o serviço ativo e atualizado, você pode apoiar com qualquer valor! 🙏
+        </p>
+
+        <!-- VALORES SUGERIDOS -->
+        <div class="grid grid-cols-3 gap-2 mt-4 text-xs font-bold">
+          <div class="bg-slate-50 border border-slate-200 py-2 rounded-xl text-slate-700">☕ R$ 2,00</div>
+          <div class="bg-amber-50 border border-amber-200 py-2 rounded-xl text-amber-800">🥪 R$ 5,00</div>
+          <div class="bg-emerald-50 border border-emerald-200 py-2 rounded-xl text-emerald-800">⭐ R$ 10,00</div>
+        </div>
+
+        <!-- ÁREA DA CHAVE PIX -->
+        <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-left">
+          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Chave PIX Oficial</label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="pixKeyDisplay" readonly value="gabriel@simaceito.com.br" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 select-all outline-none">
+          </div>
+          <button onclick="copyPixKey()" id="btnCopyPix" class="w-full mt-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copiar Chave PIX
+          </button>
+        </div>
+
+        <p class="text-[10px] text-slate-400 mt-3">Muito obrigado por fortalecer o comércio da nossa cidade!</p>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= MODAL DE CADASTRO PÚBLICO (QUERO CADASTRAR) ================= -->
   <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
@@ -386,6 +439,9 @@
             </button>
             <button onclick="changeAdminPin()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1" title="Mudar Senha">
               <i data-lucide="key" class="w-3.5 h-3.5"></i> Mudar Senha
+            </button>
+            <button onclick="changePixKey()" class="text-[11px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1" title="Configurar Chave PIX de Doação">
+              <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Chave PIX
             </button>
             <button onclick="exportDataJSON()" class="text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1" title="Baixar Backup">
               <i data-lucide="download" class="w-3.5 h-3.5"></i> Backup
@@ -1264,6 +1320,58 @@
         alert('Senha de Administrador alterada com sucesso!');
       } else {
         alert('Senha inválida. Digite pelo menos 4 caracteres.');
+      }
+    }
+
+    // ================= CONFIGURAÇÃO E MODAL DE DOAÇÃO PIX =================
+    function getPixKey() {
+      return localStorage.getItem('pilar_pix_key') || 'gabriel@simaceito.com.br';
+    }
+
+    function changePixKey() {
+      const atual = getPixKey();
+      const nova = prompt('Digite a sua Chave PIX oficial para receber doações (CPF, E-mail, Celular ou Chave Aleatória):', atual);
+      if (nova !== null && nova.trim().length > 0) {
+        localStorage.setItem('pilar_pix_key', nova.trim());
+        const display = document.getElementById('pixKeyDisplay');
+        if (display) display.value = nova.trim();
+        alert('Chave PIX atualizada com sucesso para: ' + nova.trim());
+      }
+    }
+
+    function openDonateModal() {
+      const modal = document.getElementById('donateModal');
+      const input = document.getElementById('pixKeyDisplay');
+      if (input) input.value = getPixKey();
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDonateModal() {
+      const modal = document.getElementById('donateModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function copyPixKey() {
+      const key = getPixKey();
+      const btn = document.getElementById('btnCopyPix');
+      try {
+        await navigator.clipboard.writeText(key);
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Chave Copiada com Sucesso!`;
+        btn.className = "w-full mt-2.5 bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5";
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copiar Chave PIX`;
+          btn.className = "w-full mt-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95";
+          lucide.createIcons();
+        }, 2500);
+      } catch (err) {
+        const input = document.getElementById('pixKeyDisplay');
+        if (input) {
+          input.select();
+          document.execCommand('copy');
+          alert('Chave PIX copiada: ' + key);
+        }
       }
     }
 
