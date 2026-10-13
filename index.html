@@ -1436,21 +1436,9 @@
     // ================= CARROSSEL DE FOTOS DO LOCAL (SWIPE MOBILE & LIGHTBOX) =================
     function renderStorePhotosCarousel(store, mapsLink) {
       const photos = Array.isArray(store.fotos) ? store.fotos.filter(Boolean) : [];
-      const hasPhotos = photos.length > 0;
+      if (photos.length === 0) return '';
+
       const hasMaps = Boolean(mapsLink && !mapsLink.includes('undefined'));
-
-      if (!hasPhotos && !hasMaps) return '';
-
-      if (!hasPhotos && hasMaps) {
-        return `
-          <div class="mt-2.5">
-            <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50/80 hover:bg-blue-100 border border-blue-200/80 px-2.5 py-1 rounded-xl transition shadow-2xs">
-              <i data-lucide="map-pin" class="w-3 h-3 text-blue-600"></i>
-              <span>Ver fotos e localização no Google Maps ↗</span>
-            </a>
-          </div>
-        `;
-      }
 
       return `
         <div class="mt-3 pt-2.5 border-t border-slate-100/90">
