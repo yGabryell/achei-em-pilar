@@ -1025,6 +1025,48 @@
         logo: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=200&q=80",
         vip: false,
         keywords: "frete transporte mudanca carreto caminhao cha pilar imburi"
+      },
+      {
+        id: "22",
+        nome: "Casa Berlins",
+        categoria: "utilidades",
+        bairro: "Chã do Pilar",
+        endereco: "Pilar - AL",
+        whatsapp: "5582991008045",
+        instagram: "@casaberlins",
+        descricao: "Artigos para o lar, utilidades, cama, mesa e banho, presentes e novidades para sua casa.",
+        horario: "Segunda a Sábado das 08h às 18h",
+        logo: "Fotos/741112908_17951148390198756_7716625029637759512_n.jpg",
+        vip: true,
+        keywords: "casa berlins cama mesa banho utilidades variedades presentes cha do pilar"
+      },
+      {
+        id: "23",
+        nome: "Boladão Açaiteria",
+        categoria: "delivery",
+        bairro: "Chã do Pilar",
+        endereco: "Pilar - AL",
+        whatsapp: "5582991008045",
+        instagram: "@boladaoacaiteria",
+        descricao: "O melhor açaí da cidade com cremes especiais, barcas, diversos acompanhamentos e entrega rápida.",
+        horario: "Aberto das 14h às 22h • Delivery Ativo",
+        logo: "Fotos/528694267_18171310441354017_5021224052855313548_n.jpg",
+        vip: true,
+        keywords: "boladao acaiteria acai do boladao lanches delivery doces cha do pilar"
+      },
+      {
+        id: "24",
+        nome: "Lourenço Água & Gás",
+        categoria: "servicos",
+        bairro: "Chã do Pilar",
+        endereco: "Pilar - AL",
+        whatsapp: "5582994344466",
+        instagram: "@lourenco_gas",
+        descricao: "Entrega rápida de água mineral e gás de cozinha em toda a cidade de Pilar. Qualidade que abastece!",
+        horario: "Segunda a Sábado das 07h às 19h • Entrega Rápida",
+        logo: "Fotos/66c55b96-22dd-499d-b730-6c4bfbc27eed.jpg",
+        vip: true,
+        keywords: "lourenco agua e gas botijao entrega delivery cha do pilar servicos"
       }
     ];
 
@@ -1058,9 +1100,9 @@
       return sanitizeUrl(trimmed);
     }
 
-    // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS (VERSÃO 5 COM FOTOS REAIS DO INSTAGRAM)
+    // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS (VERSÃO 7 COM NOVOS CLIENTES E FOTOS LOCAIS)
     function getStores() {
-      const stored = localStorage.getItem('pilar_stores_data_v6');
+      const stored = localStorage.getItem('pilar_stores_data_v7');
       if (stored) {
         try {
           return JSON.parse(stored);
@@ -1068,12 +1110,12 @@
           console.error(e);
         }
       }
-      localStorage.setItem('pilar_stores_data_v6', JSON.stringify(INITIAL_STORES));
+      localStorage.setItem('pilar_stores_data_v7', JSON.stringify(INITIAL_STORES));
       return INITIAL_STORES;
     }
 
     function saveStores(stores) {
-      localStorage.setItem('pilar_stores_data_v6', JSON.stringify(stores));
+      localStorage.setItem('pilar_stores_data_v7', JSON.stringify(stores));
     }
 
     // ================= CONFIGURAÇÃO DO SUPABASE (BANCO DE DADOS EM NUVEM) =================
@@ -1712,7 +1754,7 @@
 
     function resetStoresToDefault() {
       if (confirm('Tem certeza que deseja restaurar as lojas para o catálogo original com as 12 fotos oficiais do Instagram? Todas as edições manuais feitas no navegador serão restauradas.')) {
-        localStorage.setItem('pilar_stores_data_v6', JSON.stringify(INITIAL_STORES));
+        localStorage.setItem('pilar_stores_data_v7', JSON.stringify(INITIAL_STORES));
         renderStores();
         renderAdminStoresList();
         alert('Lojas restauradas com sucesso para a versão oficial!');
@@ -1868,14 +1910,12 @@
           };
           saveStores(stores);
 
-          // Salvar na nuvem (Supabase) para atualizar para todo mundo
+          // Salvar na nuvem (Supabase) com fallback seguro
           if (supabaseClient) {
-            supabaseClient.from('stores').upsert([stores[index]]).then(({ error }) => {
-              if (error) console.warn('Supabase update store error:', error);
-            });
+            saveStoreToCloud(stores[index]);
           }
 
-          alert(`O estabelecimento "${nome}" foi atualizado e salvo para todos!`);
+          alert(`O estabelecimento "${nome}" foi atualizado e salvo com sucesso!`);
         }
         cancelAdminEdit();
       } else {
@@ -1899,19 +1939,62 @@
         stores.unshift(newStore);
         saveStores(stores);
 
-        // Salvar na nuvem (Supabase) para atualizar para todo mundo
+        // Salvar na nuvem (Supabase) com fallback seguro
         if (supabaseClient) {
-          supabaseClient.from('stores').insert([newStore]).then(({ error }) => {
-            if (error) console.warn('Supabase insert store error:', error);
-          });
+          saveStoreToCloud(newStore);
         }
 
         e.target.reset();
-        alert(`O comércio "${nome}" foi cadastrado e publicado na nuvem para todos!`);
+        alert(`O comércio "${nome}" foi cadastrado e salvo com sucesso!`);
       }
 
       renderAdminStoresList();
       renderStores();
+    }
+
+    // HIGIENIZAÇÃO DE DADOS PARA TABELA DO SUPABASE
+    function cleanStoreForSupabase(store, includeExtended = true) {
+      const payload = {
+        id: String(store.id),
+        nome: store.nome || '',
+        categoria: store.categoria || 'delivery',
+        bairro: store.bairro || 'Chã do Pilar',
+        endereco: store.endereco || '',
+        whatsapp: store.whatsapp || '00000000000',
+        instagram: store.instagram || '',
+        descricao: store.descricao || '',
+        horario: store.horario || '',
+        logo: store.logo || '',
+        vip: !!store.vip,
+        keywords: store.keywords || ''
+      };
+      if (includeExtended) {
+        if (store.site) payload.site = store.site;
+        if (store.maps_url) payload.maps_url = store.maps_url;
+      }
+      return payload;
+    }
+
+    async function saveStoreToCloud(store) {
+      if (!supabaseClient) return false;
+      try {
+        let payload = cleanStoreForSupabase(store, true);
+        let { error } = await supabaseClient.from('stores').upsert([payload]);
+        if (error && (error.code === 'PGRST204' || String(error.message || '').includes('column'))) {
+          // Fallback seguro caso as colunas site/maps_url ainda não existam no Supabase
+          payload = cleanStoreForSupabase(store, false);
+          const retry = await supabaseClient.from('stores').upsert([payload]);
+          error = retry.error;
+        }
+        if (error) {
+          console.warn('Supabase store save warning:', error);
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.warn('Supabase store save exception:', err);
+        return false;
+      }
     }
 
     async function deleteStore(id) {
@@ -1943,9 +2026,15 @@
       btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Enviando...`;
       try {
         const stores = getStores();
-        const { error } = await supabaseClient.from('stores').upsert(stores);
+        let payloads = stores.map(s => cleanStoreForSupabase(s, true));
+        let { error } = await supabaseClient.from('stores').upsert(payloads);
+        if (error && (error.code === 'PGRST204' || String(error.message || '').includes('column'))) {
+          payloads = stores.map(s => cleanStoreForSupabase(s, false));
+          const retry = await supabaseClient.from('stores').upsert(payloads);
+          error = retry.error;
+        }
         if (error) {
-          alert('Atenção: A tabela "stores" ainda não foi criada no Supabase.\n\nExecute o script SQL no painel do Supabase para ativar a sincronização em nuvem completa!');
+          alert('Atenção: Erro ao sincronizar com o Supabase: ' + error.message);
         } else {
           alert(`Sucesso total! Todas as ${stores.length} lojas foram salvas na nuvem e agora atualizam para todo mundo em tempo real!`);
         }
@@ -2448,7 +2537,19 @@
         // 3. SINCRONIZAR LOJAS DA NUVEM (SE JÁ ESTIVEREM NO SUPABASE)
         const { data: cloudStores, error: storesErr } = await supabaseClient.from('stores').select('*');
         if (!storesErr && cloudStores && cloudStores.length > 0) {
-          saveStores(cloudStores);
+          const currentStores = getStores();
+          const cloudMap = new Map();
+          cloudStores.forEach(cs => cloudMap.set(String(cs.id), cs));
+          
+          // Preservar estabelecimentos locais que ainda não foram para a nuvem
+          const merged = [...cloudStores];
+          currentStores.forEach(ls => {
+            if (!cloudMap.has(String(ls.id))) {
+              merged.unshift(ls);
+              saveStoreToCloud(ls);
+            }
+          });
+          saveStores(merged);
         }
 
         renderStores();
