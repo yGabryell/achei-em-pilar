@@ -1020,12 +1020,12 @@
         keywords: "frete transporte mudanca carreto caminhao cha pilar imburi"
       },
       {
-        id: "22",
+        id: "1791899917141",
         nome: "Casa Berlins",
         categoria: "utilidades",
         bairro: "Chã do Pilar",
-        endereco: "Pilar - AL",
-        whatsapp: "5582991008045",
+        endereco: "Loteamento Manguaba III, N 17 - Chã do Pilar, Pilar - AL, 57150-000, Brasil",
+        whatsapp: "5582988985487",
         instagram: "@casaberlins",
         descricao: "Artigos para o lar, utilidades, cama, mesa e banho, presentes e novidades para sua casa.",
         horario: "Segunda a Sábado das 08h às 18h",
@@ -1038,14 +1038,16 @@
         nome: "Boladão Açaiteria",
         categoria: "delivery",
         bairro: "Chã do Pilar",
-        endereco: "Pilar - AL",
-        whatsapp: "5582991008045",
+        endereco: "Rua Joaquina rosa, 55 - Chã do Pilar",
+        whatsapp: "",
+        site: "https://pedido.anota.ai/loja/aai-bolado?f=msa",
+        maps_url: "https://maps.app.goo.gl/YeWEqC3wQUVqY3mY9",
         instagram: "@boladaoacaiteria",
         descricao: "O melhor açaí da cidade com cremes especiais, barcas, diversos acompanhamentos e entrega rápida.",
         horario: "Aberto das 14h às 22h • Delivery Ativo",
         logo: "Fotos/528694267_18171310441354017_5021224052855313548_n.jpg",
-        vip: true,
-        keywords: "boladao acaiteria acai do boladao lanches delivery doces cha do pilar"
+        vip: false,
+        keywords: "boladao acaiteria acai do boladao lanches delivery doces cha do pilar anota ai"
       },
       {
         id: "24",
@@ -1095,7 +1097,7 @@
 
     // CARREGAR DADOS DO LOCALSTORAGE OU INICIAIS (VERSÃO 7 COM NOVOS CLIENTES E FOTOS LOCAIS)
     function getStores() {
-      const stored = localStorage.getItem('pilar_stores_data_v8');
+      const stored = localStorage.getItem('pilar_stores_data_v9');
       if (stored) {
         try {
           return JSON.parse(stored);
@@ -1103,12 +1105,12 @@
           console.error(e);
         }
       }
-      localStorage.setItem('pilar_stores_data_v8', JSON.stringify(INITIAL_STORES));
+      localStorage.setItem('pilar_stores_data_v9', JSON.stringify(INITIAL_STORES));
       return INITIAL_STORES;
     }
 
     function saveStores(stores) {
-      localStorage.setItem('pilar_stores_data_v8', JSON.stringify(stores));
+      localStorage.setItem('pilar_stores_data_v9', JSON.stringify(stores));
     }
 
     // ================= CONFIGURAÇÃO DO SUPABASE (BANCO DE DADOS EM NUVEM) =================
@@ -1301,8 +1303,11 @@
         const logoUrl = sanitizeUrl(rawLogo) || defaultLogo;
 
         const zapMsg = encodeURIComponent(`Olá! Encontrei o contato de vocês no *Achei em Pilar* e gostaria de informações.`);
-        const zapCleanDigits = (store.whatsapp || '').replace(/\D/g, '');
-        const zapLink = `https://wa.me/${zapCleanDigits}?text=${zapMsg}`;
+        const rawZapDigits = (store.whatsapp || '').replace(/\D/g, '');
+        const isZapPlaceholder = /^0+$/.test(rawZapDigits);
+        const hasValidWhatsapp = rawZapDigits.length >= 8 && !isZapPlaceholder;
+        const zapCleanDigits = hasValidWhatsapp ? rawZapDigits : '';
+        const zapLink = hasValidWhatsapp ? `https://wa.me/${zapCleanDigits}?text=${zapMsg}` : '';
 
         // Link do Site / Cardápio Online (sanitizado e formatado)
         const rawSite = store.site || store.website || '';
@@ -1401,7 +1406,7 @@
 
             <!-- BOTÕES DE AÇÃO COM LOGOS OFICIAIS: WHATSAPP, SITE, INSTAGRAM E GOOGLE MAPS (TOUCH TARGET 44PX) -->
             <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2">
-              ${zapCleanDigits ? `
+              ${hasValidWhatsapp ? `
                 <!-- BOTÃO WHATSAPP OFICIAL -->
                 <a href="${zapLink}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'whatsapp')" class="flex-1 min-h-[44px] bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Chamar no WhatsApp">
                   <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
@@ -1410,7 +1415,7 @@
                   <span>WhatsApp</span>
                 </a>
               ` : (siteClean ? `
-                <!-- CASO NÃO TENHA WHATSAPP, O SITE ASSUME O BOTÃO PRINCIPAL -->
+                <!-- QUANDO NÃO TEM WHATSAPP, O BOTÃO PRINCIPAL FICA EXCLUSIVO DO SITE COM DESTAQUE -->
                 <a href="${siteClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'site')" class="flex-1 min-h-[44px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition flex items-center justify-center gap-2" title="Acessar Site / Cardápio Online">
                   <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -1425,8 +1430,8 @@
                 </div>
               `)}
 
-              <!-- BOTÃO SITE / CARDÁPIO ONLINE (SE JÁ POSSUI WHATSAPP) -->
-              ${zapCleanDigits && siteClean ? `
+              <!-- BOTÃO SECUNDÁRIO DO SITE (APENAS SE O WHATSAPP JÁ ESTIVER NO BOTÃO PRINCIPAL) -->
+              ${hasValidWhatsapp && siteClean ? `
               <a href="${siteClean}" target="_blank" rel="noopener noreferrer" onclick="trackStoreClick('${store.id}', 'site')" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 active:scale-95 rounded-xl shadow-xs transition flex items-center justify-center shrink-0" title="Acessar Site / Cardápio Online">
                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -1747,7 +1752,7 @@
 
     function resetStoresToDefault() {
       if (confirm('Tem certeza que deseja restaurar as lojas para o catálogo original com as 12 fotos oficiais do Instagram? Todas as edições manuais feitas no navegador serão restauradas.')) {
-        localStorage.setItem('pilar_stores_data_v8', JSON.stringify(INITIAL_STORES));
+        localStorage.setItem('pilar_stores_data_v9', JSON.stringify(INITIAL_STORES));
         renderStores();
         renderAdminStoresList();
         alert('Lojas restauradas com sucesso para a versão oficial!');
@@ -1825,7 +1830,9 @@
       document.getElementById('admLogo').value = store.logo || '';
       document.getElementById('admCategoria').value = store.categoria || 'delivery';
       document.getElementById('admBairro').value = store.bairro || 'Chã do Pilar';
-      document.getElementById('admWhatsapp').value = store.whatsapp || '';
+      const editZapDigits = (store.whatsapp || '').replace(/\D/g, '');
+      const isEditZapPlaceholder = /^0+$/.test(editZapDigits);
+      document.getElementById('admWhatsapp').value = isEditZapPlaceholder ? '' : (store.whatsapp || '');
       document.getElementById('admSite').value = store.site || store.website || '';
       document.getElementById('admInstagram').value = store.instagram || '';
       document.getElementById('admHorario').value = store.horario || '';
@@ -1865,7 +1872,11 @@
       const logo = document.getElementById('admLogo').value.trim();
       const categoria = document.getElementById('admCategoria').value.trim();
       const bairro = document.getElementById('admBairro').value.trim();
-      const whatsapp = document.getElementById('admWhatsapp').value.trim();
+      let whatsapp = document.getElementById('admWhatsapp').value.trim();
+      const cleanZap = whatsapp.replace(/\D/g, '');
+      if (/^0+$/.test(cleanZap)) {
+        whatsapp = '';
+      }
       const site = document.getElementById('admSite').value.trim();
       const instagram = document.getElementById('admInstagram').value.trim();
       const horario = document.getElementById('admHorario').value.trim();
@@ -1953,7 +1964,7 @@
         categoria: store.categoria || 'delivery',
         bairro: store.bairro || 'Chã do Pilar',
         endereco: store.endereco || '',
-        whatsapp: store.whatsapp || '00000000000',
+        whatsapp: (store.whatsapp && !/^0+$/.test(String(store.whatsapp).replace(/\D/g, ''))) ? String(store.whatsapp).trim() : '',
         instagram: store.instagram || '',
         descricao: store.descricao || '',
         horario: store.horario || '',
@@ -2543,11 +2554,20 @@
           try {
             deletedIds = JSON.parse(localStorage.getItem('pilar_deleted_store_ids') || '[]');
           } catch(e) { deletedIds = []; }
-          // Sempre banir o id 6 duplicado definitivamente
+          // Sempre banir IDs duplicados definitivamente
           if (!deletedIds.includes('6')) deletedIds.push('6');
+          if (!deletedIds.includes('22')) deletedIds.push('22');
 
-          // Filtrar estabelecimentos deletados
-          const validCloudStores = cloudStores.filter(cs => !deletedIds.includes(String(cs.id)));
+          // Filtrar estabelecimentos deletados e limpar zeros de whatsapp
+          const validCloudStores = cloudStores
+            .filter(cs => !deletedIds.includes(String(cs.id)))
+            .map(cs => {
+              const zapDigits = (cs.whatsapp || '').replace(/\D/g, '');
+              if (/^0+$/.test(zapDigits)) {
+                return { ...cs, whatsapp: '' };
+              }
+              return cs;
+            });
           
           // O Supabase é a fonte oficial da verdade das lojas ativas
           saveStores(validCloudStores);
