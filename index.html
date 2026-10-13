@@ -708,7 +708,16 @@
 
           <!-- LISTA DE ESTABELECIMENTOS JÁ CADASTRADOS (PARA EXCLUIR/GERENCIAR) -->
           <div>
-            <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">Comércios Cadastrados (<span id="admTotalCount">0</span>)</h4>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Comércios Cadastrados (<span id="admTotalCount">0</span>)</h4>
+            </div>
+
+            <!-- CAMPO DE BUSCA RÁPIDA NO ADM -->
+            <div class="relative mb-2">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="admSearchStoresInput" oninput="renderAdminStoresList()" placeholder="Buscar por nome, categoria ou bairro..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none focus:border-slate-400 focus:bg-white transition">
+            </div>
+
             <div id="admStoresList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
               <!-- Inserido dinamicamente -->
             </div>
@@ -1886,13 +1895,35 @@
 
     function renderAdminStoresList() {
       const stores = getStores();
-      document.getElementById('admTotalCount').innerText = stores.length;
+      const searchInput = document.getElementById('admSearchStoresInput');
+      const term = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      
+      const filtered = term ? stores.filter(s => {
+        const str = `${s.nome || ''} ${s.categoria || ''} ${s.bairro || ''} ${s.descricao || ''}`.toLowerCase();
+        return str.includes(term);
+      }) : stores;
+
+      const countEl = document.getElementById('admTotalCount');
+      if (countEl) {
+        countEl.innerText = term ? `${filtered.length} de ${stores.length}` : stores.length;
+      }
       const list = document.getElementById('admStoresList');
 
-      list.innerHTML = stores.map(store => `
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-6 text-slate-400 text-xs">
+            <i data-lucide="search-x" class="w-6 h-6 mx-auto mb-1 text-slate-300"></i>
+            Nenhum comércio encontrado com "<strong>${escapeHtml(term)}</strong>"
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      list.innerHTML = filtered.map(store => `
         <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition">
           <div class="flex items-center gap-2 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full ${store.vip ? 'bg-amber-500' : 'bg-slate-300'} shrink-0"></span>
+            <span class="w-2.5 h-2.5 rounded-full ${store.vip ? 'bg-amber-500' : 'bg-slate-300'} shrink-0" title="${store.vip ? 'Destaque VIP' : 'Normal'}"></span>
             <div class="truncate">
               <span class="text-xs font-bold text-slate-800 block truncate">${escapeHtml(store.nome)}</span>
               <span class="text-[10px] text-slate-400">${escapeHtml(store.bairro)} • ${escapeHtml(store.categoria)}</span>
@@ -1900,11 +1931,11 @@
           </div>
           <div class="flex items-center gap-1 shrink-0">
             <!-- BOTÃO EDITAR -->
-            <button onclick="startEditStore('${escapeHtml(store.id)}')" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Editar Estabelecimento">
+            <button onclick="startEditStore('${escapeHtml(store.id)}')" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition cursor-pointer" title="Editar Estabelecimento">
               <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
             <!-- BOTÃO EXCLUIR -->
-            <button onclick="deleteStore('${escapeHtml(store.id)}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Excluir Estabelecimento">
+            <button onclick="deleteStore('${escapeHtml(store.id)}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer" title="Excluir Estabelecimento">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
