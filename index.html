@@ -604,18 +604,6 @@
                 <input type="text" id="admDescricao" placeholder="Hambúrguer artesanal na brasa, batata frita e entrega rápida..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
               </div>
 
-              <!-- NOTA DE ESTRELAS E AVALIAÇÕES GOOGLE -->
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nota Google (1.0 a 5.0)</label>
-                  <input type="number" step="0.1" min="1.0" max="5.0" id="admRating" placeholder="Ex: 4.9" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Qtd. Avaliações Google</label>
-                  <input type="number" min="0" id="admReviewsCount" placeholder="Ex: 48" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs outline-none">
-                </div>
-              </div>
-
               <!-- CHECKBOX VIP / DESTAQUE -->
               <div class="flex items-center gap-2 pt-1">
                 <input type="checkbox" id="admVip" class="w-4 h-4 accent-amber-500 rounded">
@@ -1103,58 +1091,40 @@
       return (s.whatsapp_clicks || 0) + (s.instagram_clicks || 0) + (s.maps_clicks || 0);
     }
 
-    const DEFAULT_GOOGLE_RATINGS = {
-      "1": { rating: 4.9, reviews_count: 54 }, // Pilar Grill
-      "2": { rating: 4.9, reviews_count: 48 }, // Caetano's Burguer
-      "3": { rating: 4.8, reviews_count: 39 }, // Pizzaria Robson Lima
-      "4": { rating: 4.8, reviews_count: 31 }, // Armazém Pilar
-      "5": { rating: 4.9, reviews_count: 42 }, // Fábrica Burguer
-      "6": { rating: 4.9, reviews_count: 35 }, // Cantinho Do Açaí
-      "7": { rating: 4.9, reviews_count: 62 }, // Farmácia Verde
-      "8": { rating: 5.0, reviews_count: 27 }, // Barbearia do Robson
-      "9": { rating: 5.0, reviews_count: 21 }, // Gordinho dos Fretes
-      "10": { rating: 4.9, reviews_count: 18 }, // Mestre das Chaves
-      "11": { rating: 4.9, reviews_count: 33 }, // Studio Bella Mulher
-      "12": { rating: 4.8, reviews_count: 40 }, // Depósito de Bebidas Chã
-    };
-
     function getStoreGoogleRating(store) {
-      if (!store) return { score: '5.0', count: 1, stars: 5.0 };
-      const preset = DEFAULT_GOOGLE_RATINGS[store.id] || {};
-      const baseScore = parseFloat(store.rating) || preset.rating || (store.vip ? 4.9 : 4.8);
-      const baseCount = parseInt(store.reviews_count, 10) || preset.reviews_count || (store.vip ? 48 : 28);
+      if (!store) return { score: '0.0', count: 0, stars: 0 };
       const userReviews = localReviewsCache[store.id] || [];
+      const count = userReviews.length;
 
-      if (!userReviews || userReviews.length === 0) {
+      if (count === 0) {
         return {
-          score: baseScore.toFixed(1),
-          count: baseCount,
-          stars: baseScore
+          score: '0.0',
+          count: 0,
+          stars: 0
         };
       }
 
-      const userTotal = userReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
-      const totalCount = baseCount + userReviews.length;
-      const avg = ((baseScore * baseCount) + userTotal) / totalCount;
+      const totalStars = userReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+      const avg = totalStars / count;
 
       return {
         score: avg.toFixed(1),
-        count: totalCount,
+        count: count,
         stars: avg
       };
     }
 
     function renderGoogleStars(score, starClass = "w-3.5 h-3.5") {
-      const num = Number(score) || 5;
+      const num = Number(score) || 0;
       let starsHtml = '';
       for (let i = 1; i <= 5; i++) {
-        if (num >= i - 0.25) {
+        if (num > 0 && num >= i - 0.25) {
           starsHtml += `
             <svg class="${starClass} fill-[#FBBC04] text-[#FBBC04] shrink-0" viewBox="0 0 24 24">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
             </svg>
           `;
-        } else if (num >= i - 0.75) {
+        } else if (num > 0 && num >= i - 0.75) {
           starsHtml += `
             <svg class="${starClass} fill-[#FBBC04] text-[#FBBC04] shrink-0 opacity-80" viewBox="0 0 24 24">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
@@ -1199,8 +1169,23 @@
         return matchCat && matchBairro && matchQuery;
       });
 
-      // Ordenar: VIPs aparecem primeiro!
-      filtered.sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0));
+      // ORDENAÇÃO DINÂMICA:
+      // Quanto mais avaliações o comércio tiver, mais ele SOBE na lista!
+      // (VIPs mantêm destaque prioritário no topo, e dentro do seu grupo também sobem pelas avaliações)
+      filtered.sort((a, b) => {
+        if (b.vip !== a.vip) {
+          return (b.vip ? 1 : 0) - (a.vip ? 1 : 0);
+        }
+        const ratingA = getStoreGoogleRating(a);
+        const ratingB = getStoreGoogleRating(b);
+        if (ratingB.count !== ratingA.count) {
+          return ratingB.count - ratingA.count;
+        }
+        if (ratingB.stars !== ratingA.stars) {
+          return ratingB.stars - ratingA.stars;
+        }
+        return getStoreLikes(b.id) - getStoreLikes(a.id);
+      });
 
       document.getElementById('resultsCount').innerText = filtered.length === 1 
         ? '1 estabelecimento encontrado' 
@@ -1223,7 +1208,7 @@
         // Link do Google Maps
         const mapsLink = `https://maps.google.com/?q=${encodeURIComponent(store.nome + ' ' + store.endereco + ' Pilar AL')}`;
 
-        // Avaliações padrão Google Maps
+        // Avaliações reais da plataforma no layout do Google
         const ratingData = getStoreGoogleRating(store);
 
         return `
@@ -1245,12 +1230,21 @@
                     </div>
 
                     <!-- NÍVEL DE ESTRELAS IGUAL AO GOOGLE -->
-                    <div onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 mt-1 cursor-pointer group w-fit" title="Avaliação dos clientes (Estilo Google Maps - clique para avaliar)">
-                      <span class="font-black text-xs text-slate-900 leading-none">${ratingData.score}</span>
-                      <div class="flex items-center gap-0.5">
-                        ${renderGoogleStars(ratingData.stars)}
-                      </div>
-                      <span class="text-[11px] text-slate-500 font-medium group-hover:text-emerald-700 transition leading-none">(${ratingData.count})</span>
+                    <div onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 mt-1 cursor-pointer group w-fit" title="Avaliações dos clientes (toque para avaliar)">
+                      ${ratingData.count > 0 ? `
+                        <span class="font-black text-xs text-slate-900 leading-none">${ratingData.score}</span>
+                        <div class="flex items-center gap-0.5">
+                          ${renderGoogleStars(ratingData.stars)}
+                        </div>
+                        <span class="text-[11px] text-slate-500 font-medium group-hover:text-emerald-700 transition leading-none">(${ratingData.count})</span>
+                      ` : `
+                        <div class="flex items-center gap-0.5">
+                          ${renderGoogleStars(0)}
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-medium group-hover:text-emerald-700 transition leading-none flex items-center gap-1">
+                          (0) <span class="text-emerald-600 font-bold text-[10px]">Avaliar</span>
+                        </span>
+                      `}
                     </div>
                     
                     <div class="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold mt-1.5">
@@ -1287,7 +1281,7 @@
               <!-- BARRA DE AVALIAÇÕES / OPINIÕES DOS MORADORES -->
               <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
                 <button onclick="openReviewsModal('${store.id}', '${escapeHtml(store.nome)}')" class="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 px-2.5 py-1 rounded-xl transition border border-slate-200/60" title="Ver avaliações no estilo Google">
-                  <svg class="w-3.5 h-3.5 fill-[#FBBC04] text-[#FBBC04] shrink-0" viewBox="0 0 24 24">
+                  <svg class="w-3.5 h-3.5 ${ratingData.count > 0 ? 'fill-[#FBBC04] text-[#FBBC04]' : 'fill-slate-300 text-slate-300'} shrink-0" viewBox="0 0 24 24">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                   </svg>
                   <span>Avaliações <span id="rev-badge-${store.id}" class="text-emerald-700 font-extrabold">(${ratingData.count})</span></span>
@@ -1695,8 +1689,6 @@
       document.getElementById('admHorario').value = store.horario || '';
       document.getElementById('admEndereco').value = store.endereco || '';
       document.getElementById('admDescricao').value = store.descricao || '';
-      document.getElementById('admRating').value = store.rating || '';
-      document.getElementById('admReviewsCount').value = store.reviews_count || '';
       document.getElementById('admVip').checked = !!store.vip;
 
       // Atualizar interface de edição
@@ -1714,8 +1706,6 @@
     function cancelAdminEdit() {
       document.getElementById('admEditId').value = '';
       document.querySelector('#admFormContainer form').reset();
-      document.getElementById('admRating').value = '';
-      document.getElementById('admReviewsCount').value = '';
       document.getElementById('admFormTitle').innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-600"></i> Adicionar Novo Estabelecimento`;
       document.getElementById('admEditingBadge').classList.add('hidden');
       document.getElementById('admSubmitBtnText').innerText = 'Salvar e Publicar Estabelecimento';
@@ -1735,12 +1725,7 @@
       const horario = document.getElementById('admHorario').value.trim();
       const endereco = document.getElementById('admEndereco').value.trim();
       const descricao = document.getElementById('admDescricao').value.trim();
-      const ratingRaw = document.getElementById('admRating').value.trim();
-      const reviewsCountRaw = document.getElementById('admReviewsCount').value.trim();
       const vip = document.getElementById('admVip').checked;
-
-      const ratingVal = ratingRaw ? parseFloat(ratingRaw) : (vip ? 4.9 : 4.8);
-      const reviewsCountVal = reviewsCountRaw ? parseInt(reviewsCountRaw, 10) : (vip ? 48 : 28);
 
       const stores = getStores();
 
@@ -1759,8 +1744,6 @@
             horario,
             endereco,
             descricao,
-            rating: ratingVal,
-            reviews_count: reviewsCountVal,
             vip,
             keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
           };
@@ -1789,8 +1772,6 @@
           horario,
           endereco,
           descricao,
-          rating: ratingVal,
-          reviews_count: reviewsCountVal,
           vip,
           keywords: `${nome} ${descricao} ${bairro} ${categoria} ${instagram}`.toLowerCase()
         };
@@ -1981,13 +1962,22 @@
       const ratingData = getStoreGoogleRating(store || { id: storeId, nome: storeName });
       const summaryEl = document.getElementById('reviewsStoreRatingSummary');
       if (summaryEl) {
-        summaryEl.innerHTML = `
-          <span class="font-black text-xs text-slate-800 leading-none">${ratingData.score}</span>
-          <div class="flex items-center gap-0.5">
-            ${renderGoogleStars(ratingData.stars, "w-3 h-3")}
-          </div>
-          <span class="text-[11px] text-slate-500 font-medium leading-none">(${ratingData.count} avaliações no Google)</span>
-        `;
+        if (ratingData.count > 0) {
+          summaryEl.innerHTML = `
+            <span class="font-black text-xs text-slate-800 leading-none">${ratingData.score}</span>
+            <div class="flex items-center gap-0.5">
+              ${renderGoogleStars(ratingData.stars, "w-3 h-3")}
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium leading-none">(${ratingData.count} ${ratingData.count === 1 ? 'avaliação' : 'avaliações'})</span>
+          `;
+        } else {
+          summaryEl.innerHTML = `
+            <div class="flex items-center gap-0.5 text-slate-300">
+              ${renderGoogleStars(0, "w-3 h-3")}
+            </div>
+            <span class="text-[11px] text-slate-400 font-medium leading-none">(Nenhuma avaliação ainda)</span>
+          `;
+        }
       }
 
       document.getElementById('reviewsModal').classList.remove('hidden');
