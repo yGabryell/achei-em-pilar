@@ -237,12 +237,19 @@
         </div>
 
         <!-- ÁREA DA CHAVE PIX -->
-        <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-left">
-          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Chave PIX Oficial</label>
-          <div class="flex items-center gap-2">
-            <input type="text" id="pixKeyDisplay" readonly value="gabriel@simaceito.com.br" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 select-all outline-none">
+        <div class="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-[10px] font-bold uppercase text-slate-500">Chave PIX Oficial (E-mail)</label>
+            <span class="text-[10px] font-extrabold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md border border-sky-200">Mercado Pago</span>
           </div>
-          <button onclick="copyPixKey()" id="btnCopyPix" class="w-full mt-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+          <div class="flex items-center gap-2">
+            <input type="text" id="pixKeyDisplay" readonly value="gabriell.alvess399@gmail.com" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 select-all outline-none">
+          </div>
+          <div class="mt-1.5 text-[11px] text-slate-500 flex items-center justify-between px-1">
+            <span>Titular: <strong class="text-slate-800">Gabriel Alves</strong></span>
+            <span>Tipo: <strong class="text-slate-700">E-mail</strong></span>
+          </div>
+          <button onclick="copyPixKey()" id="btnCopyPix" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
             <i data-lucide="copy" class="w-4 h-4"></i> Copiar Chave PIX
           </button>
         </div>
@@ -1325,7 +1332,7 @@
 
     // ================= CONFIGURAÇÃO E MODAL DE DOAÇÃO PIX =================
     function getPixKey() {
-      return localStorage.getItem('pilar_pix_key') || 'gabriel@simaceito.com.br';
+      return localStorage.getItem('pilar_pix_key') || 'gabriell.alvess399@gmail.com';
     }
 
     function changePixKey() {
