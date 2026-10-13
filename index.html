@@ -76,12 +76,6 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <!-- BOTÃO APOIAR / DOAR -->
-        <button onclick="openDonateModal()" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-bold px-3 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0" title="Apoiar com Doação">
-          <i data-lucide="coffee" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Apoiar</span>
-        </button>
-
         <!-- BOTÃO CADASTRAR LOJA -->
         <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -210,51 +204,78 @@
     <p class="mt-2 text-[11px] text-slate-500 font-medium">Desenvolvido por Gabriel Alves</p>
   </footer>
 
-  <!-- ================= MODAL DE DOAÇÃO PIX ================= -->
+  <!-- ================= BOTÃO FLUTUANTE DE DOAÇÃO (FAB) ================= -->
+  <div id="floatingDonateBtn" class="fixed bottom-5 right-4 sm:right-6 z-40">
+    <button onclick="openDonateModal()" class="group bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs sm:text-sm pl-3.5 pr-4 py-3 rounded-full shadow-2xl shadow-orange-600/40 border-2 border-white/90 flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
+      <span class="flex h-2.5 w-2.5 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+      </span>
+      <i data-lucide="coffee" class="w-4 h-4 text-white"></i>
+      <span>Apoie com PIX</span>
+    </button>
+  </div>
+
+  <!-- ================= MODAL DE DOAÇÃO PIX (COPIA E COLA OFICIAL) ================= -->
   <div id="donateModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative">
-      <button onclick="closeDonateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <!-- BOTÃO X DESTACADO PARA FECHAR -->
+      <button onclick="closeDonateModal()" class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition shadow-2xs cursor-pointer" title="Fechar Janela">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="text-center">
-        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
-          <i data-lucide="coffee" class="w-7 h-7"></i>
+      <div class="text-center pt-1">
+        <div class="w-13 h-13 rounded-2xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center mb-2.5 shadow-xs">
+          <i data-lucide="coffee" class="w-6 h-6"></i>
         </div>
-        <h3 class="font-heading font-extrabold text-lg text-slate-900">Apoie o Achei em Pilar ❤️</h3>
+        <h3 class="font-heading font-extrabold text-lg text-slate-900 leading-tight">Apoie o Achei em Pilar ❤️</h3>
         <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
           Este guia é <strong>100% gratuito</strong> para todos os comerciantes e moradores da nossa cidade.
         </p>
         <p class="text-[11px] text-slate-500 mt-1 leading-snug">
-          Se este site te ajudou ou você quer incentivar a manter o serviço ativo e atualizado, você pode apoiar com qualquer valor! 🙏
+          Ajude a manter os servidores ativos com qualquer contribuição simbólica!
         </p>
 
-        <!-- VALORES SUGERIDOS -->
-        <div class="grid grid-cols-3 gap-2 mt-4 text-xs font-bold">
-          <div class="bg-slate-50 border border-slate-200 py-2 rounded-xl text-slate-700">☕ R$ 2,00</div>
-          <div class="bg-amber-50 border border-amber-200 py-2 rounded-xl text-amber-800">🥪 R$ 5,00</div>
-          <div class="bg-emerald-50 border border-emerald-200 py-2 rounded-xl text-emerald-800">⭐ R$ 10,00</div>
+        <!-- SELETOR DE VALORES INTERATIVO -->
+        <div class="mt-3.5">
+          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Escolha o valor de apoio:</label>
+          <div class="grid grid-cols-4 gap-1.5 text-xs font-bold" id="pixValueButtons">
+            <button type="button" onclick="selectPixAmount(0)" id="pixBtn0" class="pix-amt-btn py-1.5 rounded-xl border border-amber-500 bg-amber-50 text-amber-900 transition">Livre</button>
+            <button type="button" onclick="selectPixAmount(2)" id="pixBtn2" class="pix-amt-btn py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition">R$ 2</button>
+            <button type="button" onclick="selectPixAmount(5)" id="pixBtn5" class="pix-amt-btn py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition">R$ 5</button>
+            <button type="button" onclick="selectPixAmount(10)" id="pixBtn10" class="pix-amt-btn py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition">R$ 10</button>
+          </div>
         </div>
 
-        <!-- ÁREA DA CHAVE PIX -->
-        <div class="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-left">
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-[10px] font-bold uppercase text-slate-500">Chave PIX Oficial (E-mail)</label>
-            <span class="text-[10px] font-extrabold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md border border-sky-200">Mercado Pago</span>
+        <!-- QR CODE PIX OFICIAL -->
+        <div class="my-3 flex justify-center">
+          <div class="p-2 bg-white rounded-2xl border-2 border-slate-200 shadow-2xs inline-block">
+            <img id="pixQrImg" src="" alt="QR Code PIX" class="w-32 h-32 rounded-lg block">
           </div>
-          <div class="flex items-center gap-2">
-            <input type="text" id="pixKeyDisplay" readonly value="gabriell.alvess399@gmail.com" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 select-all outline-none">
+        </div>
+
+        <!-- ÁREA DO CÓDIGO PIX COPIA E COLA OFICIAL (PADRÃO BACEN) -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-left">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[10px] font-bold uppercase text-slate-500">Pix Copia e Cola Oficial</label>
+            <span class="text-[10px] font-extrabold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-md border border-sky-200">Mercado Pago</span>
           </div>
-          <div class="mt-1.5 text-[11px] text-slate-500 flex items-center justify-between px-1">
-            <span>Titular: <strong class="text-slate-800">Gabriel Alves</strong></span>
-            <span>Tipo: <strong class="text-slate-700">E-mail</strong></span>
-          </div>
-          <button onclick="copyPixKey()" id="btnCopyPix" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
-            <i data-lucide="copy" class="w-4 h-4"></i> Copiar Chave PIX
+          <textarea id="pixCopiaColaDisplay" readonly rows="2" class="w-full bg-white border border-slate-200 rounded-xl p-2 text-[10px] font-mono text-slate-700 select-all outline-none resize-none break-all leading-tight"></textarea>
+          
+          <button onclick="copyPixCopiaCola()" id="btnCopyPixCopiaCola" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copiar Código Pix Copia e Cola
           </button>
+
+          <div class="mt-1.5 text-[10px] text-slate-500 flex items-center justify-between px-0.5">
+            <span>Titular: <strong class="text-slate-800">Gabriel Alves</strong></span>
+            <span>Cidade: <strong class="text-slate-800">Pilar - AL</strong></span>
+          </div>
         </div>
 
-        <p class="text-[10px] text-slate-400 mt-3">Muito obrigado por fortalecer o comércio da nossa cidade!</p>
+        <!-- BOTÃO DE FECHAR / CONTINUAR -->
+        <button onclick="closeDonateModal()" class="w-full mt-3 text-slate-500 hover:text-slate-800 text-xs font-semibold py-1 transition cursor-pointer">
+          Continuar navegando no Guia ✕
+        </button>
       </div>
     </div>
   </div>
@@ -1330,26 +1351,77 @@
       }
     }
 
-    // ================= CONFIGURAÇÃO E MODAL DE DOAÇÃO PIX =================
-    function getPixKey() {
-      return localStorage.getItem('pilar_pix_key') || 'gabriell.alvess399@gmail.com';
+    // ================= CONFIGURAÇÃO E MODAL DE DOAÇÃO PIX (COPIA E COLA OFICIAL) =================
+    let currentPixAmount = 0;
+
+    function getCrc16Pix(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= (str.charCodeAt(i) << 8);
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
     }
 
-    function changePixKey() {
-      const atual = getPixKey();
-      const nova = prompt('Digite a sua Chave PIX oficial para receber doações (CPF, E-mail, Celular ou Chave Aleatória):', atual);
-      if (nova !== null && nova.trim().length > 0) {
-        localStorage.setItem('pilar_pix_key', nova.trim());
-        const display = document.getElementById('pixKeyDisplay');
-        if (display) display.value = nova.trim();
-        alert('Chave PIX atualizada com sucesso para: ' + nova.trim());
+    function buildPixCopiaCola(amount) {
+      const key = localStorage.getItem('pilar_pix_key') || 'gabriell.alvess399@gmail.com';
+      const name = 'GABRIEL ALVES';
+      const city = 'PILAR';
+      const gui = '0014br.gov.bcb.pix';
+      const k = '01' + key.length.toString().padStart(2, '0') + key;
+      const acc = gui + k;
+      const accField = '26' + acc.length.toString().padStart(2, '0') + acc;
+      const mcc = '52040000';
+      const curr = '5303986';
+      const amtStr = (amount && Number(amount) > 0) ? Number(amount).toFixed(2) : '';
+      const amtField = amtStr ? ('54' + amtStr.length.toString().padStart(2, '0') + amtStr) : '';
+      const country = '5802BR';
+      const cleanName = name.slice(0, 25);
+      const nameField = '59' + cleanName.length.toString().padStart(2, '0') + cleanName;
+      const cleanCity = city.slice(0, 15);
+      const cityField = '60' + cleanCity.length.toString().padStart(2, '0') + cleanCity;
+      const txid = '0503***';
+      const addField = '62' + txid.length.toString().padStart(2, '0') + txid;
+      const payload = '000201' + accField + mcc + curr + amtField + country + nameField + cityField + addField + '6304';
+      return payload + getCrc16Pix(payload);
+    }
+
+    function updatePixModalDisplay() {
+      const code = buildPixCopiaCola(currentPixAmount);
+      const txt = document.getElementById('pixCopiaColaDisplay');
+      if (txt) txt.value = code;
+
+      const img = document.getElementById('pixQrImg');
+      if (img) {
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(code)}`;
       }
+
+      [0, 2, 5, 10].forEach(val => {
+        const btn = document.getElementById('pixBtn' + val);
+        if (btn) {
+          if (val === currentPixAmount) {
+            btn.className = 'pix-amt-btn py-1.5 rounded-xl border border-amber-500 bg-amber-50 text-amber-900 shadow-2xs transition';
+          } else {
+            btn.className = 'pix-amt-btn py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition';
+          }
+        }
+      });
+    }
+
+    function selectPixAmount(val) {
+      currentPixAmount = val;
+      updatePixModalDisplay();
     }
 
     function openDonateModal() {
       const modal = document.getElementById('donateModal');
-      const input = document.getElementById('pixKeyDisplay');
-      if (input) input.value = getPixKey();
+      updatePixModalDisplay();
       if (modal) modal.classList.remove('hidden');
       lucide.createIcons();
     }
@@ -1357,28 +1429,39 @@
     function closeDonateModal() {
       const modal = document.getElementById('donateModal');
       if (modal) modal.classList.add('hidden');
+      try { sessionStorage.setItem('pilar_donate_seen', '1'); } catch(e) {}
     }
 
-    async function copyPixKey() {
-      const key = getPixKey();
-      const btn = document.getElementById('btnCopyPix');
+    async function copyPixCopiaCola() {
+      const txt = document.getElementById('pixCopiaColaDisplay');
+      const code = txt ? txt.value : buildPixCopiaCola(currentPixAmount);
+      const btn = document.getElementById('btnCopyPixCopiaCola');
       try {
-        await navigator.clipboard.writeText(key);
-        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Chave Copiada com Sucesso!`;
-        btn.className = "w-full mt-2.5 bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5";
+        await navigator.clipboard.writeText(code);
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Código Pix Copiado com Sucesso!`;
+        btn.className = "w-full mt-2 bg-emerald-700 text-white text-xs font-extrabold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer";
         lucide.createIcons();
         setTimeout(() => {
-          btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copiar Chave PIX`;
-          btn.className = "w-full mt-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95";
+          btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copiar Código Pix Copia e Cola`;
+          btn.className = "w-full mt-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer";
           lucide.createIcons();
         }, 2500);
       } catch (err) {
-        const input = document.getElementById('pixKeyDisplay');
-        if (input) {
-          input.select();
+        if (txt) {
+          txt.select();
           document.execCommand('copy');
-          alert('Chave PIX copiada: ' + key);
+          alert('Código Pix Copia e Cola copiado com sucesso!');
         }
+      }
+    }
+
+    function changePixKey() {
+      const atual = localStorage.getItem('pilar_pix_key') || 'gabriell.alvess399@gmail.com';
+      const nova = prompt('Digite a sua Chave PIX oficial para gerar os códigos (E-mail, Celular, CPF ou Aleatória):', atual);
+      if (nova !== null && nova.trim().length > 0) {
+        localStorage.setItem('pilar_pix_key', nova.trim());
+        updatePixModalDisplay();
+        alert('Chave PIX atualizada com sucesso para: ' + nova.trim());
       }
     }
 
@@ -2104,6 +2187,15 @@
       renderStores();
       syncSupabaseData();
       lucide.createIcons();
+
+      // Exibe de cara ao entrar no site (com opção imediata de fechar no X)
+      setTimeout(() => {
+        try {
+          if (!sessionStorage.getItem('pilar_donate_seen')) {
+            openDonateModal();
+          }
+        } catch(e) {}
+      }, 800);
     };
   </script>
 </body>
