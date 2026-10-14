@@ -123,6 +123,35 @@
       >
     </div>
 
+    <!-- ================= ATALHOS RÁPIDOS DE UTILIDADE PÚBLICA (VANS & TELEFONES) ================= -->
+    <div class="grid grid-cols-2 gap-2 sm:gap-3 mt-2.5">
+      <a href="onibus.html" class="p-3 sm:p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border border-emerald-200/90 rounded-2xl transition shadow-xs flex items-center gap-2.5 sm:gap-3 group active:scale-98 cursor-pointer no-underline">
+        <div class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black shadow-xs shrink-0 group-hover:scale-105 transition">
+          <i data-lucide="bus" class="w-5 h-5"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs sm:text-sm font-extrabold text-emerald-950 leading-tight">Horários Vans</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          </div>
+          <span class="text-[11px] text-emerald-700 font-bold block truncate">Pilar ⇄ Maceió ao vivo</span>
+        </div>
+      </a>
+
+      <a href="telefones.html" class="p-3 sm:p-3.5 bg-gradient-to-r from-rose-50 to-red-50 hover:from-rose-100 hover:to-red-100 border border-rose-200/90 rounded-2xl transition shadow-xs flex items-center gap-2.5 sm:gap-3 group active:scale-98 cursor-pointer no-underline">
+        <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black shadow-xs shrink-0 group-hover:scale-105 transition">
+          <i data-lucide="phone-call" class="w-5 h-5"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs sm:text-sm font-extrabold text-rose-950 leading-tight">Telefones Úteis</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+          </div>
+          <span class="text-[11px] text-rose-700 font-bold block truncate">SAMU, Polícia, Hospital</span>
+        </div>
+      </a>
+    </div>
+
     <!-- ================= FILTRO POR BAIRROS ================= -->
     <div class="mt-3 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
       <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
@@ -193,6 +222,17 @@
 
   <!-- ================= RODAPÉ ================= -->
   <footer class="mt-12 text-center text-xs text-slate-400 pb-8 px-4 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
+    <div class="mb-3 flex items-center justify-center gap-3 text-xs">
+      <a href="onibus.html" class="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold transition">
+        <i data-lucide="bus" class="w-3.5 h-3.5"></i>
+        <span>Horários das Vans</span>
+      </a>
+      <span class="text-slate-300">•</span>
+      <a href="telefones.html" class="inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-800 font-bold transition">
+        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+        <span>Telefones Úteis</span>
+      </a>
+    </div>
     <p>© 2026 Achei em Pilar — O Guia Comercial de Chã do Pilar & Pilar Centro • AL</p>
     <div class="mt-2.5 flex items-center justify-center">
       <button onclick="openDonateModal()" class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs">
@@ -1163,6 +1203,20 @@
         logo: "Fotos/66c55b96-22dd-499d-b730-6c4bfbc27eed.jpg",
         vip: true,
         keywords: "lourenco agua e gas botijao entrega delivery cha do pilar servicos"
+      },
+      {
+        id: "25",
+        nome: "Central de Ambulância de Pilar",
+        categoria: "saude",
+        bairro: "Pilar Centro",
+        endereco: "Rua Senhor do Bonfim, 990, Pilar - AL",
+        whatsapp: "5582920009786",
+        instagram: "",
+        descricao: "Central municipal de ambulâncias de Pilar. Atendimento de urgência, socorro e remoção médica 24 horas para toda a cidade.",
+        horario: "Aberto 24 Horas",
+        logo: "https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=400&q=80",
+        vip: true,
+        keywords: "central de ambulancia pilar ambulancias samu socorro hospital remocao saude bonfim 24h 92000-9786 82920009786"
       }
     ];
 
@@ -1252,6 +1306,12 @@
         try {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
+            // Assegura que novos estabelecimentos de INITIAL_STORES apareçam imediatamente
+            INITIAL_STORES.forEach(initStore => {
+              if (!parsed.some(s => s && String(s.id) === String(initStore.id))) {
+                parsed.push(initStore);
+              }
+            });
             parsed.forEach(s => {
               if (s) {
                 const cloudFotos = extractStoreFotos(s);
@@ -3601,6 +3661,14 @@ ${details}
               return clean;
             });
           
+          // Assegura que novos estabelecimentos de INITIAL_STORES estejam presentes e salvos na nuvem
+          INITIAL_STORES.forEach(initStore => {
+            if (!validCloudStores.some(cs => String(cs.id) === String(initStore.id)) && !deletedIds.includes(String(initStore.id))) {
+              validCloudStores.push(initStore);
+              supabaseClient.from('stores').upsert([initStore], { onConflict: 'id' }).then(() => {}).catch(() => {});
+            }
+          });
+
           // O Supabase é a fonte oficial da verdade das lojas ativas
           saveStores(validCloudStores);
         }

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horários de Micro-ônibus & Vans — Pilar ⇄ Maceió | Achei em Pilar</title>
+  
+  <meta name="description" content="Tabela completa e atualizada dos horários de micro-ônibus e vans entre Terminal do Pilar e Praça dos Martírios em Maceió. Veja a próxima saída em tempo real!">
+  
+  <!-- Open Graph / WhatsApp Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://achei-em-pilar.vercel.app/onibus">
+  <meta property="og:title" content="Horários de Vans & Micro-ônibus — Pilar ⇄ Maceió">
+  <meta property="og:description" content="Tabela oficial das saídas do Terminal do Pilar e Praça dos Martírios Maceió. Próxima van calculada em tempo real!">
+  <meta property="og:image" content="https://achei-em-pilar.vercel.app/banner-preview.png">
+  <meta name="theme-color" content="#065f46">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-16 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ================= CABEÇALHO / NAVBAR ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-3 sm:py-3.5">
+    <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-1.5 text-slate-700 hover:text-emerald-700 font-bold text-xs sm:text-sm transition cursor-pointer group">
+        <i data-lucide="arrow-left" class="w-4 h-4 transition group-hover:-translate-x-0.5"></i>
+        <span>Voltar ao Guia</span>
+      </a>
+
+      <a href="index.html" class="flex items-center gap-2 select-none" title="Achei em Pilar">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
+          P
+        </div>
+        <div class="hidden sm:block">
+          <span class="font-extrabold text-sm text-slate-900 leading-tight block">Achei em Pilar</span>
+          <span class="text-[10px] text-emerald-700 font-bold block">Horários de Vans</span>
+        </div>
+      </a>
+
+      <button onclick="sharePage()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Compartilhar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= CONTEÚDO PRINCIPAL ================= -->
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 space-y-4">
+
+    <!-- HERO CARD -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white p-5 sm:p-6 shadow-md border border-slate-800">
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <i data-lucide="bus" class="w-3.5 h-3.5"></i> Linha Intermunicipal • Tabela Oficial
+          </span>
+          <span id="liveClockBadge" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-white/10 text-emerald-200 border border-white/10">
+            <i data-lucide="clock" class="w-3 h-3"></i>
+            <span id="liveClock">--:--:--</span>
+          </span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white leading-tight">
+          Horários de Vans & Micro-ônibus
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+          Linha regular <strong>Terminal do Pilar ⇄ Praça dos Martírios Maceió</strong>. Veja a próxima van que vai passar agora!
+        </p>
+      </div>
+      <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- CARD DA PRÓXIMA SAÍDA EM TEMPO REAL -->
+    <div id="nextTripCard" class="p-4 sm:p-5 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white rounded-3xl shadow-md border border-emerald-600/40 flex items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-200 uppercase tracking-wider">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="nextDirectionLabel">Próxima saída de Pilar</span>
+        </div>
+        <div class="flex items-baseline gap-2.5 mt-1">
+          <span id="nextTimeDisplay" class="text-3xl sm:text-4xl font-black text-white tracking-tight font-mono">--:--</span>
+          <span id="nextCarDisplay" class="text-xs sm:text-sm font-extrabold text-emerald-100 bg-white/15 px-2.5 py-1 rounded-xl border border-white/20">Carro --</span>
+        </div>
+        <p id="nextCountdownDisplay" class="text-xs text-emerald-100 mt-1 font-medium">Calculando tempo restante...</p>
+      </div>
+      <div class="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center text-white shrink-0 border border-white/20 shadow-inner">
+        <i data-lucide="bus" class="w-7 h-7"></i>
+      </div>
+    </div>
+
+    <!-- TABS DE ORIGEM (SAINDO DO PILAR vs SAINDO DE MACEIÓ) -->
+    <div class="bg-white rounded-2xl p-1.5 shadow-xs border border-slate-200 flex items-center gap-2">
+      <button id="tabBtnPilar" onclick="setOrigin('pilar')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-emerald-700 text-white shadow-xs cursor-pointer">
+        <i data-lucide="map-pin" class="w-4 h-4"></i>
+        <span>Saindo do Pilar</span>
+      </button>
+      <button id="tabBtnMaceio" onclick="setOrigin('maceio')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer">
+        <i data-lucide="map-pin" class="w-4 h-4 text-sky-600"></i>
+        <span>Saindo de Maceió</span>
+      </button>
+    </div>
+
+    <!-- FILTROS POR TURNO + STATUS DA LEGENDA -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 px-1">
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+          <i data-lucide="filter" class="w-3.5 h-3.5"></i> Turno:
+        </span>
+        <button onclick="setTurno('todos')" id="btnTurnoTodos" class="turno-btn active text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 text-white transition cursor-pointer">Todos</button>
+        <button onclick="setTurno('manha')" id="btnTurnoManha" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Manhã</button>
+        <button onclick="setTurno('tarde')" id="btnTurnoTarde" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Tarde</button>
+        <button onclick="setTurno('noite')" id="btnTurnoNoite" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Noite</button>
+      </div>
+
+      <div class="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
+        <span class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Próxima
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span> A sair
+        </span>
+        <span class="flex items-center gap-1 text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-slate-200"></span> Já passou
+        </span>
+      </div>
+    </div>
+
+    <!-- GRADE DE HORÁRIOS -->
+    <div id="scheduleGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <!-- Inserido dinamicamente via JS -->
+    </div>
+
+    <!-- PONTOS DE EMBARQUE E INFORMAÇÕES ÚTEIS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-2">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+          <i data-lucide="map-pin" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-extrabold text-sm text-slate-900">Embarque no Pilar</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          <strong>Terminal Rodoviário (Chã do Pilar)</strong> com paradas nos pontos da via principal (Av. Otávio Cavalcante) até a saída da AL-108 / BR-316.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-2">
+        <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center font-bold">
+          <i data-lucide="map-pin" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-extrabold text-sm text-slate-900">Embarque em Maceió</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          <strong>Praça dos Martírios</strong> (Centro de Maceió), ao lado do Palácio Floriano Peixoto e ponto de retorno com destino a Chã e Pilar Centro.
+        </p>
+      </div>
+    </div>
+
+    <!-- AVISO DE UTILIDADE PÚBLICA -->
+    <div class="p-4 bg-amber-50/90 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-3 shadow-2xs">
+      <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+      <div class="leading-relaxed">
+        <strong>Atenção morador e passageiro:</strong> Os horários podem sofrer variações de alguns minutos devido ao fluxo do trânsito na BR-316, Ladeira do Catumbi e Av. Fernandes Lima. Chegue ao ponto com 5 a 10 minutos de antecedência.
+      </div>
+    </div>
+
+    <!-- BOTÃO COMPARTILHAR VIRAL -->
+    <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-5 text-center space-y-2">
+      <h4 class="font-extrabold text-sm text-emerald-950">Compartilhe no WhatsApp com a família e amigos</h4>
+      <p class="text-xs text-emerald-800 max-w-md mx-auto">
+        Ajude quem pega van todos os dias para estudar ou trabalhar em Maceió a não perder o horário!
+      </p>
+      <button onclick="sharePage()" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shadow-xs cursor-pointer">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        <span>Enviar Horários no WhatsApp</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- ================= RODAPÉ ================= -->
+  <footer class="mt-12 text-center text-xs text-slate-400 pb-8 px-4 w-full max-w-4xl mx-auto space-y-3">
+    <div class="flex items-center justify-center gap-3">
+      <a href="index.html" class="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold transition">
+        <span>Guia Comercial de Lojas</span>
+      </a>
+      <span class="text-slate-300">•</span>
+      <a href="telefones.html" class="inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-800 font-bold transition">
+        <span>Telefones Úteis</span>
+      </a>
+    </div>
+    <p>© 2026 Achei em Pilar — O Guia Comercial e de Serviços de Chã do Pilar & Centro • AL</p>
+  </footer>
+
+  <script>
+    const BUS_SCHEDULES = {
+      pilar: [
+        { hora: "04:30", carro: "Carro 01" },
+        { hora: "05:00", carro: "Carro 02" },
+        { hora: "05:20", carro: "Carro 03" },
+        { hora: "05:40", carro: "Carro 04" },
+        { hora: "06:00", carro: "Carro 05" },
+        { hora: "06:25", carro: "Carro 06" },
+        { hora: "06:50", carro: "Carro 07" },
+        { hora: "07:20", carro: "Carro 08" },
+        { hora: "08:00", carro: "Carro 01" },
+        { hora: "08:25", carro: "Carro 02" },
+        { hora: "08:50", carro: "Carro 03" },
+        { hora: "09:15", carro: "Carro 04" },
+        { hora: "09:35", carro: "Carro 05" },
+        { hora: "10:00", carro: "Carro 06" },
+        { hora: "10:25", carro: "Carro 07" },
+        { hora: "10:50", carro: "Carro 08" },
+        { hora: "11:15", carro: "Carro 01" },
+        { hora: "11:40", carro: "Carro 02" },
+        { hora: "12:05", carro: "Carro 03" },
+        { hora: "12:30", carro: "Carro 04" },
+        { hora: "12:55", carro: "Carro 05" },
+        { hora: "13:15", carro: "Carro 06" },
+        { hora: "13:40", carro: "Carro 07" },
+        { hora: "14:00", carro: "Carro 08" },
+        { hora: "14:25", carro: "Carro 01" },
+        { hora: "14:45", carro: "Carro 02" },
+        { hora: "15:10", carro: "Carro 03" },
+        { hora: "15:35", carro: "Carro 04" },
+        { hora: "16:00", carro: "Carro 05" },
+        { hora: "16:20", carro: "Carro 06" },
+        { hora: "16:45", carro: "Carro 07" },
+        { hora: "17:30", carro: "Carro 08" }
+      ],
+      maceio: [
+        { hora: "05:40", carro: "Carro 01" },
+        { hora: "06:20", carro: "Carro 02" },
+        { hora: "06:45", carro: "Carro 03" },
+        { hora: "07:15", carro: "Carro 04" },
+        { hora: "07:45", carro: "Carro 05" },
+        { hora: "08:10", carro: "Carro 06" },
+        { hora: "08:35", carro: "Carro 07" },
+        { hora: "09:00", carro: "Carro 08" },
+        { hora: "09:25", carro: "Carro 01" },
+        { hora: "09:50", carro: "Carro 02" },
+        { hora: "10:15", carro: "Carro 03" },
+        { hora: "10:40", carro: "Carro 04" },
+        { hora: "11:05", carro: "Carro 05" },
+        { hora: "11:30", carro: "Carro 06" },
+        { hora: "11:55", carro: "Carro 07" },
+        { hora: "12:15", carro: "Carro 08" },
+        { hora: "12:40", carro: "Carro 01" },
+        { hora: "13:00", carro: "Carro 02" },
+        { hora: "13:20", carro: "Carro 03" },
+        { hora: "13:50", carro: "Carro 04" },
+        { hora: "14:10", carro: "Carro 05" },
+        { hora: "14:30", carro: "Carro 06" },
+        { hora: "15:00", carro: "Carro 07" },
+        { hora: "15:30", carro: "Carro 08" },
+        { hora: "15:55", carro: "Carro 01" },
+        { hora: "16:20", carro: "Carro 02" },
+        { hora: "16:45", carro: "Carro 03" },
+        { hora: "17:10", carro: "Carro 04" },
+        { hora: "17:35", carro: "Carro 05" },
+        { hora: "18:00", carro: "Carro 06" },
+        { hora: "18:30", carro: "Carro 07" },
+        { hora: "19:30", carro: "Carro 08" }
+      ]
+    };
+
+    let currentOrigin = 'pilar';
+    let currentTurno = 'todos';
+
+    function setOrigin(origin) {
+      currentOrigin = origin;
+      const btnPilar = document.getElementById('tabBtnPilar');
+      const btnMaceio = document.getElementById('tabBtnMaceio');
+      const nextDir = document.getElementById('nextDirectionLabel');
+
+      if (origin === 'pilar') {
+        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-emerald-700 text-white shadow-xs cursor-pointer';
+        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer';
+        if (nextDir) nextDir.innerText = 'Próxima saída do Terminal do Pilar';
+      } else {
+        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer';
+        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-sky-700 text-white shadow-xs cursor-pointer';
+        if (nextDir) nextDir.innerText = 'Próxima saída de Maceió (Martírios)';
+      }
+      renderSchedule();
+    }
+
+    function setTurno(turno) {
+      currentTurno = turno;
+      document.querySelectorAll('.turno-btn').forEach(btn => {
+        btn.className = 'turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer';
+      });
+      const activeBtn = document.getElementById('btnTurno' + turno.charAt(0).toUpperCase() + turno.slice(1));
+      if (activeBtn) {
+        activeBtn.className = 'turno-btn active text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 text-white transition cursor-pointer';
+      }
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById('scheduleGrid');
+      if (!container) return;
+
+      const list = BUS_SCHEDULES[currentOrigin] || [];
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      let nextTrip = null;
+      let minDiff = Infinity;
+
+      list.forEach(item => {
+        const parts = item.hora.split(':');
+        const itemMins = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+        const diff = itemMins - currentMinutes;
+        if (diff >= 0 && diff < minDiff) {
+          minDiff = diff;
+          nextTrip = item;
+        }
+      });
+
+      // Atualizar card no topo
+      const timeEl = document.getElementById('nextTimeDisplay');
+      const carEl = document.getElementById('nextCarDisplay');
+      const countEl = document.getElementById('nextCountdownDisplay');
+
+      if (nextTrip) {
+        if (timeEl) timeEl.innerText = nextTrip.hora;
+        if (carEl) carEl.innerText = nextTrip.carro;
+        if (countEl) {
+          if (minDiff === 0) countEl.innerText = 'Saindo agora do ponto de embarque!';
+          else if (minDiff === 1) countEl.innerText = 'Em aproximadamente 1 minuto';
+          else if (minDiff < 60) countEl.innerText = `Saindo em aproximadamente ${minDiff} minutos`;
+          else {
+            const h = Math.floor(minDiff / 60);
+            const m = minDiff % 60;
+            countEl.innerText = `Saindo em ${h}h e ${m}min`;
+          }
+        }
+      } else {
+        const firstTomorrow = list[0];
+        if (timeEl) timeEl.innerText = firstTomorrow?.hora || '--:--';
+        if (carEl) carEl.innerText = firstTomorrow?.carro || '';
+        if (countEl) countEl.innerText = 'Viagens encerradas por hoje • Primeira saída amanhã cedo';
+      }
+
+      // Filtrar por turno
+      const filtered = list.filter(item => {
+        const hour = parseInt(item.hora.split(':')[0], 10);
+        if (currentTurno === 'manha') return hour < 12;
+        if (currentTurno === 'tarde') return hour >= 12 && hour < 18;
+        if (currentTurno === 'noite') return hour >= 18;
+        return true;
+      });
+
+      container.innerHTML = filtered.map(item => {
+        const parts = item.hora.split(':');
+        const itemMins = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+        const isPast = (itemMins < currentMinutes);
+        const isNext = (nextTrip && nextTrip.hora === item.hora && nextTrip.carro === item.carro);
+
+        let cardClass = '';
+        let badgeHtml = '';
+
+        if (isNext) {
+          cardClass = 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-500/40 shadow-sm';
+          badgeHtml = '<span class="bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Próximo</span>';
+        } else if (isPast) {
+          cardClass = 'bg-slate-50/70 border-slate-200/60 opacity-60';
+          badgeHtml = '<span class="text-slate-400 text-[10px] font-bold">✓ Passou</span>';
+        } else {
+          cardClass = 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs';
+        }
+
+        return `
+          <div class="p-3.5 rounded-2xl border transition ${cardClass}">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-black ${isNext ? 'text-emerald-950 font-extrabold' : (isPast ? 'text-slate-400' : 'text-slate-800')} tracking-tight font-mono">${item.hora}</span>
+              ${badgeHtml}
+            </div>
+            <div class="flex items-center justify-between mt-1 text-[11px]">
+              <span class="font-bold ${isNext ? 'text-emerald-800 font-extrabold' : (isPast ? 'text-slate-400' : 'text-slate-500')}">${item.carro}</span>
+              ${!isPast && !isNext ? `<span class="text-[10px] text-slate-400">${itemMins - currentMinutes}min</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function updateLiveClock() {
+      const clockEl = document.getElementById('liveClock');
+      if (!clockEl) return;
+      const now = new Date();
+      clockEl.innerText = now.toLocaleTimeString('pt-BR');
+    }
+
+    function sharePage() {
+      const shareUrl = window.location.href;
+      const shareText = 'Confira os horários atualizados de vans e micro-ônibus entre Pilar e Maceió com contagem ao vivo da próxima saída: ' + shareUrl;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Horários de Vans & Micro-ônibus — Pilar ⇄ Maceió',
+          text: 'Tabela oficial de horários das vans de Pilar e Maceió com próxima saída em tempo real!',
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        const text = encodeURIComponent(shareText);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSchedule();
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+      setInterval(renderSchedule, 30000); // Atualiza a cada 30 segundos
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

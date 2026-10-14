@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telefones Úteis & Emergência em Pilar - AL | Achei em Pilar</title>
+  
+  <meta name="description" content="Guia completo de telefones de emergência e utilidade pública de Pilar e Chã do Pilar - AL. SAMU, Polícia, Hospital, Equatorial, BRK e mais com discagem em 1 toque!">
+  
+  <!-- Open Graph / WhatsApp Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://achei-em-pilar.vercel.app/telefones">
+  <meta property="og:title" content="Telefones Úteis & Emergência — Pilar - AL">
+  <meta property="og:description" content="Lista completa de telefones de emergência e serviços essenciais de Pilar. Toque para discar agora!">
+  <meta property="og:image" content="https://achei-em-pilar.vercel.app/banner-preview.png">
+  <meta name="theme-color" content="#991b1b">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-16 antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- ================= TOAST DE COPIADO ================= -->
+  <div id="copyToast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none translate-y-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Número copiado com sucesso!</span>
+  </div>
+
+  <!-- ================= CABEÇALHO / NAVBAR ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-3 sm:py-3.5">
+    <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-1.5 text-slate-700 hover:text-rose-700 font-bold text-xs sm:text-sm transition cursor-pointer group">
+        <i data-lucide="arrow-left" class="w-4 h-4 transition group-hover:-translate-x-0.5"></i>
+        <span>Voltar ao Guia</span>
+      </a>
+
+      <a href="index.html" class="flex items-center gap-2 select-none" title="Achei em Pilar">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-br from-rose-600 to-red-700 text-white flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
+          <i data-lucide="phone" class="w-4 h-4"></i>
+        </div>
+        <div class="hidden sm:block">
+          <span class="font-extrabold text-sm text-slate-900 leading-tight block">Achei em Pilar</span>
+          <span class="text-[10px] text-rose-700 font-bold block">Telefones Úteis</span>
+        </div>
+      </a>
+
+      <button onclick="sharePage()" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold px-3 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Compartilhar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= CONTEÚDO PRINCIPAL ================= -->
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 space-y-4">
+
+    <!-- HERO CARD -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-950 via-slate-900 to-rose-950 text-white p-5 sm:p-6 shadow-md border border-slate-800">
+      <div class="relative z-10">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-2">
+          <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+          Utilidade Pública • Pilar & Chã do Pilar - AL
+        </span>
+        <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white leading-tight">
+          Telefones Úteis & Emergência
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+          Números essenciais de saúde, segurança, luz, água e serviços municipais com discagem direta em 1 toque no celular.
+        </p>
+      </div>
+      <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- BOTÕES DE EMERGÊNCIA IMEDIATA (DISCAGEM RÁPIDA) -->
+    <div>
+      <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2 px-1">Emergência Imediata (Toque para Ligar):</span>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        <a href="tel:82920009786" class="p-3 bg-red-700 hover:bg-red-800 active:scale-95 text-white rounded-2xl shadow-xs transition flex items-center gap-2.5 cursor-pointer no-underline col-span-2 sm:col-span-1">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="ambulance" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] uppercase font-bold text-red-200 block leading-tight truncate">Ambulância Pilar</span>
+            <span class="text-sm font-black tracking-tight font-mono block truncate">92000-9786</span>
+          </div>
+        </a>
+
+        <a href="tel:192" class="p-3 bg-red-600 hover:bg-red-700 active:scale-95 text-white rounded-2xl shadow-xs transition flex items-center gap-2.5 cursor-pointer no-underline">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="ambulance" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-red-200 block leading-tight">SAMU</span>
+            <span class="text-lg font-black tracking-tight font-mono">192</span>
+          </div>
+        </a>
+
+        <a href="tel:190" class="p-3 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white rounded-2xl shadow-xs transition flex items-center gap-2.5 cursor-pointer no-underline">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-blue-200 block leading-tight">Polícia / CISP</span>
+            <span class="text-lg font-black tracking-tight font-mono">190</span>
+          </div>
+        </a>
+
+        <a href="tel:8232651212" class="p-3 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white rounded-2xl shadow-xs transition flex items-center gap-2.5 cursor-pointer no-underline">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="hospital" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-emerald-200 block leading-tight">Hospital Pilar</span>
+            <span class="text-sm font-black tracking-tight font-mono">3265-1212</span>
+          </div>
+        </a>
+
+        <a href="tel:193" class="p-3 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-2xl shadow-xs transition flex items-center gap-2.5 cursor-pointer no-underline">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="flame" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-amber-200 block leading-tight">Bombeiros</span>
+            <span class="text-lg font-black tracking-tight font-mono">193</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- BARRA DE BUSCA EM TEMPO REAL -->
+    <div class="relative">
+      <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+      <input 
+        type="text" 
+        id="phoneSearch" 
+        oninput="filterPhones()" 
+        placeholder="O que você precisa? (ex: polícia, samu, hospital, água, luz, ambulância, conselho...)" 
+        class="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-xs"
+      >
+    </div>
+
+    <!-- FILTRO RÁPIDO POR CATEGORIA -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      <button onclick="setCategory('all')" class="cat-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-xs transition shrink-0 cursor-pointer" data-cat="all">
+        Todos
+      </button>
+      <button onclick="setCategory('emergencia')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition shrink-0 cursor-pointer" data-cat="emergencia">
+        🚨 Emergência 24h
+      </button>
+      <button onclick="setCategory('saude')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition shrink-0 cursor-pointer" data-cat="saude">
+        🏥 Saúde & Postos
+      </button>
+      <button onclick="setCategory('servicos')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition shrink-0 cursor-pointer" data-cat="servicos">
+        💡 Água & Luz
+      </button>
+      <button onclick="setCategory('social')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition shrink-0 cursor-pointer" data-cat="social">
+        🏛️ Prefeitura & Social
+      </button>
+    </div>
+
+    <!-- LISTA DE TELEFONES EM CARDS -->
+    <div id="phonesList" class="space-y-3">
+      <!-- Inserido dinamicamente via JS -->
+    </div>
+
+    <!-- BANNER DE SUGESTÃO DE NÚMERO -->
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div>
+        <h4 class="font-extrabold text-sm text-slate-900">Conhece outro número de utilidade pública em Pilar?</h4>
+        <p class="text-xs text-slate-500 mt-0.5">Avise a gente para adicionarmos à lista de utilidade para todos os moradores.</p>
+      </div>
+      <a href="https://wa.me/5582991008045?text=Ol%C3%A1!%20Gostaria%20de%20sugerir%20um%20n%C3%BAmero%20%C3%BAtil%20para%20a%20p%C3%A1gina%20de%20telefones%20do%20Achei%20em%20Pilar." target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        <span>Sugerir Número</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- ================= RODAPÉ ================= -->
+  <footer class="mt-12 text-center text-xs text-slate-400 pb-8 px-4 w-full max-w-4xl mx-auto space-y-3">
+    <div class="flex items-center justify-center gap-3">
+      <a href="index.html" class="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold transition">
+        <span>Guia Comercial de Lojas</span>
+      </a>
+      <span class="text-slate-300">•</span>
+      <a href="onibus.html" class="inline-flex items-center gap-1.5 text-sky-700 hover:text-sky-800 font-bold transition">
+        <span>Horários de Vans</span>
+      </a>
+    </div>
+    <p>© 2026 Achei em Pilar — O Guia Comercial e de Serviços de Chã do Pilar & Centro • AL</p>
+  </footer>
+
+  <script>
+    const USEFUL_PHONES = [
+      {
+        id: "ambulancia_pilar",
+        nome: "Central de Ambulância de Pilar",
+        categoria: "emergencia",
+        categoria2: "saude",
+        numero: "(82) 92000-9786",
+        telLink: "tel:82920009786",
+        badge: "Plantão 24h • Urgência",
+        badgeClass: "bg-red-100 text-red-800 border-red-200",
+        icon: "ambulance",
+        iconClass: "bg-red-100 text-red-700",
+        descricao: "Central municipal de regulação e despacho de ambulâncias. R. Sr. do Bonfim, 990, Pilar - AL. Atendimento e socorro 24 horas.",
+        zap: "5582920009786"
+      },
+      {
+        id: "samu",
+        nome: "SAMU — Urgência & Emergência",
+        categoria: "emergencia",
+        categoria2: "saude",
+        numero: "192",
+        telLink: "tel:192",
+        badge: "24h • Gratuito",
+        badgeClass: "bg-red-100 text-red-800 border-red-200",
+        icon: "ambulance",
+        iconClass: "bg-red-50 text-red-700",
+        descricao: "Socorro pré-hospitalar móvel para casos graves de saúde, paradas cardíacas e acidentes.",
+        zap: ""
+      },
+      {
+        id: "pm",
+        nome: "Polícia Militar / CISP Pilar",
+        categoria: "emergencia",
+        numero: "190",
+        telLink: "tel:190",
+        badge: "24h • Plantão",
+        badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+        icon: "shield-alert",
+        iconClass: "bg-blue-50 text-blue-700",
+        descricao: "Centro Integrado de Segurança Pública. Ocorrências policiais e patrulhamento em Pilar.",
+        altNumero: "(82) 3265-1190",
+        altTelLink: "tel:8232651190",
+        zap: ""
+      },
+      {
+        id: "hospital",
+        nome: "Hospital Nossa Senhora de Lourdes",
+        categoria: "saude",
+        numero: "(82) 3265-1212",
+        telLink: "tel:8232651212",
+        badge: "Plantão 24h",
+        badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        icon: "hospital",
+        iconClass: "bg-emerald-50 text-emerald-700",
+        descricao: "Hospital Geral de Pilar. Atendimento de urgência e emergência médica do município.",
+        zap: ""
+      },
+      {
+        id: "posto_cha",
+        nome: "UBS Central / Posto de Saúde da Chã",
+        categoria: "saude",
+        numero: "(82) 3265-1633",
+        telLink: "tel:8232651633",
+        badge: "Seg a Sex 07h-17h",
+        badgeClass: "bg-teal-100 text-teal-800 border-teal-200",
+        icon: "stethoscope",
+        iconClass: "bg-teal-50 text-teal-700",
+        descricao: "Consultas médicas ambulatoriais, vacinas, acompanhamento familiar e distribuição de remédios.",
+        zap: ""
+      },
+      {
+        id: "bombeiros",
+        nome: "Corpo de Bombeiros Militar",
+        categoria: "emergencia",
+        numero: "193",
+        telLink: "tel:193",
+        badge: "24h • Gratuito",
+        badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+        icon: "flame",
+        iconClass: "bg-amber-50 text-amber-700",
+        descricao: "Combate a incêndios, busca e resgate, acidentes de trânsito e afogamentos na lagoa.",
+        zap: ""
+      },
+      {
+        id: "equatorial",
+        nome: "Equatorial Energia Alagoas",
+        categoria: "servicos",
+        numero: "0800 082 0196",
+        telLink: "tel:08000820196",
+        badge: "Ligação Grátis 24h",
+        badgeClass: "bg-yellow-100 text-yellow-900 border-yellow-200",
+        icon: "zap",
+        iconClass: "bg-yellow-50 text-yellow-700",
+        descricao: "Falta de energia em bairros de Pilar, fios caídos na via, postes danificados e religação.",
+        zap: "558221269200"
+      },
+      {
+        id: "brk",
+        nome: "BRK Ambiental (Água & Esgoto)",
+        categoria: "servicos",
+        numero: "0800 771 0001",
+        telLink: "tel:08007710001",
+        badge: "Ligação Grátis 24h",
+        badgeClass: "bg-sky-100 text-sky-800 border-sky-200",
+        icon: "droplet",
+        iconClass: "bg-sky-50 text-sky-700",
+        descricao: "Falta de água em Pilar, vazamento de tubulação na rua e solicitação de desobstrução de esgoto.",
+        zap: "5511999880001"
+      },
+      {
+        id: "conselho",
+        nome: "Conselho Tutelar de Pilar",
+        categoria: "social",
+        numero: "(82) 99125-8321",
+        telLink: "tel:82991258321",
+        badge: "Plantão",
+        badgeClass: "bg-indigo-100 text-indigo-800 border-indigo-200",
+        icon: "heart-handshake",
+        iconClass: "bg-indigo-50 text-indigo-700",
+        descricao: "Garantia e defesa dos direitos de crianças e adolescentes em situação de risco.",
+        zap: "5582991258321"
+      },
+      {
+        id: "defesa_civil",
+        nome: "Defesa Civil Municipal de Pilar",
+        categoria: "emergencia",
+        numero: "199",
+        telLink: "tel:199",
+        badge: "Plantão",
+        badgeClass: "bg-orange-100 text-orange-800 border-orange-200",
+        icon: "cloud-lightning",
+        iconClass: "bg-orange-50 text-orange-700",
+        descricao: "Prevenção e socorro em cheias da lagoa, alagamentos, deslizamentos de barreiras e chuvas fortes.",
+        altNumero: "(82) 99311-4422",
+        altTelLink: "tel:82993114422",
+        zap: ""
+      },
+      {
+        id: "prefeitura",
+        nome: "Prefeitura Municipal do Pilar",
+        categoria: "social",
+        numero: "(82) 3265-1243",
+        telLink: "tel:8232651243",
+        badge: "Seg a Sex 08h-14h",
+        badgeClass: "bg-slate-100 text-slate-800 border-slate-200",
+        icon: "landmark",
+        iconClass: "bg-slate-50 text-slate-700",
+        descricao: "Sede administrativa da prefeitura, protocolos municipais, tributos e ouvidoria.",
+        zap: ""
+      },
+      {
+        id: "vans",
+        nome: "Ponto das Vans / Micro-ônibus (Terminal Pilar)",
+        categoria: "social",
+        numero: "(82) 99988-7711",
+        telLink: "tel:82999887711",
+        badge: "Das 04:30 às 19:30",
+        badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        icon: "bus",
+        iconClass: "bg-emerald-50 text-emerald-700",
+        descricao: "Informações sobre transporte coletivo intermunicipal Pilar ⇄ Maceió e saídas de carros.",
+        zap: "5582999887711"
+      }
+    ];
+
+    let currentCategory = 'all';
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.className = 'cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition shrink-0 cursor-pointer';
+      });
+      const activeBtn = document.querySelector(`.cat-btn[data-cat="${cat}"]`);
+      if (activeBtn) {
+        activeBtn.className = 'cat-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-xs transition shrink-0 cursor-pointer';
+      }
+      renderPhones();
+    }
+
+    function renderPhones() {
+      const container = document.getElementById('phonesList');
+      if (!container) return;
+
+      const q = (document.getElementById('phoneSearch')?.value || '').toLowerCase().trim();
+
+      const filtered = USEFUL_PHONES.filter(item => {
+        const matchCat = (currentCategory === 'all' || item.categoria === currentCategory || item.categoria2 === currentCategory);
+        const matchQuery = !q || (
+          item.nome.toLowerCase().includes(q) ||
+          item.descricao.toLowerCase().includes(q) ||
+          item.numero.includes(q) ||
+          (item.altNumero && item.altNumero.includes(q))
+        );
+        return matchCat && matchQuery;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl p-8 text-center border border-slate-200 text-slate-400 text-xs">
+            Nenhum telefone encontrado para a sua busca. Tente palavras como "hospital", "água", "luz" ou "polícia".
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => `
+        <div class="p-4 sm:p-5 bg-white border border-slate-200/90 rounded-3xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition hover:shadow-md">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl ${item.iconClass || 'bg-slate-100 text-slate-700'} flex items-center justify-center shrink-0 mt-0.5 font-bold">
+              <i data-lucide="${item.icon || 'phone'}" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0 space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">${item.nome}</h3>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${item.badgeClass}">${item.badge}</span>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed max-w-xl">${item.descricao}</p>
+              <div class="pt-1 flex items-center gap-3 text-sm font-mono font-black text-slate-800">
+                <span class="text-base font-extrabold text-slate-900">📞 ${item.numero}</span>
+                ${item.altNumero ? `<span class="text-xs font-semibold text-slate-400">| ${item.altNumero}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+            <a href="${item.telLink}" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer no-underline">
+              <i data-lucide="phone" class="w-4 h-4"></i>
+              <span>Ligar</span>
+            </a>
+            ${item.altTelLink ? `
+              <a href="${item.altTelLink}" class="bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-bold text-xs px-3 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1 cursor-pointer no-underline" title="Ligar para fixo alternativo">
+                <span>Fixo</span>
+              </a>
+            ` : ''}
+            ${item.zap ? `
+              <a href="https://wa.me/${item.zap}?text=Ol%C3%A1!%20Encontrei%20o%20contato%20de%20voc%C3%AAs%20no%20portal%20Achei%20em%20Pilar." target="_blank" class="bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white font-extrabold text-xs px-3 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1 cursor-pointer no-underline" title="Chamar no WhatsApp">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">WhatsApp</span>
+              </a>
+            ` : ''}
+            <button onclick="copyNumber('${item.numero}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-xl transition shadow-2xs cursor-pointer" title="Copiar número">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterPhones() {
+      renderPhones();
+    }
+
+    function copyNumber(num) {
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(num).then(() => {
+        showToast(`Número ${num} copiado!`);
+      }).catch(() => {});
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('copyToast');
+      const text = document.getElementById('toastMsg');
+      if (!toast || !text) return;
+      text.innerText = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      }, 2500);
+    }
+
+    function sharePage() {
+      const shareUrl = window.location.href;
+      const shareText = 'Confira os telefones úteis e de emergência de Pilar - AL (SAMU, Polícia, Hospital, Equatorial, BRK): ' + shareUrl;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Telefones Úteis & Emergência de Pilar - AL',
+          text: 'Lista completa de telefones de emergência e serviços essenciais de Pilar - AL!',
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        const text = encodeURIComponent(shareText);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPhones();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
