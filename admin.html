@@ -136,7 +136,7 @@
 
           <button onclick="switchTab('settings')" id="tabBtn-settings" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
             <i data-lucide="settings-2" class="w-4 h-4 text-amber-600"></i>
-            <span>Configurações & Nuvem</span>
+            <span>Configurações</span>
           </button>
 
         </div>
@@ -471,28 +471,10 @@
 
       </section>
 
-      <!-- ================= ABA 4: CONFIGURAÇÕES & NUVEM ================= -->
+      <!-- ================= ABA 4: CONFIGURAÇÕES ================= -->
       <section id="tabContent-settings" class="hidden max-w-4xl mx-auto space-y-6">
         
-        <!-- CARD 1: NUVEM SUPABASE -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-                <i data-lucide="cloud" class="w-6 h-6"></i>
-              </div>
-              <div>
-                <h3 class="font-heading font-extrabold text-base text-slate-900">Banco de Dados em Nuvem (Supabase)</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Sincronize todos os comércios locais para a nuvem para que os moradores vejam atualizações em tempo real.</p>
-              </div>
-            </div>
-            <button onclick="syncAllStoresToSupabase()" id="btnSettingsSync" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer shrink-0">
-              <i data-lucide="upload-cloud" class="w-4 h-4"></i> Subir Tudo para a Nuvem
-            </button>
-          </div>
-        </div>
-
-        <!-- CARD 2: CHAVE PIX DE DOAÇÃO -->
+        <!-- CARD 1: CHAVE PIX DE DOAÇÃO -->
         <div class="bg-white rounded-3xl border border-slate-200 shadow-xs p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
