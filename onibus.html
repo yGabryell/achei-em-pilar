@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Horários de Micro-ônibus & Vans — Pilar ⇄ Maceió | Achei em Pilar</title>
+  <title>Horários dos Micro-ônibus — Pilar ⇄ Maceió | Achei em Pilar</title>
   
-  <meta name="description" content="Tabela completa e atualizada dos horários de micro-ônibus e vans entre Terminal do Pilar e Praça dos Martírios em Maceió. Veja a próxima saída em tempo real!">
+  <meta name="description" content="Tabela completa e atualizada dos horários dos micro-ônibus entre Terminal do Pilar e Praça dos Martírios em Maceió. Veja a próxima saída em tempo real!">
   
   <!-- Open Graph / WhatsApp Preview -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://achei-em-pilar.vercel.app/onibus">
-  <meta property="og:title" content="Horários de Vans & Micro-ônibus — Pilar ⇄ Maceió">
-  <meta property="og:description" content="Tabela oficial das saídas do Terminal do Pilar e Praça dos Martírios Maceió. Próxima van calculada em tempo real!">
+  <meta property="og:title" content="Horários dos Micro-ônibus — Pilar ⇄ Maceió">
+  <meta property="og:description" content="Tabela oficial das saídas do Terminal do Pilar e Praça dos Martírios Maceió. Próximo micro-ônibus calculado em tempo real!">
   <meta property="og:image" content="https://achei-em-pilar.vercel.app/banner-preview.png">
   <meta name="theme-color" content="#065f46">
 
@@ -57,7 +57,7 @@
         </div>
         <div class="hidden sm:block">
           <span class="font-extrabold text-sm text-slate-900 leading-tight block">Achei em Pilar</span>
-          <span class="text-[10px] text-emerald-700 font-bold block">Horários de Vans</span>
+          <span class="text-[10px] text-emerald-700 font-bold block">Horários dos Micro-ônibus</span>
         </div>
       </a>
 
@@ -84,10 +84,10 @@
           </span>
         </div>
         <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white leading-tight">
-          Horários de Vans & Micro-ônibus
+          Horários dos Micro-ônibus
         </h1>
-        <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
-          Linha regular <strong>Terminal do Pilar ⇄ Praça dos Martírios Maceió</strong>. Veja a próxima van que vai passar agora!
+        <p class="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
+          Linha regular <strong>Terminal do Pilar ⇄ Praça dos Martírios Maceió</strong>. Veja o próximo micro-ônibus que vai passar agora!
         </p>
       </div>
       <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
@@ -112,38 +112,38 @@
     </div>
 
     <!-- TABS DE ORIGEM (SAINDO DO PILAR vs SAINDO DE MACEIÓ) -->
-    <div class="bg-white rounded-2xl p-1.5 shadow-xs border border-slate-200 flex items-center gap-2">
-      <button id="tabBtnPilar" onclick="setOrigin('pilar')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-emerald-700 text-white shadow-xs cursor-pointer">
+    <div class="bg-slate-200/80 rounded-2xl p-1.5 shadow-xs border border-slate-300 flex items-center gap-2">
+      <button id="tabBtnPilar" onclick="setOrigin('pilar')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 bg-emerald-700 text-white border-2 border-emerald-800 shadow-sm cursor-pointer">
         <i data-lucide="map-pin" class="w-4 h-4"></i>
         <span>Saindo do Pilar</span>
       </button>
-      <button id="tabBtnMaceio" onclick="setOrigin('maceio')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer">
+      <button id="tabBtnMaceio" onclick="setOrigin('maceio')" class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-white text-slate-800 hover:text-slate-950 border-2 border-slate-300 cursor-pointer">
         <i data-lucide="map-pin" class="w-4 h-4 text-sky-600"></i>
         <span>Saindo de Maceió</span>
       </button>
     </div>
 
-    <!-- FILTROS POR TURNO + STATUS DA LEGENDA -->
+    <!-- FILTROS POR TURNO + STATUS DA LEGENDA (ALTO CONTRASTE) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 px-1">
       <div class="flex items-center gap-1.5">
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+        <span class="text-xs font-black text-slate-700 uppercase tracking-wider mr-1 flex items-center gap-1">
           <i data-lucide="filter" class="w-3.5 h-3.5"></i> Turno:
         </span>
-        <button onclick="setTurno('todos')" id="btnTurnoTodos" class="turno-btn active text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 text-white transition cursor-pointer">Todos</button>
-        <button onclick="setTurno('manha')" id="btnTurnoManha" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Manhã</button>
-        <button onclick="setTurno('tarde')" id="btnTurnoTarde" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Tarde</button>
-        <button onclick="setTurno('noite')" id="btnTurnoNoite" class="turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">Noite</button>
+        <button onclick="setTurno('todos')" id="btnTurnoTodos" class="turno-btn active text-xs font-black px-3.5 py-1.5 rounded-xl bg-slate-900 text-white border-2 border-slate-900 transition cursor-pointer shadow-xs">Todos</button>
+        <button onclick="setTurno('manha')" id="btnTurnoManha" class="turno-btn text-xs font-extrabold px-3.5 py-1.5 rounded-xl bg-white text-slate-800 hover:bg-slate-200 border-2 border-slate-300 transition cursor-pointer shadow-2xs">Manhã</button>
+        <button onclick="setTurno('tarde')" id="btnTurnoTarde" class="turno-btn text-xs font-extrabold px-3.5 py-1.5 rounded-xl bg-white text-slate-800 hover:bg-slate-200 border-2 border-slate-300 transition cursor-pointer shadow-2xs">Tarde</button>
+        <button onclick="setTurno('noite')" id="btnTurnoNoite" class="turno-btn text-xs font-extrabold px-3.5 py-1.5 rounded-xl bg-white text-slate-800 hover:bg-slate-200 border-2 border-slate-300 transition cursor-pointer shadow-2xs">Noite</button>
       </div>
 
-      <div class="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-        <span class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Próxima
+      <div class="flex items-center gap-3 text-xs text-slate-700 font-bold">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span> Próximo
         </span>
-        <span class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-slate-400"></span> A sair
+        <span class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span> A sair
         </span>
-        <span class="flex items-center gap-1 text-slate-400">
-          <span class="w-2 h-2 rounded-full bg-slate-200"></span> Já passou
+        <span class="flex items-center gap-1.5 text-slate-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Já passou
         </span>
       </div>
     </div>
@@ -188,11 +188,11 @@
     <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-5 text-center space-y-2">
       <h4 class="font-extrabold text-sm text-emerald-950">Compartilhe no WhatsApp com a família e amigos</h4>
       <p class="text-xs text-emerald-800 max-w-md mx-auto">
-        Ajude quem pega van todos os dias para estudar ou trabalhar em Maceió a não perder o horário!
+        Ajude quem pega micro-ônibus todos os dias para estudar ou trabalhar em Maceió a não perder o horário!
       </p>
       <button onclick="sharePage()" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shadow-xs cursor-pointer">
         <i data-lucide="message-circle" class="w-4 h-4"></i>
-        <span>Enviar Horários no WhatsApp</span>
+        <span>Enviar Horários dos Micro-ônibus no WhatsApp</span>
       </button>
     </div>
   </main>
@@ -293,12 +293,12 @@
       const nextDir = document.getElementById('nextDirectionLabel');
 
       if (origin === 'pilar') {
-        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-emerald-700 text-white shadow-xs cursor-pointer';
-        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer';
+        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 bg-emerald-700 text-white border-2 border-emerald-800 shadow-sm cursor-pointer';
+        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-white text-slate-800 hover:text-slate-950 border-2 border-slate-300 cursor-pointer';
         if (nextDir) nextDir.innerText = 'Próxima saída do Terminal do Pilar';
       } else {
-        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer';
-        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-sky-700 text-white shadow-xs cursor-pointer';
+        btnPilar.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 bg-white text-slate-800 hover:text-slate-950 border-2 border-slate-300 cursor-pointer';
+        btnMaceio.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 bg-sky-700 text-white border-2 border-sky-800 shadow-sm cursor-pointer';
         if (nextDir) nextDir.innerText = 'Próxima saída de Maceió (Martírios)';
       }
       renderSchedule();
@@ -307,11 +307,11 @@
     function setTurno(turno) {
       currentTurno = turno;
       document.querySelectorAll('.turno-btn').forEach(btn => {
-        btn.className = 'turno-btn text-xs font-bold px-3 py-1.5 rounded-xl bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 transition cursor-pointer';
+        btn.className = 'turno-btn text-xs font-extrabold px-3.5 py-1.5 rounded-xl bg-white text-slate-800 hover:bg-slate-200 border-2 border-slate-300 transition cursor-pointer shadow-2xs';
       });
       const activeBtn = document.getElementById('btnTurno' + turno.charAt(0).toUpperCase() + turno.slice(1));
       if (activeBtn) {
-        activeBtn.className = 'turno-btn active text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 text-white transition cursor-pointer';
+        activeBtn.className = 'turno-btn active text-xs font-black px-3.5 py-1.5 rounded-xl bg-slate-900 text-white border-2 border-slate-900 transition cursor-pointer shadow-xs';
       }
       renderSchedule();
     }
@@ -379,26 +379,37 @@
 
         let cardClass = '';
         let badgeHtml = '';
+        let timeColor = '';
+        let carColor = '';
 
         if (isNext) {
-          cardClass = 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-500/40 shadow-sm';
-          badgeHtml = '<span class="bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Próximo</span>';
+          cardClass = 'bg-emerald-50/90 border-2 border-emerald-600 ring-2 ring-emerald-500/20 shadow-md';
+          badgeHtml = '<span class="bg-emerald-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider animate-pulse">Próximo</span>';
+          timeColor = 'text-emerald-950 font-black';
+          carColor = 'text-emerald-800 font-extrabold';
         } else if (isPast) {
-          cardClass = 'bg-slate-50/70 border-slate-200/60 opacity-60';
-          badgeHtml = '<span class="text-slate-400 text-[10px] font-bold">✓ Passou</span>';
+          // Alto contraste para dia ensolarado, sem opacidade reduzida
+          cardClass = 'bg-white border-2 border-slate-300/90 shadow-2xs';
+          badgeHtml = '<span class="bg-slate-100 text-slate-700 border border-slate-300 text-[10px] font-black px-1.5 py-0.5 rounded-md">✓ Passou</span>';
+          timeColor = 'text-slate-700 font-black';
+          carColor = 'text-slate-500 font-bold';
         } else {
-          cardClass = 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs';
+          // A sair
+          cardClass = 'bg-white hover:border-slate-400 border-2 border-slate-300 shadow-xs';
+          badgeHtml = `<span class="bg-sky-50 text-sky-800 border border-sky-300 text-[10px] font-black px-1.5 py-0.5 rounded-md">Em ${itemMins - currentMinutes}m</span>`;
+          timeColor = 'text-slate-950 font-black';
+          carColor = 'text-slate-800 font-extrabold';
         }
 
         return `
           <div class="p-3.5 rounded-2xl border transition ${cardClass}">
             <div class="flex items-center justify-between">
-              <span class="text-base sm:text-lg font-black ${isNext ? 'text-emerald-950 font-extrabold' : (isPast ? 'text-slate-400' : 'text-slate-800')} tracking-tight font-mono">${item.hora}</span>
+              <span class="text-base sm:text-lg ${timeColor} tracking-tight font-mono">${item.hora}</span>
               ${badgeHtml}
             </div>
             <div class="flex items-center justify-between mt-1 text-[11px]">
-              <span class="font-bold ${isNext ? 'text-emerald-800 font-extrabold' : (isPast ? 'text-slate-400' : 'text-slate-500')}">${item.carro}</span>
-              ${!isPast && !isNext ? `<span class="text-[10px] text-slate-400">${itemMins - currentMinutes}min</span>` : ''}
+              <span class="${carColor}">${item.carro}</span>
+              ${!isPast && !isNext ? `<span class="text-[10px] text-slate-600 font-bold">${itemMins - currentMinutes}min</span>` : ''}
             </div>
           </div>
         `;
@@ -416,12 +427,12 @@
 
     function sharePage() {
       const shareUrl = window.location.href;
-      const shareText = 'Confira os horários atualizados de vans e micro-ônibus entre Pilar e Maceió com contagem ao vivo da próxima saída: ' + shareUrl;
+      const shareText = 'Confira os horários atualizados dos micro-ônibus entre Pilar e Maceió com contagem ao vivo da próxima saída: ' + shareUrl;
 
       if (navigator.share) {
         navigator.share({
-          title: 'Horários de Vans & Micro-ônibus — Pilar ⇄ Maceió',
-          text: 'Tabela oficial de horários das vans de Pilar e Maceió com próxima saída em tempo real!',
+          title: 'Horários dos Micro-ônibus — Pilar ⇄ Maceió',
+          text: 'Tabela oficial de horários dos micro-ônibus de Pilar e Maceió com próxima saída em tempo real!',
           url: shareUrl
         }).catch(() => {});
       } else {
