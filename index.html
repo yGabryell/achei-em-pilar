@@ -283,10 +283,7 @@
             <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <i data-lucide="plus-circle" class="w-4 h-4 text-white"></i>
             </div>
-            <div class="flex-1 min-w-0">
-              <span class="block font-black leading-tight">Cadastrar Meu Negócio</span>
-              <span class="text-[10px] text-emerald-100 block font-normal">Apareça no guia de graça</span>
-            </div>
+            <span class="flex-1 min-w-0 font-black leading-tight text-sm">Cadastrar Meu Negócio</span>
             <i data-lucide="chevron-right" class="w-4 h-4 text-emerald-200"></i>
           </button>
 
@@ -533,7 +530,7 @@
         </div>
         <h3 class="font-heading font-extrabold text-lg text-slate-900">Cadastre seu Negócio</h3>
       </div>
-      <p class="text-xs text-slate-500 mb-4">Apareça para centenas de moradores de Pilar que buscam produtos e serviços todos os dias!</p>
+      <p class="text-xs text-slate-500 mb-4">Cadastre as informações da sua empresa. O comércio é enviado diretamente para o sistema e analisado pelo administrador para entrar no guia comercial.</p>
 
       <form onsubmit="handlePublicRegister(event)" class="space-y-3.5">
         <div>
@@ -590,9 +587,9 @@
           <textarea id="pubDescricao" rows="2" placeholder="Ex: Bolos confeitados por encomenda, salgados para festa..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
         </div>
 
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
-          <i data-lucide="send" class="w-4 h-4"></i>
-          Enviar Solicitação de Cadastro
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs py-3.5 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>Cadastrar Comércio no Guia</span>
         </button>
       </form>
     </div>

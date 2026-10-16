@@ -37,13 +37,8 @@
     }
   </script>
 
-  <!-- LUCIDE ICONS (JSDelivr com fallback) -->
-  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script>
-    if (!window.lucide) {
-      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
-    }
-  </script>
+  <!-- LUCIDE ICONS -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- SUPABASE JS CLIENT -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -289,7 +284,7 @@
     
     let supabase = null;
     try {
-      if (window.supabase) {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
@@ -316,32 +311,33 @@
       const subtitle = document.getElementById('authSubtitle');
 
       if (mode === 'login') {
-        formLogin.classList.remove('hidden');
-        formRegister.classList.add('hidden');
-        formForgot.classList.add('hidden');
-        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
-        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
-        title.innerText = 'Painel do Comércio';
-        subtitle.innerText = 'Gerencie seu estabelecimento no guia comercial de Pilar.';
+        if (formLogin) formLogin.classList.remove('hidden');
+        if (formRegister) formRegister.classList.add('hidden');
+        if (formForgot) formForgot.classList.add('hidden');
+        if (tabLogin) tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
+        if (tabRegister) tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
+        if (title) title.innerText = 'Painel do Comércio';
+        if (subtitle) subtitle.innerText = 'Gerencie seu estabelecimento no guia comercial de Pilar.';
       } else if (mode === 'register') {
-        formLogin.classList.add('hidden');
-        formRegister.classList.remove('hidden');
-        formForgot.classList.add('hidden');
-        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
-        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
-        title.innerText = 'Cadastrar Comércio';
-        subtitle.innerText = 'Crie sua conta para divulgar seu negócio em Pilar.';
+        if (formLogin) formLogin.classList.add('hidden');
+        if (formRegister) formRegister.classList.remove('hidden');
+        if (formForgot) formForgot.classList.add('hidden');
+        if (tabRegister) tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
+        if (tabLogin) tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
+        if (title) title.innerText = 'Cadastrar Comércio';
+        if (subtitle) subtitle.innerText = 'Crie sua conta para divulgar seu negócio em Pilar.';
       } else if (mode === 'forgot') {
-        formLogin.classList.add('hidden');
-        formRegister.classList.add('hidden');
-        formForgot.classList.remove('hidden');
-        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
-        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
-        title.innerText = 'Recuperar Senha';
-        subtitle.innerText = 'Informe seu e-mail para receber as instruções.';
+        if (formLogin) formLogin.classList.add('hidden');
+        if (formRegister) formRegister.classList.add('hidden');
+        if (formForgot) formForgot.classList.remove('hidden');
+        if (tabLogin) tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
+        if (tabRegister) tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
+        if (title) title.innerText = 'Recuperar Senha';
+        if (subtitle) subtitle.innerText = 'Informe seu e-mail para receber as instruções.';
       }
       safeCreateIcons();
     }
+    window.switchAuthMode = switchAuthMode;
 
     function togglePassVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
@@ -556,6 +552,22 @@
     // AO CARREGAR A PÁGINA: VERIFICAR SE JÁ ESTÁ LOGADO
     window.addEventListener('DOMContentLoaded', async () => {
       safeCreateIcons();
+
+      // Vincular eventos de clique diretos aos botões de alternância
+      const tabRegister = document.getElementById('tabBtnRegister');
+      if (tabRegister) {
+        tabRegister.addEventListener('click', (e) => {
+          e.preventDefault();
+          switchAuthMode('register');
+        });
+      }
+      const tabLogin = document.getElementById('tabBtnLogin');
+      if (tabLogin) {
+        tabLogin.addEventListener('click', (e) => {
+          e.preventDefault();
+          switchAuthMode('login');
+        });
+      }
 
       // Verificar parâmetro na URL (?modo=cadastro)
       const urlParams = new URLSearchParams(window.location.search);
