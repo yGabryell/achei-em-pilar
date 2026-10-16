@@ -107,6 +107,7 @@ module.exports = async (req, res) => {
       };
       if (store.site) payload.site = String(store.site).trim();
       if (store.maps_url) payload.maps_url = String(store.maps_url).trim();
+      if (store.status) payload.status = String(store.status).trim();
 
       if (fotos.length > 0) payload.fotos = fotos;
 
@@ -119,9 +120,10 @@ module.exports = async (req, res) => {
         body: JSON.stringify([payload])
       });
 
-      if (!saveRes.ok && payload.fotos) {
-        // Fallback seguro caso a coluna fotos ainda não tenha sido criada no Supabase
+      if (!saveRes.ok && (payload.fotos || payload.status)) {
+        // Fallback seguro caso as colunas fotos ou status ainda não tenham sido criadas no Supabase
         delete payload.fotos;
+        delete payload.status;
         saveRes = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
           method: 'POST',
           headers: {

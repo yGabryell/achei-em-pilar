@@ -85,18 +85,11 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <!-- ÁREA DO LOJISTA / ENTRAR (Ícone no mobile, com texto no desktop) -->
-        <a href="entrar.html" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-bold p-2.5 sm:px-3 sm:py-2.5 rounded-xl transition border border-slate-200/80 flex items-center gap-1.5 shrink-0" title="Área do Lojista (Entrar)">
-          <i data-lucide="store" class="w-4 h-4 text-emerald-600"></i>
-          <span class="hidden sm:inline">Área do Lojista</span>
-        </a>
-
-        <!-- BOTÃO CADASTRAR LOJA -->
-        <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Cadastrar Meu Negócio</span>
-          <span class="sm:hidden">Cadastrar</span>
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- BOTÃO MENU GERAL (DRAWER LATERAL) -->
+        <button onclick="toggleSideMenu()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 text-xs sm:text-sm font-extrabold px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl transition border border-slate-200/90 cursor-pointer shadow-2xs" aria-label="Abrir Menu">
+          <i data-lucide="menu" class="w-4 h-4 text-emerald-700"></i>
+          <span>Menu</span>
         </button>
       </div>
     </div>
@@ -256,6 +249,175 @@
       <i data-lucide="coffee" class="w-4 h-4 text-white"></i>
       <span>Apoie com PIX</span>
     </button>
+  </div>
+
+  <!-- ================= GAVETA / DRAWER LATERAL DO MENU ================= -->
+  <div id="sideMenuOverlay" onclick="toggleSideMenu()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity duration-300 opacity-0"></div>
+
+  <aside id="sideMenuDrawer" class="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-50 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out">
+    
+    <!-- TOPO DO MENU -->
+    <div>
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-600/20">
+            P
+          </div>
+          <div>
+            <span class="font-extrabold text-base text-slate-900 leading-tight block">Achei em Pilar</span>
+            <span class="text-[11px] text-emerald-700 font-bold block">Menu do Guia</span>
+          </div>
+        </div>
+
+        <button onclick="toggleSideMenu()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer" aria-label="Fechar Menu">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- ITENS PRINCIPAIS -->
+      <div class="p-4 space-y-2">
+        
+        <!-- DESTAQUES LOJISTA -->
+        <div class="space-y-2 mb-3">
+          <button onclick="toggleSideMenu(); openRegisterModal();" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm p-3.5 rounded-2xl transition shadow-md shadow-emerald-600/20 flex items-center gap-3 cursor-pointer text-left">
+            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-white"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="block font-black leading-tight">Cadastrar Meu Negócio</span>
+              <span class="text-[10px] text-emerald-100 block font-normal">Apareça no guia de graça</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-emerald-200"></i>
+          </button>
+
+          <a href="entrar.html" class="w-full bg-slate-50 hover:bg-slate-100 active:scale-98 text-slate-800 font-extrabold text-xs sm:text-sm p-3.5 rounded-2xl transition border border-slate-200 flex items-center gap-3 cursor-pointer text-left no-underline block">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <i data-lucide="store" class="w-4 h-4"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="block font-black leading-tight">Área do Lojista</span>
+              <span class="text-[10px] text-slate-400 block font-normal">Entrar no painel da sua loja</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </a>
+        </div>
+
+        <div class="h-px bg-slate-100 my-2"></div>
+
+        <!-- UTILIDADES PÚBLICAS -->
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block">Cidade & Utilidades</span>
+
+        <a href="onibus.html" class="w-full hover:bg-slate-50 p-3 rounded-2xl transition flex items-center gap-3 text-slate-700 font-bold text-xs cursor-pointer no-underline block">
+          <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+            <i data-lucide="bus" class="w-4 h-4"></i>
+          </div>
+          <span class="flex-1">Horário dos Micro-ônibus</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </a>
+
+        <a href="telefones.html" class="w-full hover:bg-slate-50 p-3 rounded-2xl transition flex items-center gap-3 text-slate-700 font-bold text-xs cursor-pointer no-underline block">
+          <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center shrink-0">
+            <i data-lucide="phone-call" class="w-4 h-4"></i>
+          </div>
+          <span class="flex-1">Telefones Úteis (SAMU, Polícia)</span>
+        </a>
+
+        <div class="h-px bg-slate-100 my-2"></div>
+
+        <!-- INSTITUCIONAL -->
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block">Mais Opções</span>
+
+        <button onclick="toggleSideMenu(); openAboutModal();" class="w-full hover:bg-slate-50 p-3 rounded-2xl transition flex items-center gap-3 text-slate-700 font-bold text-xs cursor-pointer text-left">
+          <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
+            <i data-lucide="info" class="w-4 h-4"></i>
+          </div>
+          <span class="flex-1">Sobre o Achei em Pilar</span>
+        </button>
+
+        <button onclick="toggleSideMenu(); openDonateModal();" class="w-full hover:bg-amber-50/70 p-3 rounded-2xl transition flex items-center gap-3 text-amber-900 font-bold text-xs cursor-pointer text-left">
+          <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <i data-lucide="coffee" class="w-4 h-4"></i>
+          </div>
+          <span class="flex-1">Apoiar o Guia com PIX</span>
+        </button>
+
+        <a href="https://wa.me/5582991008045?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20sobre%20o%20Achei%20em%20Pilar" target="_blank" rel="noopener noreferrer" class="w-full hover:bg-slate-50 p-3 rounded-2xl transition flex items-center gap-3 text-slate-700 font-bold text-xs cursor-pointer text-left no-underline block">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+          </div>
+          <span class="flex-1">Falar no WhatsApp (Suporte)</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- RODAPÉ DO MENU -->
+    <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">
+      <p class="font-bold text-slate-600">Achei em Pilar © 2026</p>
+      <p class="text-[11px] mt-0.5">Criado com dedicação em Pilar - AL</p>
+    </div>
+  </aside>
+
+  <!-- ================= MODAL SOBRE O ACHEI EM PILAR ================= -->
+  <div id="aboutModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto text-center">
+      <button onclick="closeAboutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center text-3xl font-black mx-auto mb-3 shadow-lg shadow-emerald-600/30">
+        P
+      </div>
+
+      <h3 class="font-heading font-black text-xl text-slate-900 leading-tight">Achei em Pilar</h3>
+      <p class="text-xs font-bold text-emerald-700 mt-0.5">O Guia Comercial de Pilar & Chã • AL</p>
+
+      <div class="mt-4 text-left text-xs text-slate-600 space-y-2.5 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+        <p>
+          O <strong>Achei em Pilar</strong> nasceu com uma missão simples e independente: <strong>conectar os moradores de Pilar aos melhores comércios, lanchonetes, serviços e profissionais da nossa cidade</strong> em apenas 1 clique.
+        </p>
+        <p>
+          Aqui você encontra delivery, barbearias, farmácias, horários ao vivo dos micro-ônibus e telefones úteis, com contato direto no WhatsApp e localização no mapa.
+        </p>
+        <p class="pt-2 border-t border-slate-200 font-medium text-slate-500 text-[11px]">
+          💡 Criado e mantido com orgulho por <strong class="text-slate-800">Gabriel Alves</strong> para fortalecer o comércio e a comunidade local.
+        </p>
+      </div>
+
+      <button onclick="closeAboutModal()" class="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 rounded-xl transition shadow-xs cursor-pointer">
+        Fechar e Explorar Guia
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE SUCESSO DE CADASTRO ================= -->
+  <div id="registerSuccessModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3 shadow-inner">
+        <i data-lucide="check-circle" class="w-8 h-8 text-emerald-600"></i>
+      </div>
+
+      <h3 class="font-heading font-black text-lg text-slate-900 leading-tight">Solicitação Enviada! 🎉</h3>
+      <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+        O comércio <strong id="successStoreName" class="text-slate-900"></strong> foi recebido com sucesso no nosso sistema.
+      </p>
+
+      <div class="mt-3.5 p-3.5 bg-amber-50 border border-amber-200/80 rounded-2xl text-left text-[11px] text-amber-900 space-y-1">
+        <p class="font-bold flex items-center gap-1.5 text-amber-800">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i> Aguardando aprovação
+        </p>
+        <p>O administrador do site irá revisar os dados e aprovar para que seu comércio apareça no guia público em breve.</p>
+      </div>
+
+      <div class="mt-4 space-y-2">
+        <a href="entrar.html?modo=cadastro" class="w-full bg-slate-900 hover:bg-black text-white font-extrabold text-xs py-3 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer no-underline block">
+          <i data-lucide="store" class="w-4 h-4"></i> Criar Conta na Área do Lojista
+        </a>
+        <button onclick="closeRegisterSuccessModal()" class="w-full text-slate-500 hover:text-slate-800 text-xs font-semibold py-2 transition cursor-pointer">
+          Voltar para a Página Inicial
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ================= MODAL DE DOAÇÃO PIX (COPIA E COLA OFICIAL) ================= -->
@@ -1369,6 +1531,12 @@
         // Filtrar
         const filtered = stores.filter(store => {
           if (!store) return false;
+
+          // Esconder lojas pendentes de aprovação ou em rascunho
+          const isPending = store.status === 'pendente' || store.status === 'rascunho' || 
+            (store.keywords && (store.keywords.includes('[STATUS:pendente]') || store.keywords.includes('[STATUS:rascunho]')));
+          if (isPending) return false;
+
           const matchCat = (currentCategory === 'all' || store.categoria === currentCategory);
           const matchBairro = (currentBairro === 'all' || store.bairro === currentBairro);
           
@@ -1617,46 +1785,134 @@
       renderStores();
     }
 
-    // ================= MODAL DE CADASTRO PÚBLICO =================
+    // ================= MENU LATERAL (DRAWER) & MODAIS =================
+    function toggleSideMenu() {
+      const drawer = document.getElementById('sideMenuDrawer');
+      const overlay = document.getElementById('sideMenuOverlay');
+      if (!drawer || !overlay) return;
+
+      const isClosed = drawer.classList.contains('translate-x-full');
+      if (isClosed) {
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+          overlay.classList.remove('opacity-0');
+          drawer.classList.remove('translate-x-full');
+        }, 10);
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+        }, 300);
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openAboutModal() {
+      const modal = document.getElementById('aboutModal');
+      if (modal) modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeAboutModal() {
+      const modal = document.getElementById('aboutModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showRegisterSuccessModal(storeName) {
+      const modal = document.getElementById('registerSuccessModal');
+      const nameEl = document.getElementById('successStoreName');
+      if (nameEl) nameEl.innerText = storeName || 'seu negócio';
+      if (modal) modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeRegisterSuccessModal() {
+      const modal = document.getElementById('registerSuccessModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // ================= MODAL DE CADASTRO PÚBLICO DIRETO NO GUIA =================
     function openRegisterModal() {
       document.getElementById('registerModal').classList.remove('hidden');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
+
     function closeRegisterModal() {
       document.getElementById('registerModal').classList.add('hidden');
     }
 
-    function handlePublicRegister(e) {
+    async function handlePublicRegister(e) {
       e.preventDefault();
-      const nome = document.getElementById('pubNome').value;
+      const nome = document.getElementById('pubNome').value.trim();
       const categoria = document.getElementById('pubCategoria').value;
       const bairro = document.getElementById('pubBairro').value;
-      const zap = document.getElementById('pubWhatsapp').value.trim();
+      const rawZap = document.getElementById('pubWhatsapp').value.trim().replace(/\D/g, '');
       const site = document.getElementById('pubSite') ? document.getElementById('pubSite').value.trim() : '';
       const insta = document.getElementById('pubInstagram').value.trim();
-      const endereco = document.getElementById('pubEndereco').value;
-      const desc = document.getElementById('pubDescricao').value;
+      const endereco = document.getElementById('pubEndereco').value.trim();
+      const desc = document.getElementById('pubDescricao').value.trim();
 
-      if (!zap && !site) {
+      if (!rawZap && !site) {
         alert('Por favor, informe ao menos uma forma de contato (WhatsApp ou Site/Link).');
         return;
       }
 
-      // Mensagem que será enviada direto para o WhatsApp do Gabriel (Administrador)
-      const admZap = "5582991008045"; // Número oficial de Gabriel Alves!
-      const texto = `Olá! Gostaria de cadastrar meu negócio no *Achei em Pilar*:\n\n` +
-                    `🏢 *Nome:* ${nome}\n` +
-                    `📁 *Categoria:* ${categoria}\n` +
-                    `📍 *Bairro:* ${bairro}\n` +
-                    `📞 *WhatsApp:* ${zap || 'Não informado'}\n` +
-                    `🌐 *Site:* ${site || 'Não informado'}\n` +
-                    `📸 *Instagram:* ${insta || 'Não informado'}\n` +
-                    `🏠 *Endereço:* ${endereco}\n` +
-                    `📝 *Detalhes:* ${desc}`;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Enviando cadastro...';
+        if (window.lucide) lucide.createIcons();
+      }
 
-      window.open(`https://wa.me/${admZap}?text=${encodeURIComponent(texto)}`, '_blank');
-      alert('Sua solicitação foi enviada! O administrador adicionará seu negócio em breve.');
-      closeRegisterModal();
+      const formattedZap = rawZap ? (rawZap.startsWith('55') ? rawZap : '55' + rawZap) : '';
+      const newStoreId = String(Date.now());
+      const pin = rawZap ? rawZap.slice(-4) : '1234';
+
+      const basePayload = {
+        id: newStoreId,
+        nome: nome,
+        categoria: categoria,
+        bairro: bairro,
+        endereco: endereco || 'Pilar - AL',
+        whatsapp: formattedZap,
+        instagram: insta ? (insta.startsWith('@') ? insta : '@' + insta) : '',
+        site: site || null,
+        descricao: desc || `Bem-vindo(a) à ${nome} em Pilar! Entre em contato conosco pelo WhatsApp.`,
+        horario: 'Segunda a Sábado',
+        logo: '',
+        vip: false,
+        keywords: `${nome.toLowerCase()} pilar ${categoria} ${bairro}\n[PIN:${pin}]\n[STATUS:pendente]`
+      };
+
+      const fullPayload = {
+        ...basePayload,
+        status: 'pendente',
+        plano: 'basico'
+      };
+
+      try {
+        if (supabaseClient) {
+          const { error } = await supabaseClient.from('stores').insert([fullPayload]);
+          if (error) {
+            await supabaseClient.from('stores').insert([basePayload]);
+          }
+        }
+        
+        closeRegisterModal();
+        e.target.reset();
+        showRegisterSuccessModal(nome);
+      } catch(err) {
+        console.error('Erro ao cadastrar direto:', err);
+        alert('Ocorreu um erro ao salvar o cadastro. Tente novamente ou use a Área do Lojista.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
     }
 
     // ================= CONFIGURAÇÃO E MODAL DE DOAÇÃO PIX (COPIA E COLA OFICIAL) =================

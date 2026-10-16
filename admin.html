@@ -116,25 +116,31 @@
 
       <!-- BARRA DE NAVEGAÇÃO POR ABAS -->
       <div class="bg-slate-50 border-t border-slate-200 px-3 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-3 py-2">
+        <div class="max-w-7xl mx-auto flex items-center overflow-x-auto gap-1.5 sm:gap-2.5 py-2">
           
-          <button onclick="switchTab('stores')" id="tabBtn-stores" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer">
+          <button onclick="switchTab('stores')" id="tabBtn-stores" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer shrink-0">
             <i data-lucide="store" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0"></i>
             <span class="truncate">Estabelecimentos</span>
             <span id="badgeTotalStores" class="bg-emerald-100 text-emerald-800 text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-extrabold shrink-0">0</span>
           </button>
 
-          <button onclick="switchTab('form')" id="tabBtn-form" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+          <button onclick="switchTab('pending')" id="tabBtn-pending" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
+            <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0"></i>
+            <span class="truncate">Aprovações</span>
+            <span id="badgePendingStores" class="bg-amber-100 text-amber-800 text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-extrabold shrink-0">0</span>
+          </button>
+
+          <button onclick="switchTab('form')" id="tabBtn-form" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
             <i data-lucide="plus-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0"></i>
             <span id="tabFormTitle" class="truncate">Cadastrar Novo</span>
           </button>
 
-          <button onclick="switchTab('metrics')" id="tabBtn-metrics" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+          <button onclick="switchTab('metrics')" id="tabBtn-metrics" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
             <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 shrink-0"></i>
             <span class="truncate">Cliques & Métricas</span>
           </button>
 
-          <button onclick="switchTab('settings')" id="tabBtn-settings" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
+          <button onclick="switchTab('settings')" id="tabBtn-settings" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
             <i data-lucide="settings-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0"></i>
             <span class="truncate">Configurações</span>
           </button>
@@ -195,6 +201,42 @@
           </div>
           <h4 class="font-bold text-sm text-slate-700">Nenhum estabelecimento encontrado</h4>
           <p class="text-xs text-slate-400 mt-0.5">Tente buscar com outro termo ou limpe os filtros.</p>
+        </div>
+
+      </section>
+
+      <!-- ================= ABA NOVA: APROVAÇÕES / CADASTROS PENDENTES ================= -->
+      <section id="tabContent-pending" class="hidden space-y-4">
+        
+        <!-- HEADER INFORMATIVO -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+              <i data-lucide="clock" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="font-heading font-extrabold text-base sm:text-lg leading-tight">Cadastros Aguardando Sua Aprovação</h3>
+              <p class="text-xs text-white/90">Lojistas ou comércios cadastrados diretamente pelo site. Aprove com 1 clique para publicar no guia!</p>
+            </div>
+          </div>
+          <div class="bg-white/20 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 self-end sm:self-auto">
+            <span id="pendingCountBadge" class="bg-white text-amber-800 rounded-full w-5 h-5 inline-flex items-center justify-center font-extrabold text-[11px]">0</span>
+            pendente(s)
+          </div>
+        </div>
+
+        <!-- CONTAINER DA LISTA DE PENDENTES -->
+        <div id="pendingStoresContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <!-- EMPTY STATE SE NÃO HOUVER NENHUM PENDENTE -->
+        <div id="pendingEmptyState" class="hidden text-center py-12 bg-white rounded-3xl border border-slate-200">
+          <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+          </div>
+          <h4 class="font-bold text-sm text-slate-800">Tudo limpo por aqui!</h4>
+          <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Nenhum novo cadastro pendente no momento. Quando um comerciante cadastrar pelo site, ele aparecerá nesta tela para sua revisão e aprovação.</p>
         </div>
 
       </section>
@@ -678,19 +720,19 @@
     let currentActiveTab = 'stores';
     function switchTab(tabId) {
       currentActiveTab = tabId;
-      const tabs = ['stores', 'form', 'metrics', 'settings'];
+      const tabs = ['stores', 'pending', 'form', 'metrics', 'settings'];
       tabs.forEach(t => {
         const content = document.getElementById(`tabContent-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (t === tabId) {
           if (content) content.classList.remove('hidden');
           if (btn) {
-            btn.className = 'tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer';
+            btn.className = 'tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer shrink-0';
           }
         } else {
           if (content) content.classList.add('hidden');
           if (btn) {
-            btn.className = 'tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
+            btn.className = 'tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0';
           }
         }
       });
@@ -699,6 +741,8 @@
         renderMetricsTab();
       } else if (tabId === 'stores') {
         renderAdminStores();
+      } else if (tabId === 'pending') {
+        renderPendingStores();
       }
       lucide.createIcons();
     }
@@ -814,6 +858,12 @@
       storesData = stores;
     }
 
+    function isStorePending(store) {
+      if (!store) return false;
+      return store.status === 'pendente' || store.status === 'rascunho' ||
+        (store.keywords && typeof store.keywords === 'string' && (store.keywords.includes('[STATUS:pendente]') || store.keywords.includes('[STATUS:rascunho]')));
+    }
+
     async function loadAllStores() {
       storesData = getLocalStores();
       
@@ -834,18 +884,26 @@
       }
 
       renderAdminStores();
+      renderPendingStores();
     }
 
     function renderAdminStores() {
       const container = document.getElementById('storesListContainer');
       const emptyState = document.getElementById('storesEmptyState');
       const badgeTotal = document.getElementById('badgeTotalStores');
+      const badgePending = document.getElementById('badgePendingStores');
       
+      const pendingCount = storesData.filter(s => isStorePending(s)).length;
+      if (badgePending) badgePending.innerText = pendingCount;
+
+      const activeStores = storesData.filter(s => !isStorePending(s));
+      if (badgeTotal) badgeTotal.innerText = activeStores.length;
+
       const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const cat = document.getElementById('filterCategory').value;
       const bairro = document.getElementById('filterBairro').value;
 
-      const filtered = storesData.filter(store => {
+      const filtered = activeStores.filter(store => {
         const matchSearch = !search || (
           (store.nome || '').toLowerCase().includes(search) ||
           (store.bairro || '').toLowerCase().includes(search) ||
@@ -857,8 +915,6 @@
         const matchBairro = !bairro || store.bairro === bairro;
         return matchSearch && matchCat && matchBairro;
       });
-
-      if (badgeTotal) badgeTotal.innerText = storesData.length;
 
       if (filtered.length === 0) {
         container.innerHTML = '';
@@ -952,6 +1008,158 @@
 
     function filterAdminStores() {
       renderAdminStores();
+    }
+
+    // GESTÃO DE APROVAÇÕES / CADASTROS PENDENTES
+    function renderPendingStores() {
+      const container = document.getElementById('pendingStoresContainer');
+      const emptyState = document.getElementById('pendingEmptyState');
+      const badgePending = document.getElementById('badgePendingStores');
+      const countBadge = document.getElementById('pendingCountBadge');
+
+      const pendingList = storesData.filter(s => isStorePending(s));
+
+      if (badgePending) badgePending.innerText = pendingList.length;
+      if (countBadge) countBadge.innerText = pendingList.length;
+
+      if (!container) return;
+
+      if (pendingList.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      container.innerHTML = pendingList.map(store => {
+        const hasZap = store.whatsapp && !/^0+$/.test(String(store.whatsapp).replace(/\D/g, ''));
+        const zapClean = hasZap ? String(store.whatsapp).replace(/\D/g, '') : '';
+        const logoSrc = store.logo || '';
+        const pin = extractStorePin(store);
+
+        return `
+          <div class="bg-white rounded-2xl border-2 border-amber-300 p-4 shadow-xs hover:shadow-md transition flex flex-col justify-between gap-3 relative">
+            
+            <!-- HEADER DO CARD: BADGE NOVO CADASTRO -->
+            <div class="flex items-center justify-between gap-2 border-b border-amber-100 pb-2.5">
+              <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-md">
+                <i data-lucide="clock" class="w-3 h-3 text-amber-600"></i> Cadastro Pendente
+              </span>
+              <span class="text-[10px] text-slate-500 font-mono">PIN: <strong class="text-slate-800">${pin}</strong></span>
+            </div>
+
+            <!-- CORPO: LOGO E INFORMAÇÕES -->
+            <div class="flex items-start gap-3">
+              <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0 overflow-hidden text-amber-600 font-black text-lg">
+                ${logoSrc ? `
+                  <img src="${logoSrc}" alt="${escapeHtml(store.nome)}" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='${store.nome.charAt(0)}';">
+                ` : store.nome.charAt(0)}
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <h4 class="font-extrabold text-sm text-slate-900 leading-tight">${escapeHtml(store.nome)}</h4>
+                <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 flex-wrap">
+                  <span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold text-slate-700">${escapeHtml(store.categoria || 'Geral')}</span>
+                  <span>•</span>
+                  <span>${escapeHtml(store.bairro || 'Pilar')}</span>
+                </div>
+                ${store.endereco ? `<p class="text-[11px] text-slate-500 mt-1 truncate"><i data-lucide="map-pin" class="w-3 h-3 inline text-slate-400"></i> ${escapeHtml(store.endereco)}</p>` : ''}
+              </div>
+            </div>
+
+            <!-- DESCRIÇÃO -->
+            ${store.descricao ? `
+              <p class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 line-clamp-3">
+                ${escapeHtml(store.descricao)}
+              </p>
+            ` : ''}
+
+            <!-- CONTATOS INFORMADOS -->
+            <div class="flex items-center gap-2 text-xs flex-wrap">
+              ${hasZap ? `
+                <a href="https://wa.me/55${zapClean}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold hover:bg-emerald-100 transition">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> ${store.whatsapp}
+                </a>
+              ` : ''}
+              ${store.instagram ? `
+                <a href="https://instagram.com/${store.instagram.replace('@','')}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-pink-50 text-pink-700 font-bold hover:bg-pink-100 transition">
+                  <i data-lucide="instagram" class="w-3.5 h-3.5"></i> ${store.instagram}
+                </a>
+              ` : ''}
+              ${store.site ? `
+                <a href="${store.site}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition">
+                  <i data-lucide="globe" class="w-3.5 h-3.5"></i> Link/Site
+                </a>
+              ` : ''}
+            </div>
+
+            <!-- BOTÕES DE AÇÃO: APROVAR / EDITAR / RECUSAR -->
+            <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+              <button onclick="approveStore('${escapeHtml(store.id)}', '${escapeHtml(store.nome)}')" class="col-span-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="check" class="w-4 h-4"></i> Aprovar e Publicar no Guia
+              </button>
+              <button onclick="startEditingStore('${escapeHtml(store.id)}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar Dados
+              </button>
+              <button onclick="confirmDeletePendingStore('${escapeHtml(store.id)}', '${escapeHtml(store.nome)}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Recusar / Excluir
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function approveStore(id, nome) {
+      const idx = storesData.findIndex(s => String(s.id) === String(id));
+      if (idx === -1) return;
+
+      const store = storesData[idx];
+      store.status = 'ativo';
+      if (store.keywords) {
+        store.keywords = store.keywords.replace(/\[STATUS:(pendente|rascunho)\]/g, '').trim() + '\n[STATUS:ativo]';
+      } else {
+        store.keywords = '[STATUS:ativo]';
+      }
+
+      saveLocalStores(storesData);
+      renderPendingStores();
+      renderAdminStores();
+
+      // Salvar no Supabase
+      if (supabaseClient) {
+        try {
+          const directPayload = {
+            id: store.id,
+            status: 'ativo',
+            keywords: store.keywords
+          };
+          const { error } = await supabaseClient.from('stores').update(directPayload).eq('id', store.id);
+          if (error) {
+            // Fallback caso a coluna status ainda não exista no schema do Supabase
+            await supabaseClient.from('stores').update({ keywords: store.keywords }).eq('id', store.id);
+          }
+        } catch(e) {
+          console.warn('Erro ao aprovar no Supabase:', e);
+        }
+      }
+
+      // Sincronizar via Vercel API se token de admin estiver ativo
+      await sendStoreToCloud(store);
+
+      showToast(`O negócio "${nome || store.nome}" foi aprovado e agora está publicado no guia!`, 'success');
+    }
+
+    async function confirmDeletePendingStore(id, nome) {
+      if (!confirm(`Deseja realmente recusar e excluir o cadastro de "${nome}"?`)) {
+        return;
+      }
+      await confirmDeleteStore(id, nome);
+      renderPendingStores();
     }
 
     // FORMULÁRIO: CADASTRAR OU EDITAR
@@ -1138,6 +1346,7 @@
       const pin = (document.getElementById('formPin').value || '').trim();
       const rawKw = `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase();
       let packedKeywords = packStoreFotosIntoKeywords(rawKw, fotosList);
+      packedKeywords = packedKeywords.replace(/\[STATUS:(pendente|rascunho)\]/g, '').trim() + '\n[STATUS:ativo]';
       if (pin && /^\d{4}$/.test(pin)) {
         packedKeywords = packStorePinIntoKeywords(packedKeywords, pin);
       }
@@ -1158,6 +1367,7 @@
         vip,
         pin: pin || undefined,
         fotos: fotosList,
+        status: 'ativo',
         keywords: packedKeywords
       };
 
@@ -1170,6 +1380,7 @@
 
       saveLocalStores(storesData);
       renderAdminStores();
+      renderPendingStores();
 
       // Salvar na Nuvem (Vercel API com fallback Supabase)
       await sendStoreToCloud(storePayload);
