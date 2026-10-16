@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Estabelecimento — Achei em Pilar</title>
+  <meta id="pageDesc" name="description" content="Informações, endereço, horário e WhatsApp do estabelecimento em Pilar - AL.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- TAILWIND CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- LUCIDE ICONS -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- SUPABASE JS CLIENT -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- HEADER DE NAVEGAÇÃO SUPERIOR FIXO -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+      <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-700 hover:text-black bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Voltar</span>
+      </a>
+
+      <div class="flex-1 min-w-0 text-center px-2">
+        <span id="navStoreTitle" class="text-xs sm:text-sm font-black text-slate-900 truncate block">Achei em Pilar</span>
+      </div>
+
+      <button onclick="shareStore()" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition cursor-pointer" title="Compartilhar">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Compartilhar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL DA PÁGINA DA LOJA -->
+  <main class="flex-1 max-w-2xl w-full mx-auto px-3 sm:px-4 py-4 pb-24 space-y-3.5">
+    
+    <!-- CONTAINER RENDERIZADO DINAMICAMENTE -->
+    <div id="storeContent" class="space-y-3.5">
+      <!-- Loading Skeleton -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center py-16 space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mx-auto animate-bounce">
+          <i data-lucide="store" class="w-6 h-6"></i>
+        </div>
+        <p class="text-xs font-bold text-slate-500">Carregando informações da loja...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BARRA INFERIOR FLUTUANTE DE WHATSAPP (MOBILE FAST ACTION) -->
+  <div id="floatingZapBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-30 shadow-lg hidden">
+    <div class="max-w-2xl mx-auto flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p id="floatingStoreName" class="text-xs font-extrabold text-slate-900 truncate"></p>
+        <p class="text-[10px] text-emerald-700 font-semibold">Atendimento direto no WhatsApp</p>
+      </div>
+      <a id="floatingZapBtn" href="#" target="_blank" rel="noopener noreferrer" class="shrink-0 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition">
+        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        <span>Chamar no Zap</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE AVALIAÇÕES ================= -->
+  <div id="reviewsModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100 mb-3">
+        <div>
+          <h3 class="font-heading font-black text-slate-900 text-base">Avaliar Estabelecimento</h3>
+          <p class="text-xs text-slate-400">Compartilhe sua experiência com outros moradores.</p>
+        </div>
+        <button onclick="closeReviewsModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleReviewSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Quantas estrelas você dá?</label>
+          <div class="flex items-center gap-1.5" id="starRatingContainer">
+            <button type="button" onclick="setReviewRating(1)" class="star-btn p-1 cursor-pointer"><svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+            <button type="button" onclick="setReviewRating(2)" class="star-btn p-1 cursor-pointer"><svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+            <button type="button" onclick="setReviewRating(3)" class="star-btn p-1 cursor-pointer"><svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+            <button type="button" onclick="setReviewRating(4)" class="star-btn p-1 cursor-pointer"><svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+            <button type="button" onclick="setReviewRating(5)" class="star-btn p-1 cursor-pointer"><svg class="w-7 h-7 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+          </div>
+          <span id="starRatingLabel" class="text-[11px] font-bold text-amber-800">Excelente (5 estrelas)</span>
+          <input type="hidden" id="revRating" value="5">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Seu Nome</label>
+          <input type="text" id="revAuthor" required placeholder="Ex: Maria Clara" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Seu Comentário</label>
+          <textarea id="revComment" rows="3" required placeholder="O que achou do atendimento, qualidade e preços?" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <button type="submit" id="btnSubmitReview" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 rounded-xl transition shadow-sm cursor-pointer flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Publicar Avaliação</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL LIGHTBOX DE FOTOS ================= -->
+  <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-3 sm:p-6" onclick="closeLightbox(event)">
+    <div class="w-full max-w-2xl flex items-center justify-between pb-3 text-white">
+      <h4 id="lightboxTitle" class="font-bold text-sm truncate"></h4>
+      <button onclick="closeLightbox()" class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="relative max-w-2xl max-h-[80vh] flex items-center justify-center">
+      <img id="lightboxImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Foto da loja" class="max-h-[80vh] max-w-full rounded-2xl object-contain">
+    </div>
+  </div>
+
+  <!-- SCRIPT PRINCIPAL DA PÁGINA DA LOJA -->
+  <script>
+    const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
+    let supabase = null;
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(e) {}
+
+    let currentStore = null;
+    let localStatsCache = {};
+    let localReviewsCache = {};
+    let localLikedStores = [];
+
+    try {
+      localStatsCache = JSON.parse(localStorage.getItem('pilar_stats_cache') || '{}');
+      localReviewsCache = JSON.parse(localStorage.getItem('pilar_reviews_cache') || '{}');
+      localLikedStores = JSON.parse(localStorage.getItem('pilar_liked_stores') || '[]');
+    } catch(e) {}
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function extractStoreFotos(store) {
+      if (!store) return [];
+      if (Array.isArray(store.fotos) && store.fotos.length > 0) return store.fotos;
+      if (typeof store.fotos === 'string' && store.fotos.trim()) {
+        try {
+          const parsed = JSON.parse(store.fotos);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch(e) {
+          const split = store.fotos.split(',').map(s => s.trim()).filter(Boolean);
+          if (split.length > 0) return split;
+        }
+      }
+      return [];
+    }
+
+    function buildMapsLink(store) {
+      if (!store) return '';
+      if (store.maps_link && store.maps_link.trim().startsWith('http')) return store.maps_link.trim();
+      const query = `${store.nome}, ${store.endereco || ''}, Pilar - AL, Brasil`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
+    function getStoreGoogleRating(store) {
+      if (!store) return { score: '0.0', count: 0, stars: 0 };
+      const sid = String(store.id);
+      const reviews = localReviewsCache[sid] || [];
+      if (!Array.isArray(reviews) || reviews.length === 0) {
+        return { score: '0.0', count: 0, stars: 0 };
+      }
+      const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+      const avg = sum / reviews.length;
+      return { score: avg.toFixed(1), count: reviews.length, stars: avg };
+    }
+
+    function renderGoogleStars(score, starClass = "w-3.5 h-3.5") {
+      const num = Number(score) || 0;
+      let starsHtml = '';
+      for (let i = 1; i <= 5; i++) {
+        if (num > 0 && num >= i - 0.25) {
+          starsHtml += `<svg class="${starClass} fill-[#FBBC04] text-[#FBBC04] shrink-0" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        } else if (num > 0 && num >= i - 0.75) {
+          starsHtml += `<svg class="${starClass} fill-[#FBBC04] text-[#FBBC04] shrink-0 opacity-80" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        } else {
+          starsHtml += `<svg class="${starClass} fill-slate-200 text-slate-200 shrink-0" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        }
+      }
+      return starsHtml;
+    }
+
+    function isStoreLiked(storeId) {
+      return localLikedStores.includes(String(storeId));
+    }
+
+    function getStoreLikes(storeId) {
+      return localStatsCache[storeId]?.likes || 0;
+    }
+
+    async function handleStoreLike(storeId) {
+      if (isStoreLiked(storeId)) {
+        alert('Você já curtiu este estabelecimento! Obrigado pelo carinho com os negócios de Pilar.');
+        return;
+      }
+      localLikedStores.push(String(storeId));
+      localStorage.setItem('pilar_liked_stores', JSON.stringify(localLikedStores));
+      if (!localStatsCache[storeId]) localStatsCache[storeId] = { likes: 0 };
+      localStatsCache[storeId].likes = (localStatsCache[storeId].likes || 0) + 1;
+      localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+
+      const countEl = document.getElementById('like-count-display');
+      const btnEl = document.getElementById('like-btn-display');
+      if (countEl) countEl.innerText = localStatsCache[storeId].likes;
+      if (btnEl) {
+        btnEl.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition bg-rose-50 text-rose-600 border-rose-200 font-black';
+        const svg = btnEl.querySelector('svg');
+        if (svg) svg.setAttribute('class', 'w-4 h-4 fill-rose-500 text-rose-500');
+      }
+
+      if (supabase) {
+        try { await supabase.rpc('increment_store_like', { p_store_id: storeId }); } catch(e) {}
+      }
+    }
+
+    async function trackClick(storeId, type) {
+      if (!localStatsCache[storeId]) localStatsCache[storeId] = {};
+      if (type === 'whatsapp') localStatsCache[storeId].whatsapp_clicks = (localStatsCache[storeId].whatsapp_clicks || 0) + 1;
+      if (type === 'instagram') localStatsCache[storeId].instagram_clicks = (localStatsCache[storeId].instagram_clicks || 0) + 1;
+      if (type === 'maps') localStatsCache[storeId].maps_clicks = (localStatsCache[storeId].maps_clicks || 0) + 1;
+      localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+
+      if (supabase) {
+        try { await supabase.rpc('increment_store_click', { p_store_id: storeId, p_click_type: type }); } catch(e) {}
+      }
+    }
+
+    function openLightbox(title, imgUrl) {
+      const modal = document.getElementById('lightboxModal');
+      const titleEl = document.getElementById('lightboxTitle');
+      const imgEl = document.getElementById('lightboxImg');
+      if (titleEl) titleEl.innerText = title;
+      if (imgEl) imgEl.src = imgUrl;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeLightbox(e) {
+      if (e && e.target && e.target.closest && e.target.closest('#lightboxImg')) return;
+      const modal = document.getElementById('lightboxModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function shareStore() {
+      if (!currentStore) return;
+      const shareUrl = window.location.href;
+      if (navigator.share) {
+        navigator.share({
+          title: `${currentStore.nome} — Achei em Pilar`,
+          text: `Conheça ${currentStore.nome} no guia comercial de Pilar:`,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert('Link da loja copiado com sucesso! Você já pode colar e compartilhar no WhatsApp.');
+        }).catch(() => {
+          window.open(`https://wa.me/?text=${encodeURIComponent(`Conheça ${currentStore.nome} no Achei em Pilar: ${shareUrl}`)}`, '_blank');
+        });
+      }
+    }
+
+    function renderStorePage(store) {
+      currentStore = store;
+      document.getElementById('pageTitle').innerText = `${store.nome} — Achei em Pilar`;
+      document.getElementById('navStoreTitle').innerText = store.nome;
+
+      const rawZap = (store.whatsapp || '').replace(/\D/g, '');
+      const hasValidZap = rawZap.length >= 10 && !/^0+$/.test(rawZap);
+      const zapLink = hasValidZap ? `https://wa.me/55${rawZap}?text=${encodeURIComponent(`Olá! Encontrei a ${store.nome} através do guia Achei em Pilar e gostaria de saber mais informações!`)}` : '';
+
+      const rawInsta = (store.instagram || '').replace('@', '').trim();
+      const instaClean = rawInsta.replace(/[^a-zA-Z0-9._]/g, '');
+
+      let siteClean = (store.site || '').trim();
+      if (siteClean && !siteClean.startsWith('http')) siteClean = 'https://' + siteClean;
+
+      const mapsLink = buildMapsLink(store);
+      const ratingData = getStoreGoogleRating(store);
+      const isLiked = isStoreLiked(store.id);
+      const likesCount = getStoreLikes(store.id);
+
+      const CATEGORY_NAMES = {
+        'delivery': 'Lanches & Delivery',
+        'bolos': 'Bolos & Doces',
+        'roupas': 'Roupas & Calçados',
+        'beleza': 'Salão & Barbearia',
+        'servicos': 'Fretes & Serviços',
+        'utilidades': 'Variedades & Móveis',
+        'saude': 'Farmácia & Saúde'
+      };
+      const categoryLabel = CATEGORY_NAMES[store.categoria] || store.categoria || 'Comércio & Serviços';
+
+      const logoUrl = store.logo || 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=300&q=80';
+      const fotos = extractStoreFotos(store);
+      const coverUrl = fotos.length > 0 ? fotos[0] : logoUrl;
+
+      // Atualiza barra inferior fixa de WhatsApp
+      if (hasValidZap) {
+        const zapBar = document.getElementById('floatingZapBar');
+        const zapName = document.getElementById('floatingStoreName');
+        const zapBtn = document.getElementById('floatingZapBtn');
+        if (zapBar) zapBar.classList.remove('hidden');
+        if (zapName) zapName.innerText = store.nome;
+        if (zapBtn) {
+          zapBtn.href = zapLink;
+          zapBtn.onclick = () => trackClick(store.id, 'whatsapp');
+        }
+      }
+
+      const reviews = localReviewsCache[String(store.id)] || [];
+
+      const html = `
+        <!-- BANNER DE CAPA & LOGO -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden relative">
+          <div class="h-44 sm:h-56 w-full bg-slate-900 relative overflow-hidden">
+            <img src="${escapeHtml(coverUrl)}" alt="Capa ${escapeHtml(store.nome)}" class="w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"></div>
+            ${store.vip ? `
+              <div class="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-lg flex items-center gap-1">
+                <i data-lucide="crown" class="w-3.5 h-3.5 fill-white"></i> VIP
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="px-5 pb-5 pt-0 relative">
+            <div class="-mt-14 sm:-mt-16 flex items-end gap-3.5 mb-3">
+              <div class="w-22 h-22 sm:w-26 sm:h-26 rounded-2xl bg-white p-1 shadow-xl border-2 border-white overflow-hidden shrink-0" style="width: 88px; height: 88px;">
+                <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(store.nome)}" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=200&q=80'">
+              </div>
+              <div class="flex-1 min-w-0 pb-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider mb-1 border border-emerald-200/60">
+                  ${escapeHtml(categoryLabel)}
+                </span>
+                <h1 class="font-heading font-black text-xl sm:text-2xl text-slate-900 leading-tight">
+                  ${escapeHtml(store.nome)}
+                </h1>
+              </div>
+            </div>
+
+            <!-- ENGAJAMENTO: NOTA E CURTIDAS -->
+            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center justify-between gap-2 mt-2">
+              <button onclick="openReviewsModal()" class="flex items-center gap-2 group cursor-pointer text-left">
+                <div class="flex items-center gap-1 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs">
+                  <span class="text-amber-500 text-sm font-black">★</span>
+                  <span class="text-slate-900 font-extrabold text-xs">${ratingData.score}</span>
+                </div>
+                <div class="text-[11px] leading-tight">
+                  <p class="font-bold text-slate-800 group-hover:text-emerald-700 transition">
+                    ${ratingData.count > 0 ? `${ratingData.count} ${ratingData.count === 1 ? 'avaliação' : 'avaliações'}` : 'Nova no guia'}
+                  </p>
+                  <p class="text-slate-400 text-[10px]">Toque para avaliar</p>
+                </div>
+              </button>
+
+              <button onclick="handleStoreLike('${store.id}')" id="like-btn-display" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition cursor-pointer ${isLiked ? 'bg-rose-50 text-rose-600 border-rose-200 font-black' : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200 font-bold'}">
+                <svg class="w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : 'fill-none text-current'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                <span id="like-count-display" class="text-xs">${likesCount}</span>
+              </button>
+            </div>
+
+            <!-- BOTÃO PRINCIPAL WHATSAPP -->
+            ${hasValidZap ? `
+              <a href="${zapLink}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${store.id}', 'whatsapp')" class="w-full mt-3 bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-white font-black text-sm py-3.5 px-4 rounded-2xl shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2.5 transition">
+                <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                <span>Conversar no WhatsApp</span>
+              </a>
+            ` : ''}
+
+            <!-- BOTÕES SECUNDÁRIOS -->
+            <div class="flex flex-wrap items-center gap-2 mt-2.5">
+              ${instaClean ? `
+                <a href="https://instagram.com/${instaClean}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${store.id}', 'instagram')" class="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs">
+                  <svg class="w-4 h-4 fill-[#E4405F]" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689-.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                  <span>Instagram</span>
+                </a>
+              ` : ''}
+              ${mapsLink ? `
+                <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${store.id}', 'maps')" class="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#FFFFFF"/></svg>
+                  <span>Como Chegar</span>
+                </a>
+              ` : ''}
+              ${siteClean ? `
+                <a href="${siteClean}" target="_blank" rel="noopener noreferrer" class="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs">
+                  <i data-lucide="globe" class="w-4 h-4 text-blue-500"></i>
+                  <span>Site Oficial</span>
+                </a>
+              ` : ''}
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SOBRE O ESTABELECIMENTO -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-2">
+          <div class="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wide">
+            <i data-lucide="info" class="w-4 h-4 text-emerald-600"></i>
+            <span>Sobre o Estabelecimento</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+            ${escapeHtml(store.descricao || 'Nenhuma descrição detalhada informada ainda.')}
+          </p>
+        </div>
+
+        <!-- HORÁRIO DE ATENDIMENTO -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/60">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Horário de Atendimento</p>
+            <p class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">${escapeHtml(store.horario || 'Segunda a Sábado em horário comercial')}</p>
+          </div>
+        </div>
+
+        <!-- ENDEREÇO COMPLETO -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wide">
+              <i data-lucide="map-pin" class="w-4 h-4 text-rose-500"></i>
+              <span>Endereço Completo</span>
+            </div>
+            ${mapsLink ? `
+              <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-700 hover:underline">Ver no Mapa →</a>
+            ` : ''}
+          </div>
+          <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+            ${escapeHtml(store.endereco || 'Pilar - AL')}
+          </p>
+          <span class="inline-block text-[11px] font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-xl">
+            Bairro: ${escapeHtml(store.bairro || 'Centro')}
+          </span>
+        </div>
+
+        <!-- GALERIA DE FOTOS (SE HOUVER) -->
+        ${fotos.length > 0 ? `
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wide">
+                <i data-lucide="images" class="w-4 h-4 text-emerald-600"></i>
+                <span>Fotos do Local (${fotos.length})</span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-medium">Toque para ampliar</span>
+            </div>
+
+            <div class="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none snap-x">
+              ${fotos.map(foto => `
+                <div onclick="openLightbox('${escapeHtml(store.nome)}', '${escapeHtml(foto)}')" class="h-28 w-36 min-w-[140px] rounded-2xl overflow-hidden shrink-0 border border-slate-200 shadow-2xs snap-start cursor-pointer hover:opacity-90 active:scale-95 transition relative bg-slate-100">
+                  <img src="${escapeHtml(foto)}" alt="${escapeHtml(store.nome)}" class="w-full h-full object-cover">
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- SEÇÃO DE AVALIAÇÕES DOS MORADORES -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <h3 class="font-heading font-black text-slate-900 text-sm sm:text-base">Avaliações dos Moradores</h3>
+              <p class="text-xs text-slate-400">Opiniões de quem já foi cliente</p>
+            </div>
+            <button onclick="openReviewsModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-xs cursor-pointer">
+              Avaliar
+            </button>
+          </div>
+
+          ${reviews.length > 0 ? `
+            <div class="space-y-3">
+              ${reviews.map(r => `
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-slate-800">${escapeHtml(r.author || 'Morador(a)')}</span>
+                    <div class="flex items-center gap-0.5">${renderGoogleStars(r.rating || 5, 'w-3 h-3')}</div>
+                  </div>
+                  <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(r.comment || '')}</p>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="text-center py-6">
+              <i data-lucide="star" class="w-8 h-8 text-slate-300 mx-auto mb-1.5"></i>
+              <p class="text-xs font-bold text-slate-600">Nenhuma avaliação ainda</p>
+              <p class="text-[11px] text-slate-400">Seja o primeiro a avaliar este comércio!</p>
+            </div>
+          `}
+        </div>
+
+        <!-- LINK PARA VOLTAR AO GUIA -->
+        <div class="text-center pt-3 pb-6">
+          <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-700 transition">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Voltar e ver outros estabelecimentos em Pilar</span>
+          </a>
+        </div>
+      `;
+
+      document.getElementById('storeContent').innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openReviewsModal() {
+      document.getElementById('reviewsModal').classList.remove('hidden');
+    }
+
+    function closeReviewsModal() {
+      document.getElementById('reviewsModal').classList.add('hidden');
+    }
+
+    function setReviewRating(val) {
+      document.getElementById('revRating').value = val;
+      const labels = { 5: 'Excelente (5 estrelas)', 4: 'Muito bom (4 estrelas)', 3: 'Bom (3 estrelas)', 2: 'Regular (2 estrelas)', 1: 'Ruim (1 estrela)' };
+      document.getElementById('starRatingLabel').innerText = labels[val] || `${val} estrelas`;
+      document.querySelectorAll('#starRatingContainer .star-btn').forEach((btn, idx) => {
+        const svg = btn.querySelector('svg');
+        if (idx + 1 <= val) {
+          svg.setAttribute('class', 'w-7 h-7 fill-amber-400 text-amber-400');
+        } else {
+          svg.setAttribute('class', 'w-7 h-7 fill-slate-200 text-slate-200');
+        }
+      });
+    }
+
+    async function handleReviewSubmit(e) {
+      e.preventDefault();
+      if (!currentStore) return;
+      const rating = parseInt(document.getElementById('revRating').value, 10);
+      const author = document.getElementById('revAuthor').value.trim();
+      const comment = document.getElementById('revComment').value.trim();
+
+      const newRev = {
+        store_id: String(currentStore.id),
+        author: author,
+        rating: rating,
+        comment: comment,
+        created_at: new Date().toISOString()
+      };
+
+      const sid = String(currentStore.id);
+      if (!localReviewsCache[sid]) localReviewsCache[sid] = [];
+      localReviewsCache[sid].unshift(newRev);
+      localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+
+      closeReviewsModal();
+      renderStorePage(currentStore);
+      alert('Sua avaliação foi enviada com sucesso! Muito obrigado.');
+
+      if (supabase) {
+        try {
+          await supabase.from('store_reviews').insert([{
+            store_id: sid,
+            author: author,
+            rating: rating,
+            comment: comment
+          }]);
+        } catch(err) {}
+      }
+    async function syncStoreData(storeId) {
+      if (!supabase) return;
+      try {
+        const [statsRes, reviewsRes] = await Promise.all([
+          supabase.from('store_stats').select('*').eq('store_id', storeId).maybeSingle(),
+          supabase.from('store_reviews').select('*').eq('store_id', storeId)
+        ]);
+
+        let hasUpdate = false;
+        if (statsRes && statsRes.data) {
+          localStatsCache[storeId] = {
+            whatsapp_clicks: statsRes.data.whatsapp_clicks || 0,
+            instagram_clicks: statsRes.data.instagram_clicks || 0,
+            maps_clicks: statsRes.data.maps_clicks || 0,
+            likes: statsRes.data.likes || 0
+          };
+          localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
+          hasUpdate = true;
+        }
+
+        if (reviewsRes && reviewsRes.data) {
+          localReviewsCache[storeId] = reviewsRes.data;
+          localStorage.setItem('pilar_reviews_cache', JSON.stringify(localReviewsCache));
+          hasUpdate = true;
+        }
+
+        if (hasUpdate && currentStore && String(currentStore.id) === String(storeId)) {
+          renderStorePage(currentStore);
+        }
+      } catch(e) {}
+    }
+
+    // CARREGAR LOJA AO ENTRAR
+    async function initStorePage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const storeId = urlParams.get('id') || urlParams.get('loja');
+
+      if (!storeId) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // 1. Tentar pegar do localStorage
+      let stores = [];
+      try {
+        stores = JSON.parse(localStorage.getItem('pilar_stores_data_v2') || localStorage.getItem('pilar_stores_data') || '[]');
+      } catch(e) {}
+
+      let store = stores.find(s => String(s.id) === String(storeId));
+
+      // 2. Se não achou no localStorage ou busca dados mais recentes do Supabase
+      if (supabase) {
+        try {
+          const { data, error } = await supabase.from('stores').select('*').eq('id', storeId).single();
+          if (!error && data) {
+            store = data;
+          }
+        } catch(e) {}
+      }
+
+      if (store) {
+        renderStorePage(store);
+        syncStoreData(store.id);
+      } else {
+        document.getElementById('storeContent').innerHTML = `
+          <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-3">
+            <i data-lucide="alert-circle" class="w-12 h-12 text-slate-300 mx-auto"></i>
+            <h2 class="font-extrabold text-base text-slate-800">Estabelecimento não encontrado</h2>
+            <p class="text-xs text-slate-500">Este comércio pode ter sido atualizado ou removido do guia.</p>
+            <a href="index.html" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+              <span>Voltar para a Página Inicial</span>
+            </a>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initStorePage);
+  </script>
+</body>
+</html>
