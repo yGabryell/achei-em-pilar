@@ -37,8 +37,13 @@
     }
   </script>
 
-  <!-- LUCIDE ICONS -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- LUCIDE ICONS (JSDelivr com fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    if (!window.lucide) {
+      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
+    }
+  </script>
 
   <!-- SUPABASE JS CLIENT -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -75,7 +80,13 @@
       <!-- TÍTULO & ÍCONE -->
       <div class="text-center mb-6">
         <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-3 shadow-inner">
-          <i data-lucide="store" class="w-7 h-7"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+            <path d="M2 7h20"/>
+            <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+          </svg>
         </div>
         <h1 id="authTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Painel do Comércio</h1>
         <p id="authSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1">Gerencie seu estabelecimento no guia comercial de Pilar.</p>
@@ -83,10 +94,10 @@
 
       <!-- ABAS: ENTRAR / CRIAR CONTA -->
       <div class="flex p-1 bg-slate-100 rounded-2xl mb-6">
-        <button id="tabBtnLogin" onclick="switchAuthMode('login')" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer">
+        <button type="button" id="tabBtnLogin" onclick="switchAuthMode('login')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none">
           Já tenho conta
         </button>
-        <button id="tabBtnRegister" onclick="switchAuthMode('register')" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer">
+        <button type="button" id="tabBtnRegister" onclick="switchAuthMode('register')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none">
           Cadastrar Comércio
         </button>
       </div>
@@ -285,6 +296,14 @@
       console.error('Erro ao conectar ao Supabase:', err);
     }
 
+    function safeCreateIcons() {
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch(e) {}
+    }
+
     // ALTERNÂNCIA DE ABAS
     function switchAuthMode(mode) {
       clearAlert();
@@ -300,28 +319,28 @@
         formLogin.classList.remove('hidden');
         formRegister.classList.add('hidden');
         formForgot.classList.add('hidden');
-        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer';
-        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
+        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
         title.innerText = 'Painel do Comércio';
         subtitle.innerText = 'Gerencie seu estabelecimento no guia comercial de Pilar.';
       } else if (mode === 'register') {
         formLogin.classList.add('hidden');
         formRegister.classList.remove('hidden');
         formForgot.classList.add('hidden');
-        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer';
-        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none';
+        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
         title.innerText = 'Cadastrar Comércio';
         subtitle.innerText = 'Crie sua conta para divulgar seu negócio em Pilar.';
       } else if (mode === 'forgot') {
         formLogin.classList.add('hidden');
         formRegister.classList.add('hidden');
         formForgot.classList.remove('hidden');
-        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
-        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabLogin.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
+        tabRegister.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none';
         title.innerText = 'Recuperar Senha';
         subtitle.innerText = 'Informe seu e-mail para receber as instruções.';
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function togglePassVisibility(inputId, iconId) {
@@ -334,7 +353,7 @@
         input.type = 'password';
         icon.setAttribute('data-lucide', 'eye');
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function showAlert(msg, type = 'error') {
@@ -351,7 +370,7 @@
         icon.setAttribute('data-lucide', 'check-circle');
       }
       box.classList.remove('hidden');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function clearAlert() {
@@ -374,7 +393,7 @@
 
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Entrando...`;
-      lucide.createIcons();
+      safeCreateIcons();
 
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -390,7 +409,7 @@
           }
           btn.disabled = false;
           btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Entrar no Painel`;
-          lucide.createIcons();
+          safeCreateIcons();
           return;
         }
 
@@ -403,7 +422,7 @@
         showAlert('Erro inesperado: ' + err.message);
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Entrar no Painel`;
-        lucide.createIcons();
+        safeCreateIcons();
       }
     }
 
@@ -425,7 +444,7 @@
 
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Cadastrando...`;
-      lucide.createIcons();
+      safeCreateIcons();
 
       try {
         // 1. Criar usuário no Supabase Auth
@@ -445,7 +464,7 @@
           showAlert('Erro ao criar conta: ' + authError.message);
           btn.disabled = false;
           btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
-          lucide.createIcons();
+          safeCreateIcons();
           return;
         }
 
@@ -500,7 +519,7 @@
         showAlert('Erro inesperado: ' + err.message);
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
-        lucide.createIcons();
+        safeCreateIcons();
       }
     }
 
@@ -513,7 +532,7 @@
 
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Enviando...`;
-      lucide.createIcons();
+      safeCreateIcons();
 
       try {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -530,13 +549,13 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Enviar Link de Recuperação`;
-        lucide.createIcons();
+        safeCreateIcons();
       }
     }
 
     // AO CARREGAR A PÁGINA: VERIFICAR SE JÁ ESTÁ LOGADO
     window.addEventListener('DOMContentLoaded', async () => {
-      lucide.createIcons();
+      safeCreateIcons();
 
       // Verificar parâmetro na URL (?modo=cadastro)
       const urlParams = new URLSearchParams(window.location.search);
@@ -545,10 +564,13 @@
       }
 
       if (supabase) {
-        const { data } = await supabase.auth.getSession();
-        if (data && data.session) {
-          // Se já tem sessão ativa, encaminha direto para minha-loja.html
-          window.location.href = 'minha-loja.html';
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data && data.session) {
+            window.location.href = 'minha-loja.html';
+          }
+        } catch(sessErr) {
+          console.warn('Erro ao verificar sessão:', sessErr);
         }
       }
     });

@@ -37,8 +37,13 @@
     }
   </script>
 
-  <!-- LUCIDE ICONS -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- LUCIDE ICONS (JSDelivr com fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    if (!window.lucide) {
+      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
+    }
+  </script>
 
   <!-- SUPABASE JS CLIENT -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -408,6 +413,14 @@
       console.error('Erro no Supabase:', err);
     }
 
+    function safeCreateIcons() {
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch(e) {}
+    }
+
     // FEEDBACK TOAST
     function showToast(msg, type = 'success') {
       const toast = document.getElementById('toastNotification');
@@ -422,7 +435,7 @@
         icon.setAttribute('data-lucide', 'check-circle');
         icon.className = 'w-4 h-4 text-emerald-400';
       }
-      lucide.createIcons();
+      safeCreateIcons();
 
       toast.classList.remove('translate-y-24', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
@@ -699,7 +712,7 @@
       // Ocultar tela de loading
       const loading = document.getElementById('loadingOverlay');
       if (loading) loading.classList.add('hidden');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     // PREENCHER FORMULÁRIO COM DADOS DA LOJA
@@ -753,7 +766,7 @@
       const btn = document.getElementById('btnSaveStore');
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando dados...`;
-      lucide.createIcons();
+      safeCreateIcons();
 
       const rawZap = document.getElementById('storeWhatsapp').value.replace(/\D/g, '');
       const formattedZap = rawZap.startsWith('55') ? rawZap : '55' + rawZap;
@@ -811,13 +824,13 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Salvar Alterações da Loja`;
-        lucide.createIcons();
+        safeCreateIcons();
       }
     }
 
     // INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      safeCreateIcons();
       initMerchantDashboard();
     });
   </script>
