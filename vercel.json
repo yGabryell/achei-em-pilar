@@ -1,8 +1,16 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "functions": {
+    "api/loja.js": {
+      "includeFiles": "loja-app.html"
+    }
+  },
   "rewrites": [
-    { "source": "/admin", "destination": "/admin.html" }
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/loja", "destination": "/api/loja" },
+    { "source": "/loja.html", "destination": "/api/loja" },
+    { "source": "/loja/:id", "destination": "/api/loja?id=:id" }
   ],
   "headers": [
     {
