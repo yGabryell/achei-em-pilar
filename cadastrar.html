@@ -59,7 +59,7 @@
       </a>
 
       <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
         <span>Voltar ao Guia</span>
       </a>
     </div>
@@ -75,7 +75,13 @@
       <!-- TÍTULO & ÍCONE -->
       <div class="text-center mb-6">
         <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-3 shadow-inner">
-          <i data-lucide="store" class="w-7 h-7 text-emerald-600"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+            <path d="M2 7h20"/>
+            <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+          </svg>
         </div>
         <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Cadastrar Comércio</h1>
         <p class="text-xs sm:text-sm text-slate-500 mt-1">Crie sua conta para divulgar seu negócio em Pilar.</p>
@@ -93,7 +99,7 @@
 
       <!-- MENSAGEM DE ALERTA/FEEDBACK -->
       <div id="alertBox" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5">
-        <i id="alertIcon" data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <span id="alertIcon" class="shrink-0 mt-0.5"></span>
         <span id="alertMessage" class="flex-1"></span>
       </div>
 
@@ -102,7 +108,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regName">Seu Nome Completo *</label>
           <div class="relative">
-            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <input 
               type="text" 
               id="regName" 
@@ -116,7 +122,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regStoreName">Nome do Comércio / Empresa *</label>
           <div class="relative">
-            <i data-lucide="store" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
             <input 
               type="text" 
               id="regStoreName" 
@@ -130,7 +136,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regWhatsapp">WhatsApp da Loja (com DDD) *</label>
           <div class="relative">
-            <i data-lucide="phone" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             <input 
               type="tel" 
               id="regWhatsapp" 
@@ -144,7 +150,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regEmail">Seu E-mail para Acesso *</label>
           <div class="relative">
-            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
             <input 
               type="email" 
               id="regEmail" 
@@ -158,7 +164,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regPassword">Criar Senha (mínimo 6 caracteres) *</label>
           <div class="relative">
-            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <input 
               type="password" 
               id="regPassword" 
@@ -167,8 +173,10 @@
               placeholder="Digite uma senha forte" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
-            <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeIcon')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-              <i id="regEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+            <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeIcon')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+              <span id="regEyeIcon" class="w-4 h-4 block">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 hover:text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
             </button>
           </div>
         </div>
@@ -178,14 +186,14 @@
           id="btnRegSubmit"
           class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-3"
         >
-          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
           <span>Criar Minha Conta de Lojista</span>
         </button>
 
         <div class="pt-4 border-t border-slate-100 text-center">
           <p class="text-xs text-slate-500 mb-2">Já possui uma conta?</p>
           <a href="entrar.html" class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition no-underline">
-            <i data-lucide="log-in" class="w-4 h-4"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
             <span>Entrar com Minha Conta</span>
           </a>
         </div>
@@ -224,14 +232,18 @@
     function togglePassVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
+      if (!input) return;
       if (input.type === 'password') {
         input.type = 'text';
-        icon.setAttribute('data-lucide', 'eye-off');
+        if (icon) {
+          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+        }
       } else {
         input.type = 'password';
-        icon.setAttribute('data-lucide', 'eye');
+        if (icon) {
+          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 hover:text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
       }
-      safeCreateIcons();
     }
 
     function showAlert(msg, type = 'error') {
@@ -243,13 +255,16 @@
 
       if (type === 'error') {
         box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-rose-50 text-rose-800 border border-rose-200';
-        if (icon) icon.setAttribute('data-lucide', 'alert-circle');
+        if (icon) {
+          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+        }
       } else {
         box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200';
-        if (icon) icon.setAttribute('data-lucide', 'check-circle');
+        if (icon) {
+          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+        }
       }
       box.classList.remove('hidden');
-      safeCreateIcons();
     }
 
     function clearAlert() {
@@ -278,8 +293,7 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Criando conta...`;
-      safeCreateIcons();
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Criando conta...`;
 
       try {
         // 1. Criar usuário no Supabase Auth
@@ -298,8 +312,7 @@
         if (authError) {
           showAlert('Erro ao criar conta: ' + authError.message);
           btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
-          safeCreateIcons();
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Criar Minha Conta de Lojista`;
           return;
         }
 
@@ -351,8 +364,7 @@
       } catch(err) {
         showAlert('Erro inesperado: ' + err.message);
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
-        safeCreateIcons();
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Criar Minha Conta de Lojista`;
       }
     }
 
