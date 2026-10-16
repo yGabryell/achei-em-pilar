@@ -87,14 +87,14 @@
         <p id="authSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1">Gerencie seu estabelecimento no guia comercial de Pilar.</p>
       </div>
 
-      <!-- ABAS: ENTRAR / CRIAR CONTA -->
+      <!-- ABAS COM LINKS DIRETOS 100% CONFIÁVEIS -->
       <div class="flex p-1 bg-slate-100 rounded-2xl mb-6">
-        <button type="button" id="tabBtnLogin" onclick="switchAuthMode('login')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer select-none">
+        <span id="tabBtnLogin" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs text-center select-none cursor-default block">
           Já tenho conta
-        </button>
-        <button type="button" id="tabBtnRegister" onclick="switchAuthMode('register')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer select-none">
+        </span>
+        <a href="cadastrar.html" id="tabBtnRegister" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 text-center select-none no-underline block">
           Cadastrar Comércio
-        </button>
+        </a>
       </div>
 
       <!-- MENSAGEM DE ALERTA/FEEDBACK -->
@@ -149,6 +149,14 @@
           <i data-lucide="log-in" class="w-4 h-4"></i>
           <span>Entrar no Painel</span>
         </button>
+
+        <div class="pt-4 border-t border-slate-100 text-center">
+          <p class="text-xs text-slate-500 mb-2">Ainda não tem conta de lojista?</p>
+          <a href="cadastrar.html" class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-xs font-black transition no-underline">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Cadastrar Meu Comércio Grátis</span>
+          </a>
+        </div>
       </form>
 
       <!-- FORMULÁRIO 2: CADASTRO DE NOVO LOJISTA -->
@@ -554,26 +562,12 @@
       safeCreateIcons();
 
       // Vincular eventos de clique diretos aos botões de alternância
-      const tabRegister = document.getElementById('tabBtnRegister');
-      if (tabRegister) {
-        tabRegister.addEventListener('click', (e) => {
-          e.preventDefault();
-          switchAuthMode('register');
-        });
-      }
-      const tabLogin = document.getElementById('tabBtnLogin');
-      if (tabLogin) {
-        tabLogin.addEventListener('click', (e) => {
-          e.preventDefault();
-          switchAuthMode('login');
-        });
-      }
-
-      // Verificar parâmetro na URL (?modo=cadastro, ?cadastro ou #cadastro)
+      // Se o usuário acessar com intenção de cadastrar (?modo=cadastro ou #cadastro), redireciona direto para cadastrar.html
       const urlParams = new URLSearchParams(window.location.search);
       const isCadastro = urlParams.get('modo') === 'cadastro' || urlParams.has('cadastro') || window.location.hash.toLowerCase().includes('cadastro');
       if (isCadastro) {
-        switchAuthMode('register');
+        window.location.href = 'cadastrar.html';
+        return;
       }
 
       if (supabase) {
