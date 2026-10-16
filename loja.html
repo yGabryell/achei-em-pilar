@@ -43,7 +43,7 @@
   <!-- SUPABASE JS CLIENT -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  
+
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
@@ -164,10 +164,10 @@
   <script>
     const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
-    let supabase = null;
+    let supabaseClient = null;
     try {
       if (window.supabase && typeof window.supabase.createClient === 'function') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(e) {}
 
@@ -595,12 +595,22 @@
           if (split.length > 0) return split;
         }
       }
+      if (store.keywords && typeof store.keywords === 'string' && store.keywords.includes('[FOTOS_START]')) {
+        try {
+          const match = store.keywords.match(/\[FOTOS_START\](.*?)\[FOTOS_END\]/s);
+          if (match && match[1]) {
+            const parsed = JSON.parse(match[1]);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch(e) {}
+      }
       return [];
     }
 
     function buildMapsLink(store) {
       if (!store) return '';
-      if (store.maps_link && store.maps_link.trim().startsWith('http')) return store.maps_link.trim();
+      const rawMaps = (store.maps_url || store.maps_link || '').trim();
+      if (rawMaps && rawMaps.startsWith('http')) return rawMaps;
       const query = `${store.nome}, ${store.endereco || ''}, Pilar - AL, Brasil`;
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     }
@@ -660,8 +670,8 @@
         if (svg) svg.setAttribute('class', 'w-4 h-4 fill-rose-500 text-rose-500');
       }
 
-      if (supabase) {
-        try { await supabase.rpc('increment_store_like', { p_store_id: storeId }); } catch(e) {}
+      if (supabaseClient) {
+        try { await supabaseClient.rpc('increment_store_like', { p_store_id: storeId }); } catch(e) {}
       }
     }
 
@@ -672,8 +682,8 @@
       if (type === 'maps') localStatsCache[storeId].maps_clicks = (localStatsCache[storeId].maps_clicks || 0) + 1;
       localStorage.setItem('pilar_stats_cache', JSON.stringify(localStatsCache));
 
-      if (supabase) {
-        try { await supabase.rpc('increment_store_click', { p_store_id: storeId, p_click_type: type }); } catch(e) {}
+      if (supabaseClient) {
+        try { await supabaseClient.rpc('increment_store_click', { p_store_id: storeId, p_click_type: type }); } catch(e) {}
       }
     }
 
@@ -998,9 +1008,9 @@
       renderStorePage(currentStore);
       alert('Sua avaliação foi enviada com sucesso! Muito obrigado.');
 
-      if (supabase) {
+      if (supabaseClient) {
         try {
-          await supabase.from('store_reviews').insert([{
+          await supabaseClient.from('store_reviews').insert([{
             store_id: sid,
             author: author,
             rating: rating,
@@ -1011,11 +1021,16 @@
     }
 
     async function syncStoreData(storeId) {
-      if (!supabase) return;
+      if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+        try {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {}
+      }
+      if (!supabaseClient) return;
       try {
         const [statsRes, reviewsRes] = await Promise.all([
-          supabase.from('store_stats').select('*').eq('store_id', storeId).maybeSingle(),
-          supabase.from('store_reviews').select('*').eq('store_id', storeId)
+          supabaseClient.from('store_stats').select('*').eq('store_id', storeId).maybeSingle(),
+          supabaseClient.from('store_reviews').select('*').eq('store_id', storeId)
         ]);
 
         let hasUpdate = false;
@@ -1094,6 +1109,42 @@
       return null;
     }
 
+    // BUSCA NA NUVEM COM SUPABASE CLIENT E FALLBACK REST DIRETO
+    async function fetchStoreFromSupabase(storeId) {
+      if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+        try {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {}
+      }
+
+      if (supabaseClient) {
+        try {
+          const fetchPromise = supabaseClient.from('stores').select('*').eq('id', storeId).maybeSingle();
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 4000));
+          const result = await Promise.race([fetchPromise, timeoutPromise]);
+          if (result && result.data) return result.data;
+        } catch(e) {}
+      }
+
+      // Fallback REST nativo (imune a bloqueios ou falha de CDN)
+      try {
+        const restUrl = `${SUPABASE_URL}/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=*`;
+        const resp = await fetch(restUrl, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Accept': 'application/vnd.pgrst.object+json'
+          }
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.id) return data;
+        }
+      } catch(e) {}
+
+      return null;
+    }
+
     // CARREGAR LOJA AO ENTRAR
     async function initStorePage() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -1113,22 +1164,22 @@
         syncStoreData(store.id);
       }
 
-      // 2. Se não encontrou localmente ou para atualizar com dados mais recentes do Supabase em segundo plano:
-      if (supabase) {
-        try {
-          const fetchPromise = supabase.from('stores').select('*').eq('id', storeId).maybeSingle();
-          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 4000));
-          const result = await Promise.race([fetchPromise, timeoutPromise]);
-          
-          if (result && result.data) {
-            store = result.data;
-            renderStorePage(store);
-            syncStoreData(store.id);
-            return;
-          }
-        } catch(e) {
-          console.warn('Nota: Supabase não retornou loja ou demorou:', e);
+      // 2. Se não encontrou localmente ou para atualizar com dados da nuvem:
+      if (!store) {
+        const cloudStore = await fetchStoreFromSupabase(storeId);
+        if (cloudStore) {
+          store = cloudStore;
+          renderStorePage(store);
+          syncStoreData(store.id);
+          return;
         }
+      } else {
+        // Se já renderizou, sincroniza em segundo plano de forma silenciosa
+        fetchStoreFromSupabase(storeId).then(fresh => {
+          if (fresh && fresh.id && JSON.stringify(fresh) !== JSON.stringify(store)) {
+            renderStorePage(fresh);
+          }
+        }).catch(() => {});
       }
 
       // 3. Se mesmo após todas as tentativas a loja não existe:
