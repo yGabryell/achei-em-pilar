@@ -485,13 +485,13 @@
               horario: 'Segunda a Sábado',
               logo: '',
               vip: false,
-              keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${user.id}]\n[STATUS:rascunho]`
+              keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${user.id}]\n[STATUS:pendente]`
             };
 
             // Tentar com colunas novas primeiro
             const fullPayload = {
               ...basePayload,
-              status: 'rascunho',
+              status: 'pendente',
               plano: 'basico',
               owner_id: user.id
             };
@@ -569,9 +569,10 @@
         });
       }
 
-      // Verificar parâmetro na URL (?modo=cadastro)
+      // Verificar parâmetro na URL (?modo=cadastro, ?cadastro ou #cadastro)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('modo') === 'cadastro') {
+      const isCadastro = urlParams.get('modo') === 'cadastro' || urlParams.has('cadastro') || window.location.hash.toLowerCase().includes('cadastro');
+      if (isCadastro) {
         switchAuthMode('register');
       }
 
