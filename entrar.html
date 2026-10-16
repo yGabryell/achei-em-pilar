@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Lojista — Achei em Pilar</title>
+  <meta name="description" content="Acesse o painel do seu comércio no Achei em Pilar. Gerencie informações, cardápio, fotos e horários.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- TAILWIND CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- LUCIDE ICONS -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- SUPABASE JS CLIENT -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOPO / NAVBAR SIMPLES -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-600/20 group-hover:scale-105 transition">
+          P
+        </div>
+        <div>
+          <span class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight block">Achei em Pilar</span>
+          <span class="text-[11px] text-emerald-700 font-bold block">Área do Lojista</span>
+        </div>
+      </a>
+
+      <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Voltar ao Guia</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL: FORMULÁRIO CENTRALIZADO -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-6">
+    <div class="w-full max-w-md bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-6 sm:p-8 relative overflow-hidden">
+      
+      <!-- DETALHE DECORATIVO SUPERIOR -->
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- TÍTULO & ÍCONE -->
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-3 shadow-inner">
+          <i data-lucide="store" class="w-7 h-7"></i>
+        </div>
+        <h1 id="authTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Painel do Comércio</h1>
+        <p id="authSubtitle" class="text-xs sm:text-sm text-slate-500 mt-1">Gerencie seu estabelecimento no guia comercial de Pilar.</p>
+      </div>
+
+      <!-- ABAS: ENTRAR / CRIAR CONTA -->
+      <div class="flex p-1 bg-slate-100 rounded-2xl mb-6">
+        <button id="tabBtnLogin" onclick="switchAuthMode('login')" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer">
+          Já tenho conta
+        </button>
+        <button id="tabBtnRegister" onclick="switchAuthMode('register')" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer">
+          Cadastrar Comércio
+        </button>
+      </div>
+
+      <!-- MENSAGEM DE ALERTA/FEEDBACK -->
+      <div id="alertBox" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5">
+        <i id="alertIcon" data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <span id="alertMessage" class="flex-1"></span>
+      </div>
+
+      <!-- FORMULÁRIO 1: LOGIN -->
+      <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5" for="loginEmail">E-mail</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              required 
+              placeholder="seuemail@exemplo.com" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-bold text-slate-700" for="loginPassword">Senha</label>
+            <button type="button" onclick="switchAuthMode('forgot')" class="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer">
+              Esqueci a senha
+            </button>
+          </div>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              required 
+              placeholder="Sua senha secreta" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+            <button type="button" onclick="togglePassVisibility('loginPassword', 'loginEyeIcon')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <i id="loginEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btnLoginSubmit"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
+        >
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Entrar no Painel</span>
+        </button>
+      </form>
+
+      <!-- FORMULÁRIO 2: CADASTRO DE NOVO LOJISTA -->
+      <form id="formRegister" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regName">Seu Nome Completo</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="regName" 
+              required 
+              placeholder="Ex: João da Silva" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regStoreName">Nome do Comércio / Empresa</label>
+          <div class="relative">
+            <i data-lucide="store" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="regStoreName" 
+              required 
+              placeholder="Ex: Lanchonete Sabores de Pilar" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regWhatsapp">WhatsApp da Loja (com DDD)</label>
+          <div class="relative">
+            <i data-lucide="phone" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="tel" 
+              id="regWhatsapp" 
+              required 
+              placeholder="Ex: 82 99999-9999" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regEmail">Seu E-mail para Acesso</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="email" 
+              id="regEmail" 
+              required 
+              placeholder="seuemail@exemplo.com" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regPassword">Criar Senha (mínimo 6 caracteres)</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="password" 
+              id="regPassword" 
+              required 
+              minlength="6"
+              placeholder="Digite uma senha forte" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+            <button type="button" onclick="togglePassVisibility('regPassword', 'regEyeIcon')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <i id="regEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btnRegSubmit"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-3"
+        >
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Criar Minha Conta de Lojista</span>
+        </button>
+      </form>
+
+      <!-- FORMULÁRIO 3: RECUPERAR SENHA -->
+      <form id="formForgot" onsubmit="handleForgot(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5" for="forgotEmail">E-mail Cadastrado</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="email" 
+              id="forgotEmail" 
+              required 
+              placeholder="seuemail@exemplo.com" 
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Enviaremos um link de redefinição para o seu e-mail.</p>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btnForgotSubmit"
+          class="w-full bg-slate-900 hover:bg-black active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Enviar Link de Recuperação</span>
+        </button>
+
+        <button type="button" onclick="switchAuthMode('login')" class="w-full text-center text-xs font-bold text-slate-500 hover:text-slate-800 transition py-1">
+          Voltar para o Login
+        </button>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPACTO -->
+  <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200 bg-white">
+    <p>© 2026 Achei em Pilar — O Guia Comercial de Pilar & Chã do Pilar • AL</p>
+  </footer>
+
+  <!-- SCRIPT DE AUTENTICAÇÃO COM SUPABASE -->
+  <script>
+    // CONFIGURAÇÃO OFICIAL DO SUPABASE
+    const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
+    
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.error('Erro ao conectar ao Supabase:', err);
+    }
+
+    // ALTERNÂNCIA DE ABAS
+    function switchAuthMode(mode) {
+      clearAlert();
+      const tabLogin = document.getElementById('tabBtnLogin');
+      const tabRegister = document.getElementById('tabBtnRegister');
+      const formLogin = document.getElementById('formLogin');
+      const formRegister = document.getElementById('formRegister');
+      const formForgot = document.getElementById('formForgot');
+      const title = document.getElementById('authTitle');
+      const subtitle = document.getElementById('authSubtitle');
+
+      if (mode === 'login') {
+        formLogin.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        formForgot.classList.add('hidden');
+        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer';
+        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        title.innerText = 'Painel do Comércio';
+        subtitle.innerText = 'Gerencie seu estabelecimento no guia comercial de Pilar.';
+      } else if (mode === 'register') {
+        formLogin.classList.add('hidden');
+        formRegister.classList.remove('hidden');
+        formForgot.classList.add('hidden');
+        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition bg-white text-emerald-800 shadow-xs cursor-pointer';
+        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        title.innerText = 'Cadastrar Comércio';
+        subtitle.innerText = 'Crie sua conta para divulgar seu negócio em Pilar.';
+      } else if (mode === 'forgot') {
+        formLogin.classList.add('hidden');
+        formRegister.classList.add('hidden');
+        formForgot.classList.remove('hidden');
+        tabLogin.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabRegister.className = 'flex-1 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition text-slate-500 hover:text-slate-800 cursor-pointer';
+        title.innerText = 'Recuperar Senha';
+        subtitle.innerText = 'Informe seu e-mail para receber as instruções.';
+      }
+      lucide.createIcons();
+    }
+
+    function togglePassVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alertBox');
+      const text = document.getElementById('alertMessage');
+      const icon = document.getElementById('alertIcon');
+      text.innerText = msg;
+
+      if (type === 'error') {
+        box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-rose-50 text-rose-800 border border-rose-200';
+        icon.setAttribute('data-lucide', 'alert-circle');
+      } else {
+        box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200';
+        icon.setAttribute('data-lucide', 'check-circle');
+      }
+      box.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function clearAlert() {
+      const box = document.getElementById('alertBox');
+      box.classList.add('hidden');
+    }
+
+    // AÇÃO 1: LOGIN COM SUPABASE AUTH
+    async function handleLogin(e) {
+      e.preventDefault();
+      clearAlert();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('btnLoginSubmit');
+
+      if (!supabase) {
+        showAlert('Erro ao inicializar conexão com o servidor. Tente recarregar.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Entrando...`;
+      lucide.createIcons();
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            showAlert('E-mail ou senha incorretos. Verifique seus dados.');
+          } else {
+            showAlert('Erro ao entrar: ' + error.message);
+          }
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Entrar no Painel`;
+          lucide.createIcons();
+          return;
+        }
+
+        showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+        setTimeout(() => {
+          window.location.href = 'minha-loja.html';
+        }, 800);
+
+      } catch(err) {
+        showAlert('Erro inesperado: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Entrar no Painel`;
+        lucide.createIcons();
+      }
+    }
+
+    // AÇÃO 2: CADASTRO COM SUPABASE AUTH E CRIAÇÃO INICIAL DO COMÉRCIO
+    async function handleRegister(e) {
+      e.preventDefault();
+      clearAlert();
+      const name = document.getElementById('regName').value.trim();
+      const storeName = document.getElementById('regStoreName').value.trim();
+      const whatsapp = document.getElementById('regWhatsapp').value.replace(/\D/g, '');
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const btn = document.getElementById('btnRegSubmit');
+
+      if (whatsapp.length < 10) {
+        showAlert('Por favor, informe um WhatsApp válido com DDD (ex: 82 99999-9999).');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Cadastrando...`;
+      lucide.createIcons();
+
+      try {
+        // 1. Criar usuário no Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: name,
+              store_name: storeName,
+              whatsapp: whatsapp
+            }
+          }
+        });
+
+        if (authError) {
+          showAlert('Erro ao criar conta: ' + authError.message);
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
+          lucide.createIcons();
+          return;
+        }
+
+        const user = authData.user;
+
+        // 2. Se o usuário já estiver ativo (sem confirmação de email pendente ou com auto-confirm), criar o registro da loja
+        if (user) {
+          try {
+            const formattedPhone = whatsapp.startsWith('55') ? whatsapp : '55' + whatsapp;
+            const newStoreId = String(Date.now());
+            const pin = whatsapp.slice(-4) || '1234';
+
+            const basePayload = {
+              id: newStoreId,
+              nome: storeName,
+              categoria: 'delivery',
+              bairro: 'Chã do Pilar',
+              endereco: 'Pilar - AL',
+              whatsapp: formattedPhone,
+              instagram: '',
+              descricao: `Bem-vindo(a) à ${storeName}! Entre em contato conosco pelo WhatsApp.`,
+              horario: 'Segunda a Sábado',
+              logo: '',
+              vip: false,
+              keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${user.id}]\n[STATUS:rascunho]`
+            };
+
+            // Tentar com colunas novas primeiro
+            const fullPayload = {
+              ...basePayload,
+              status: 'rascunho',
+              plano: 'basico',
+              owner_id: user.id
+            };
+
+            const { error: insErr } = await supabase.from('stores').insert([fullPayload]);
+            if (insErr) {
+              // Se coluna não existir, insere com basePayload (metadados dentro de keywords)
+              await supabase.from('stores').insert([basePayload]);
+            }
+          } catch(storeErr) {
+            console.warn('Nota: Inserção de loja será concluída em minha-loja.html:', storeErr);
+          }
+        }
+
+        showAlert('Conta criada com sucesso! Redirecionando para configurar seu comércio...', 'success');
+        setTimeout(() => {
+          window.location.href = 'minha-loja.html';
+        }, 1200);
+
+      } catch(err) {
+        showAlert('Erro inesperado: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Criar Minha Conta de Lojista`;
+        lucide.createIcons();
+      }
+    }
+
+    // AÇÃO 3: RECUPERAR SENHA
+    async function handleForgot(e) {
+      e.preventDefault();
+      clearAlert();
+      const email = document.getElementById('forgotEmail').value.trim();
+      const btn = document.getElementById('btnForgotSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Enviando...`;
+      lucide.createIcons();
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/entrar.html?modo=reset'
+        });
+
+        if (error) {
+          showAlert('Erro ao enviar link: ' + error.message);
+        } else {
+          showAlert('E-mail enviado! Verifique sua caixa de entrada e spam para redefinir a senha.', 'success');
+        }
+      } catch(err) {
+        showAlert('Erro: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Enviar Link de Recuperação`;
+        lucide.createIcons();
+      }
+    }
+
+    // AO CARREGAR A PÁGINA: VERIFICAR SE JÁ ESTÁ LOGADO
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+
+      // Verificar parâmetro na URL (?modo=cadastro)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('modo') === 'cadastro') {
+        switchAuthMode('register');
+      }
+
+      if (supabase) {
+        const { data } = await supabase.auth.getSession();
+        if (data && data.session) {
+          // Se já tem sessão ativa, encaminha direto para minha-loja.html
+          window.location.href = 'minha-loja.html';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

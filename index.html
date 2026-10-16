@@ -86,6 +86,13 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- ÁREA DO LOJISTA / ENTRAR -->
+        <a href="entrar.html" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-bold px-3 py-2.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 shrink-0" title="Acessar painel do meu comércio">
+          <i data-lucide="store" class="w-4 h-4 text-emerald-600"></i>
+          <span class="hidden sm:inline">Área do Lojista</span>
+          <span class="sm:hidden">Entrar</span>
+        </a>
+
         <!-- BOTÃO CADASTRAR LOJA -->
         <button onclick="openRegisterModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -2351,7 +2358,7 @@ ${details}
           const targetStore = stores.find(s => String(s.id) === String(storeId));
           const storePin = extractStorePin(targetStore);
 
-          const isValid = (enteredPin === storePin || enteredPin === 'Gabriel@Pilar2026');
+          const isValid = (enteredPin === storePin);
 
           if (!isValid) {
             alert(`PIN incorreto para ${targetStore ? targetStore.nome : 'este comércio'}!\n\nDica: O PIN padrão são os 4 últimos dígitos do WhatsApp cadastrado da sua loja.`);
@@ -2736,6 +2743,18 @@ ${details}
       try {
         trackSiteVisit();
         renderStores();
+        
+        // Auto-busca via URL (ex: index.html?busca=Sandubaria)
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('busca') || urlParams.get('q');
+        if (searchParam) {
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) {
+            searchInput.value = searchParam;
+            applyFilters();
+          }
+        }
+
         if (window.lucide) lucide.createIcons();
       } catch(e) {
         console.error('Erro na inicialização:', e);
