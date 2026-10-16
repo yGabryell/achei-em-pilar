@@ -1,5 +1,5 @@
 // stores-data.js — Dados oficiais e precarregados do Achei em Pilar
-    const INITIAL_STORES = [
+var INITIAL_STORES = window.INITIAL_STORES || [
       // 1. ALIMENTAÇÃO & DELIVERY
       {
         id: "1",
