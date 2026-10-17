@@ -77,11 +77,13 @@
 <body class="bg-slate-100 text-slate-800 font-sans pb-24 md:pb-12 antialiased selection:bg-emerald-500 selection:text-white overflow-x-hidden">
 
   <!-- ================= NOVO TOPO ESTILO APP LOCALOOK (IMERSIVO ESMERALDA) ================= -->
-  <header class="bg-gradient-to-b from-[#064e3b] via-[#047857] to-[#059669] text-white pt-4 pb-8 px-4 sm:px-6 rounded-b-[2.2rem] sm:rounded-b-[2.6rem] shadow-lg relative overflow-hidden">
+  <header class="bg-gradient-to-b from-[#064e3b] via-[#047857] to-[#059669] text-white pt-4 pb-8 px-4 sm:px-6 rounded-b-[2.2rem] sm:rounded-b-[2.6rem] shadow-lg relative z-30">
     
-    <!-- Efeitos de iluminação sutil de fundo -->
-    <div class="absolute -top-12 -right-12 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-300/15 rounded-full blur-2xl pointer-events-none"></div>
+    <!-- Efeitos de iluminação sutil de fundo (overflow isolado para não cortar dropdowns) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none rounded-b-[2.2rem] sm:rounded-b-[2.6rem]">
+      <div class="absolute -top-12 -right-12 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-300/15 rounded-full blur-2xl pointer-events-none"></div>
+    </div>
 
     <div class="w-full max-w-4xl mx-auto relative z-10">
       
@@ -114,21 +116,24 @@
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-emerald-200/80"></i>
         </button>
 
-        <!-- DROPDOWN RÁPIDO DE BAIRROS -->
-        <div id="bairroDropdown" class="hidden absolute top-full mt-2 w-60 bg-white text-slate-800 rounded-2xl p-2 shadow-2xl border border-slate-200 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <!-- DROPDOWN RÁPIDO DE BAIRROS (ESTILO LOCALOOK COM ALTO Z-INDEX E SOMBRA SUAVE) -->
+        <div id="bairroDropdown" class="hidden absolute top-full mt-2 w-64 max-w-[90vw] bg-white text-slate-800 rounded-2xl p-2 shadow-2xl border border-slate-200/90 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div class="px-2.5 py-1 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Filtrar por Bairro:</div>
-          <button onclick="selectBairroFromPicker('all')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
+          <button onclick="selectBairroFromPicker('all')" data-bairro-choice="all" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer bg-emerald-50 text-emerald-800">
             <span>Todos os Bairros</span>
-            <span class="text-xs text-emerald-600 font-black">✓</span>
+            <span class="bairro-check text-xs text-emerald-600 font-black">✓</span>
           </button>
-          <button onclick="selectBairroFromPicker('Chã do Pilar')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
+          <button onclick="selectBairroFromPicker('Chã do Pilar')" data-bairro-choice="Chã do Pilar" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
             <span>Chã do Pilar</span>
+            <span class="bairro-check hidden text-xs text-emerald-600 font-black">✓</span>
           </button>
-          <button onclick="selectBairroFromPicker('Pilar Centro')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
+          <button onclick="selectBairroFromPicker('Pilar Centro')" data-bairro-choice="Pilar Centro" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
             <span>Pilar Centro</span>
+            <span class="bairro-check hidden text-xs text-emerald-600 font-black">✓</span>
           </button>
-          <button onclick="selectBairroFromPicker('Imburi')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
+          <button onclick="selectBairroFromPicker('Imburi')" data-bairro-choice="Imburi" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-50 hover:text-emerald-800 flex items-center justify-between transition cursor-pointer">
             <span>Imburi</span>
+            <span class="bairro-check hidden text-xs text-emerald-600 font-black">✓</span>
           </button>
         </div>
       </div>
@@ -1699,6 +1704,22 @@
         } else {
           badgeText.innerText = `Pilar - AL • ${bairro}`;
         }
+      }
+
+      // Atualiza destaques e checkmarks dentro do dropdown do topo
+      const dd = document.getElementById('bairroDropdown');
+      if (dd) {
+        dd.querySelectorAll('[data-bairro-choice]').forEach(btn => {
+          const choice = btn.getAttribute('data-bairro-choice');
+          const check = btn.querySelector('.bairro-check');
+          if (choice === bairro) {
+            btn.classList.add('bg-emerald-50', 'text-emerald-800');
+            if (check) check.classList.remove('hidden');
+          } else {
+            btn.classList.remove('bg-emerald-50', 'text-emerald-800');
+            if (check) check.classList.add('hidden');
+          }
+        });
       }
 
       renderStores();
