@@ -186,11 +186,14 @@
           </div>
         </div>
 
+        <!-- ALERTA LOCAL DIRETO ACIMA DO BOTÃO (VISÍVEL NO MOBILE MESMO COM SCROLL) -->
+        <div id="btnAlert" class="hidden mb-2 text-xs font-bold p-3 rounded-xl"></div>
+
         <button 
-          type="button" 
+          type="submit" 
           onclick="handleRegister(event)"
           id="btnRegSubmit"
-          class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-3"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
           <span>Criar Minha Conta de Lojista</span>
@@ -256,26 +259,41 @@
       const box = document.getElementById('alertBox');
       const text = document.getElementById('alertMessage');
       const icon = document.getElementById('alertIcon');
-      if (!box || !text) return;
-      text.innerText = msg;
+      const btnAlert = document.getElementById('btnAlert');
 
-      if (type === 'error') {
-        box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-rose-50 text-rose-800 border border-rose-200';
-        if (icon) {
-          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
-        }
-      } else {
-        box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200';
-        if (icon) {
-          icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+      // 1. Alerta direto acima do botão (sempre visível no mobile onde o usuário está olhando)
+      if (btnAlert) {
+        btnAlert.innerText = msg;
+        if (type === 'error') {
+          btnAlert.className = 'mb-2 p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 block text-center animate-pulse';
+        } else {
+          btnAlert.className = 'mb-2 p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 block text-center';
         }
       }
-      box.classList.remove('hidden');
+
+      // 2. Alerta do topo
+      if (box && text) {
+        text.innerText = msg;
+        if (type === 'error') {
+          box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-rose-50 text-rose-800 border border-rose-200';
+          if (icon) {
+            icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+          }
+        } else {
+          box.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200';
+          if (icon) {
+            icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+          }
+        }
+        box.classList.remove('hidden');
+      }
     }
 
     function clearAlert() {
       const box = document.getElementById('alertBox');
+      const btnAlert = document.getElementById('btnAlert');
       if (box) box.classList.add('hidden');
+      if (btnAlert) btnAlert.classList.add('hidden');
     }
 
     async function handleRegister(e) {
@@ -285,12 +303,27 @@
       }
       clearAlert();
 
+      const btn = document.getElementById('btnRegSubmit');
+      const originalBtnHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg><span>Criar Minha Conta de Lojista</span>`;
+
+      // 1. Feedback visual imediato ao tocar
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Criando sua conta...`;
+      }
+
+      function restoreBtn() {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnHTML;
+        }
+      }
+
       const nameEl = document.getElementById('regName');
       const storeNameEl = document.getElementById('regStoreName');
       const whatsappEl = document.getElementById('regWhatsapp');
       const emailEl = document.getElementById('regEmail');
       const passwordEl = document.getElementById('regPassword');
-      const btn = document.getElementById('btnRegSubmit');
 
       const name = nameEl ? nameEl.value.trim() : '';
       const storeName = storeNameEl ? storeNameEl.value.trim() : '';
@@ -298,48 +331,49 @@
       const email = emailEl ? emailEl.value.trim() : '';
       const password = passwordEl ? passwordEl.value : '';
 
+      // Validação rápida com feedback visível
       if (!name) {
+        restoreBtn();
         showAlert('Por favor, informe seu nome completo.');
         if (nameEl) nameEl.focus();
         return false;
       }
 
       if (!storeName) {
+        restoreBtn();
         showAlert('Por favor, informe o nome do seu comércio.');
         if (storeNameEl) storeNameEl.focus();
         return false;
       }
 
-      if (whatsapp.length < 10) {
-        showAlert('Por favor, informe um WhatsApp válido com DDD (ex: 82 99999-9999).');
+      if (!whatsapp || whatsapp.length < 8) {
+        restoreBtn();
+        showAlert('Por favor, informe seu WhatsApp (ex: 82 99999-9999).');
         if (whatsappEl) whatsappEl.focus();
         return false;
       }
 
       if (!email || !email.includes('@')) {
+        restoreBtn();
         showAlert('Por favor, informe um e-mail válido.');
         if (emailEl) emailEl.focus();
         return false;
       }
 
       if (password.length < 6) {
+        restoreBtn();
         showAlert('A senha deve ter no mínimo 6 caracteres.');
         if (passwordEl) passwordEl.focus();
         return false;
       }
 
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Criando sua conta...`;
-      }
-
       try {
         let userId = null;
 
-        // 1. Tentar criar usuário no Supabase Auth
+        // 1. Tentar criar usuário no Supabase Auth com timeout de 4s para nunca travar
         if (supabase) {
           try {
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            const authPromise = supabase.auth.signUp({
               email: email,
               password: password,
               options: {
@@ -350,24 +384,28 @@
                 }
               }
             });
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000));
+            const authRes = await Promise.race([authPromise, timeoutPromise]).catch(err => ({ error: err }));
 
-            if (authData && authData.user) {
-              userId = authData.user.id;
-            } else if (authError) {
-              console.warn('Nota Supabase Auth signUp:', authError.message);
-              // Se já existir, tentar login para associar id
-              try {
-                const { data: loginData } = await supabase.auth.signInWithPassword({
-                  email: email,
-                  password: password
-                });
-                if (loginData && loginData.user) {
-                  userId = loginData.user.id;
-                }
-              } catch(loginEx) {}
+            if (authRes && authRes.data && authRes.data.user) {
+              userId = authRes.data.user.id;
+            } else if (authRes && authRes.error) {
+              const errMsg = (authRes.error.message || '').toLowerCase();
+              if (errMsg.includes('already registered') || errMsg.includes('already_exists')) {
+                // Tenta autenticar se já existia
+                try {
+                  const { data: loginData } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                  });
+                  if (loginData && loginData.user) {
+                    userId = loginData.user.id;
+                  }
+                } catch(loginEx) {}
+              }
             }
           } catch(authEx) {
-            console.warn('Exceção Supabase Auth:', authEx);
+            console.warn('Nota Supabase Auth:', authEx);
           }
         }
 
@@ -414,13 +452,14 @@
           keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${userId}]\n[EMAIL:${email.toLowerCase()}]\n[STATUS:pendente]`
         };
 
-        // Salvar no Supabase
+        // Salvar no Supabase (não-bloqueante com timeout de 3s)
         if (supabase) {
           try {
-            await supabase.from('stores').insert([storePayload]);
-          } catch(dbErr) {
-            console.warn('Erro ao salvar loja no banco:', dbErr);
-          }
+            await Promise.race([
+              supabase.from('stores').insert([storePayload]),
+              new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 3000))
+            ]).catch(e => console.warn('Supabase store insert notice:', e));
+          } catch(dbErr) {}
         }
 
         // Salvar em fallback local
@@ -434,21 +473,36 @@
         showAlert('Conta criada com sucesso! Entrando no seu painel...', 'success');
         setTimeout(() => {
           window.location.replace('minha-loja.html');
-        }, 600);
+        }, 500);
 
       } catch(err) {
         console.error('Erro no cadastro:', err);
-        showAlert('Erro ao processar cadastro: ' + (err.message || 'Tente novamente.'));
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Criar Minha Conta de Lojista`;
-        }
+        showAlert('Erro: ' + (err.message || 'Tente novamente.'));
+        restoreBtn();
       }
       return false;
     }
 
+    window.handleRegister = handleRegister;
+
     window.addEventListener('DOMContentLoaded', () => {
       safeCreateIcons();
+      const form = document.getElementById('formRegister');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          handleRegister(e);
+          return false;
+        });
+      }
+      const btn = document.getElementById('btnRegSubmit');
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          handleRegister(e);
+          return false;
+        });
+      }
     });
   </script>
 </body>
