@@ -3193,6 +3193,19 @@ ${details}
         // Atualizar status do lojista no menu lateral
         updateDrawerMerchantStatus();
 
+        // Popup automático de Apoio / Doação PIX ao entrar na página
+        setTimeout(() => {
+          try {
+            if (window.location.hash && window.location.hash.includes('loja=')) return;
+            const drawer = document.getElementById('sideMenuDrawer');
+            if (drawer && !drawer.classList.contains('translate-x-full')) return;
+
+            if (!sessionStorage.getItem('pilar_donate_seen') || window.location.search.includes('doar=1') || window.location.hash === '#doar') {
+              openDonateModal();
+            }
+          } catch(e) {}
+        }, 1200);
+
         if (window.lucide) lucide.createIcons();
       } catch(e) {
         console.error('Erro na inicialização:', e);
