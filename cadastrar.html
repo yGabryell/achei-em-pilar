@@ -104,7 +104,7 @@
       </div>
 
       <!-- FORMULÁRIO DE CADASTRO DE NOVO LOJISTA -->
-      <form id="formRegister" onsubmit="handleRegister(event)" class="space-y-3.5">
+      <form id="formRegister" onsubmit="event.preventDefault(); handleRegister(event); return false;" class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1" for="regName">Seu Nome Completo *</label>
           <div class="relative">
@@ -113,6 +113,7 @@
               type="text" 
               id="regName" 
               required 
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleRegister(event);}"
               placeholder="Ex: João da Silva" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
@@ -127,6 +128,7 @@
               type="text" 
               id="regStoreName" 
               required 
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleRegister(event);}"
               placeholder="Ex: Pastelaria Sabores de Pilar" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
@@ -141,6 +143,7 @@
               type="tel" 
               id="regWhatsapp" 
               required 
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleRegister(event);}"
               placeholder="Ex: 82 99999-9999" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
@@ -155,6 +158,7 @@
               type="email" 
               id="regEmail" 
               required 
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleRegister(event);}"
               placeholder="seuemail@exemplo.com" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
@@ -170,6 +174,7 @@
               id="regPassword" 
               required 
               minlength="6"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();handleRegister(event);}"
               placeholder="Digite uma senha forte" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
             >
@@ -182,7 +187,8 @@
         </div>
 
         <button 
-          type="submit" 
+          type="button" 
+          onclick="handleRegister(event)"
           id="btnRegSubmit"
           class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-3"
         >
@@ -273,27 +279,59 @@
     }
 
     async function handleRegister(e) {
-      e.preventDefault();
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       clearAlert();
-      const name = document.getElementById('regName').value.trim();
-      const storeName = document.getElementById('regStoreName').value.trim();
-      const whatsapp = document.getElementById('regWhatsapp').value.replace(/\D/g, '');
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
+
+      const nameEl = document.getElementById('regName');
+      const storeNameEl = document.getElementById('regStoreName');
+      const whatsappEl = document.getElementById('regWhatsapp');
+      const emailEl = document.getElementById('regEmail');
+      const passwordEl = document.getElementById('regPassword');
       const btn = document.getElementById('btnRegSubmit');
+
+      const name = nameEl ? nameEl.value.trim() : '';
+      const storeName = storeNameEl ? storeNameEl.value.trim() : '';
+      const whatsapp = whatsappEl ? whatsappEl.value.replace(/\D/g, '') : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const password = passwordEl ? passwordEl.value : '';
+
+      if (!name) {
+        showAlert('Por favor, informe seu nome completo.');
+        if (nameEl) nameEl.focus();
+        return false;
+      }
+
+      if (!storeName) {
+        showAlert('Por favor, informe o nome do seu comércio.');
+        if (storeNameEl) storeNameEl.focus();
+        return false;
+      }
 
       if (whatsapp.length < 10) {
         showAlert('Por favor, informe um WhatsApp válido com DDD (ex: 82 99999-9999).');
-        return;
+        if (whatsappEl) whatsappEl.focus();
+        return false;
+      }
+
+      if (!email || !email.includes('@')) {
+        showAlert('Por favor, informe um e-mail válido.');
+        if (emailEl) emailEl.focus();
+        return false;
       }
 
       if (password.length < 6) {
         showAlert('A senha deve ter no mínimo 6 caracteres.');
-        return;
+        if (passwordEl) passwordEl.focus();
+        return false;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Criando sua conta...`;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Criando sua conta...`;
+      }
 
       try {
         let userId = null;
@@ -316,8 +354,9 @@
             if (authData && authData.user) {
               userId = authData.user.id;
             } else if (authError) {
-              // Se o e-mail já estiver cadastrado, tenta fazer login
-              if (authError.message.toLowerCase().includes('already registered')) {
+              console.warn('Nota Supabase Auth signUp:', authError.message);
+              // Se já existir, tentar login para associar id
+              try {
                 const { data: loginData } = await supabase.auth.signInWithPassword({
                   email: email,
                   password: password
@@ -325,9 +364,7 @@
                 if (loginData && loginData.user) {
                   userId = loginData.user.id;
                 }
-              } else {
-                console.warn('Nota Supabase Auth:', authError.message);
-              }
+              } catch(loginEx) {}
             }
           } catch(authEx) {
             console.warn('Exceção Supabase Auth:', authEx);
@@ -338,7 +375,7 @@
           userId = 'usr_' + Date.now();
         }
 
-        // 2. Salvar sessão do lojista no navegador (Garante entrada imediata em minha-loja.html sem travar em confirmação de e-mail)
+        // 2. Salvar sessão do lojista no navegador
         const merchantUser = {
           id: userId,
           email: email,
@@ -348,13 +385,19 @@
             whatsapp: whatsapp
           }
         };
-        localStorage.setItem('pilar_current_merchant', JSON.stringify(merchantUser));
+        try {
+          localStorage.setItem('pilar_current_merchant', JSON.stringify(merchantUser));
+        } catch(lsErr) {
+          console.warn('LocalStorage error:', lsErr);
+        }
 
         // 3. Criar registro inicial da loja
         const formattedPhone = whatsapp.startsWith('55') ? whatsapp : '55' + whatsapp;
         const newStoreId = String(Date.now());
         const pin = whatsapp.slice(-4) || '1234';
-        localStorage.setItem('pilar_my_store_id', newStoreId);
+        try {
+          localStorage.setItem('pilar_my_store_id', newStoreId);
+        } catch(e) {}
 
         const storePayload = {
           id: newStoreId,
@@ -390,27 +433,22 @@
 
         showAlert('Conta criada com sucesso! Entrando no seu painel...', 'success');
         setTimeout(() => {
-          window.location.href = 'minha-loja.html';
-        }, 1000);
+          window.location.replace('minha-loja.html');
+        }, 600);
 
       } catch(err) {
         console.error('Erro no cadastro:', err);
         showAlert('Erro ao processar cadastro: ' + (err.message || 'Tente novamente.'));
-        btn.disabled = false;
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Criar Minha Conta de Lojista`;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Criar Minha Conta de Lojista`;
+        }
       }
+      return false;
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       safeCreateIcons();
-      if (supabase) {
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (data && data.session) {
-            window.location.href = 'minha-loja.html';
-          }
-        } catch(e) {}
-      }
     });
   </script>
 </body>
