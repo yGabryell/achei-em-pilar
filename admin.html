@@ -221,6 +221,7 @@
                 <option value="joias">↳ Joalherias & Acessórios</option>
                 <option value="beleza">↳ Salão & Barbearia</option>
                 <option value="servicos">↳ Fretes & Serviços</option>
+                <option value="casamento">↳ Sites de Casamento & Convites</option>
                 <option value="utilidades">↳ Variedades & Móveis</option>
                 <option value="saude">↳ Farmácia & Saúde</option>
               </optgroup>
@@ -372,6 +373,7 @@
                       <option value="joias">↳ Joalherias & Acessórios</option>
                       <option value="beleza">↳ Salão & Barbearia</option>
                       <option value="servicos">↳ Fretes & Serviços</option>
+                      <option value="casamento">↳ Sites de Casamento & Convites</option>
                       <option value="utilidades">↳ Variedades & Móveis</option>
                       <option value="saude">↳ Farmácia & Saúde</option>
                     </optgroup>
@@ -1308,7 +1310,7 @@
         ) || (
           cat === 'compras' && (store.categoria === 'roupas' || store.categoria === 'joias' || store.categoria === 'utilidades')
         ) || (
-          cat === 'servicos' && (store.categoria === 'beleza' || store.categoria === 'servicos')
+          cat === 'servicos' && (store.categoria === 'beleza' || store.categoria === 'servicos' || store.categoria === 'casamento')
         ) || (
           cat === 'saude' && store.categoria === 'saude'
         );

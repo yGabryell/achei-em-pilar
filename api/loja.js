@@ -48,7 +48,8 @@ const PRELOADED_STORES = {
   "23": { nome: "Boladão Açaiteria", bairro: "Chã do Pilar", descricao: "O açaí mais cremoso de Pilar com mais de 30 acompanhamentos, cremes especiais e fondue de frutas.", image: `${BASE_DOMAIN}/Fotos/528694267_18171310441354017_5021224052855313548_n.jpg` },
   "24": { nome: "Lourenço Água & Gás", bairro: "Pilar Centro", descricao: "Distribuidora autorizada de botijões de gás Ultragaz e galões de água mineral 20L com entrega ultra rápida.", image: `${BASE_DOMAIN}/Fotos/66c55b96-22dd-499d-b730-6c4bfbc27eed.jpg` },
   "25": { nome: "Central de Ambulância de Pilar", bairro: "Pilar Centro", descricao: "Central municipal de ambulâncias de Pilar. Atendimento de urgência, socorro e remoção médica 24 horas para toda a cidade.", image: "https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=600&q=80" },
-  "26": { nome: "A Sandubaria Famintos", bairro: "Chã do Pilar", descricao: "Sanduíches artesanais, hambúrgueres e os famosos passaportes bem recheados, Faminfritas e delivery.", image: `${BASE_DOMAIN}/Fotos/sandubaria_famintos_logo.png` }
+  "26": { nome: "A Sandubaria Famintos", bairro: "Chã do Pilar", descricao: "Sanduíches artesanais, hambúrgueres e os famosos passaportes bem recheados, Faminfritas e delivery.", image: `${BASE_DOMAIN}/Fotos/sandubaria_famintos_logo.png` },
+  "27": { nome: "Sim, Aceito! — Sites de Casamento", bairro: "Pilar Centro", descricao: "A plataforma mais moderna e elegante de sites de casamento! Lista de presentes via PIX com TAXA ZERO, confirmação de presença (RSVP) e resgate em até 24h.", image: `${BASE_DOMAIN}/Fotos/sim_aceito_banner_opt.jpg` }
 };
 
 function fetchSupabaseStore(id) {

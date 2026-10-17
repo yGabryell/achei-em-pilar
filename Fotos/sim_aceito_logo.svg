@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <!-- Gradiente Ouro Real Luxo para os anéis -->
+    <linearGradient id="goldBandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5D6" />
+      <stop offset="25%" stop-color="#F5D076" />
+      <stop offset="50%" stop-color="#D4AF37" />
+      <stop offset="80%" stop-color="#AA8022" />
+      <stop offset="100%" stop-color="#73500E" />
+    </linearGradient>
+
+    <linearGradient id="goldBandRightGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8E7" />
+      <stop offset="30%" stop-color="#F2CB6C" />
+      <stop offset="65%" stop-color="#C99E32" />
+      <stop offset="100%" stop-color="#805915" />
+    </linearGradient>
+
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="35%" stop-color="#E0F4FF" />
+      <stop offset="70%" stop-color="#70D6FF" />
+      <stop offset="100%" stop-color="#0077B6" />
+    </linearGradient>
+
+    <filter id="favDropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <g transform="translate(3, 12.5) scale(0.1502)" filter="url(#favDropShadow)">
+    <path fill="url(#goldBandGrad)" fill-rule="evenodd" d="M 223 78 L 211 67 L 199 59 L 183 52 L 164 48 L 136 48 L 110 53 L 86 62 L 61 76 L 47 86 L 29 104 L 13 126 L 5 143 L 2 152 L 0 163 L 0 183 L 2 194 L 10 213 L 18 224 L 26 232 L 39 241 L 49 246 L 61 250 L 77 253 L 108 253 L 129 249 L 136 246 L 146 244 L 174 231 L 178 228 L 167 217 L 157 202 L 155 202 L 139 211 L 121 218 L 105 222 L 90 224 L 72 224 L 65 223 L 50 219 L 39 214 L 29 207 L 21 199 L 15 190 L 12 183 L 9 171 L 9 157 L 12 144 L 20 127 L 32 110 L 48 94 L 59 85 L 79 73 L 82 74 L 72 80 L 54 94 L 38 110 L 24 130 L 24 132 L 22 134 L 17 147 L 15 156 L 15 172 L 17 180 L 22 190 L 30 200 L 27 186 L 28 170 L 31 159 L 40 142 L 46 135 L 48 131 L 50 130 L 65 114 L 79 103 L 96 93 L 112 86 L 136 79 L 149 77 L 169 77 L 184 80 L 196 85 L 202 89 L 215 103 L 213 94 L 209 84 L 203 76 L 193 68 L 181 62 L 171 59 L 159 57 L 135 56 L 143 54 L 163 54 L 179 57 L 188 60 L 203 69 L 210 76 L 215 83 L 220 97 L 221 102 L 221 117 L 219 128 L 216 137 L 211 148 L 204 159 L 190 175 L 195 182 L 207 194 L 212 198 L 214 198 L 221 190 L 233 170 L 239 154 L 242 139 L 242 123 L 239 108 L 231 89 Z M 90 70 L 87 72 L 81 73 L 87 69 Z " />
+    <path fill="url(#goldBandRightGrad)" fill-rule="evenodd" d="M 282 25 L 288 40 L 288 43 L 294 57 L 294 63 L 289 58 L 287 54 L 267 51 L 239 52 L 221 56 L 212 60 L 217 63 L 228 74 L 234 82 L 246 80 L 263 80 L 282 83 L 304 90 L 324 101 L 333 108 L 345 120 L 356 136 L 359 142 L 363 155 L 364 171 L 367 159 L 367 139 L 364 125 L 359 113 L 351 98 L 355 102 L 365 117 L 371 133 L 373 143 L 373 159 L 371 169 L 365 184 L 356 197 L 347 206 L 336 214 L 334 214 L 324 220 L 315 223 L 296 227 L 272 227 L 258 225 L 240 220 L 224 213 L 208 203 L 207 201 L 203 199 L 190 186 L 182 175 L 175 160 L 172 148 L 172 132 L 175 123 L 183 110 L 198 96 L 198 94 L 185 87 L 176 84 L 166 95 L 162 101 L 154 118 L 149 138 L 149 161 L 155 183 L 164 201 L 176 217 L 190 230 L 202 238 L 220 246 L 222 248 L 237 253 L 261 258 L 292 258 L 305 256 L 330 248 L 346 239 L 356 231 L 364 223 L 371 214 L 378 201 L 381 193 L 385 175 L 385 153 L 383 142 L 378 126 L 371 112 L 356 92 L 344 81 L 335 75 L 328 76 L 323 75 L 329 71 L 360 58 L 342 53 L 336 54 L 336 55 L 329 61 L 318 67 L 334 52 L 332 49 L 314 41 L 308 40 L 308 49 L 305 66 L 304 38 L 293 30 Z M 178 181 L 185 190 L 198 203 L 207 210 L 222 219 L 236 225 L 239 225 L 242 227 L 249 229 L 280 234 L 268 235 L 247 232 L 232 228 L 215 220 L 204 213 L 185 195 L 177 183 Z M 176 178 L 177 182 L 175 180 Z     M 345 94 L 347 93 L 348 97 Z      " />
+    <path fill="url(#diamondGrad)" fill-rule="evenodd" stroke="#0077B6" stroke-width="1.5" d="M 285 21 L 295 26 L 305 33 L 321 39 L 334 46 L 336 46 L 332 41 L 335 39 L 336 41 L 341 41 L 338 46 L 339 48 L 359 53 L 359 51 L 355 43 L 353 33 L 351 29 L 349 27 L 337 21 L 312 11 L 305 11 Z M 345 33 L 350 32 L 352 37 L 347 37 L 347 35 Z M 326 30 L 327 36 L 324 38 L 322 36 L 322 34 Z M 310 28 L 317 31 L 316 35 L 310 35 Z  M 336 25 L 339 28 L 335 28 Z M 325 23 L 327 21 L 331 22 L 332 24 L 331 27 L 328 27 Z  M 307 13 L 308 15 L 312 18 L 308 19 L 306 21 L 301 17 Z" />
+    <path fill="#FFFFFF" d="M 283 1 L 277 8 L 273 8 L 279 13 L 280 15 L 280 19 L 285 13 L 291 11 L 288 10 L 285 7 Z" />
+    <path fill="#FFFFFF" d="M 367 33 L 366 36 L 363 40 L 357 42 L 360 43 L 364 47 L 366 52 L 367 48 L 369 46 L 375 43 L 373 43 L 369 40 L 367 36 Z" />
+  </g>
+</svg>
