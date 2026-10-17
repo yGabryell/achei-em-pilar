@@ -198,36 +198,36 @@
     <div class="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-slate-200/90 shadow-md">
       <div class="grid grid-cols-4 gap-1.5 sm:gap-2 text-center">
         
-        <!-- Gastronomia / Delivery -->
-        <button onclick="quickFilterCategory('delivery')" data-quick-cat="delivery" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95">
+        <!-- Gastronomia (Lanches, Pizzas, Bolos & Delivery) -->
+        <button onclick="quickFilterCategory('gastronomia')" data-quick-cat="gastronomia" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95" aria-label="Filtrar por Gastronomia">
           <div class="quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition">
             <i data-lucide="utensils" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"></i>
           </div>
-          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight">Gastronomia</span>
+          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center">Gastronomia</span>
         </button>
 
-        <!-- Compras / Lojas -->
-        <button onclick="quickFilterCategory('roupas')" data-quick-cat="roupas" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95">
+        <!-- Compras (Roupas, Joias, Artigos do Lar & Lojas) -->
+        <button onclick="quickFilterCategory('compras')" data-quick-cat="compras" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95" aria-label="Filtrar por Compras">
           <div class="quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition">
             <i data-lucide="shopping-bag" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"></i>
           </div>
-          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight">Compras</span>
+          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center">Compras</span>
         </button>
 
-        <!-- Serviços / Fretes -->
-        <button onclick="quickFilterCategory('servicos')" data-quick-cat="servicos" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95">
+        <!-- Serviços & Beleza (Salão, Barbearia, Fretes, Mecânica) -->
+        <button onclick="quickFilterCategory('servicos')" data-quick-cat="servicos" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95" aria-label="Filtrar por Serviços e Beleza">
           <div class="quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition">
             <i data-lucide="wrench" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"></i>
           </div>
-          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight">Serviços</span>
+          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center">Serviços & Beleza</span>
         </button>
 
-        <!-- Saúde / Farmácia -->
-        <button onclick="quickFilterCategory('saude')" data-quick-cat="saude" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95">
+        <!-- Saúde & Bem-Estar (Farmácias, Clínicas, Dentistas, Treinos) -->
+        <button onclick="quickFilterCategory('saude')" data-quick-cat="saude" class="quick-cat-btn group flex flex-col items-center gap-1 cursor-pointer p-1 rounded-xl transition hover:bg-slate-50 active:scale-95" aria-label="Filtrar por Saúde e Bem-Estar">
           <div class="quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition">
             <i data-lucide="heart-pulse" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"></i>
           </div>
-          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight">Saúde</span>
+          <span class="quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center">Saúde & Bem-Estar</span>
         </button>
 
       </div>
@@ -262,43 +262,19 @@
       </a>
     </div>
 
-    <!-- ================= FILTRO HORIZONTAL COMPLETO DE CATEGORIAS ================= -->
-    <div class="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-      <button onclick="setCategory('all')" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white border border-emerald-700 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="all">
-        <span>🔥 Todos</span>
-      </button>
-      <button onclick="setCategory('delivery')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="delivery">
-        <span>🍔 Lanches & Delivery</span>
-      </button>
-      <button onclick="setCategory('bolos')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="bolos">
-        <span>🎂 Bolos & Doces</span>
-      </button>
-      <button onclick="setCategory('roupas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="roupas">
-        <span>🛍️ Roupas & Calçados</span>
-      </button>
-      <button onclick="setCategory('joias')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="joias">
-        <span>💍 Joalherias & Acessórios</span>
-      </button>
-      <button onclick="setCategory('beleza')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="beleza">
-        <span>✂️ Salão & Barbearia</span>
-      </button>
-      <button onclick="setCategory('servicos')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="servicos">
-        <span>🚚 Fretes & Serviços</span>
-      </button>
-      <button onclick="setCategory('utilidades')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="utilidades">
-        <span>🏠 Variedades & Móveis</span>
-      </button>
-      <button onclick="setCategory('saude')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5" data-cat="saude">
-        <span>💊 Farmácia & Saúde</span>
-      </button>
-    </div>
-
     <!-- ================= TÍTULO DA SEÇÃO & CONTADOR (ESTILO LOCALOOK) ================= -->
     <div id="storesSection" class="mt-4 flex items-center justify-between px-1 scroll-mt-24">
       <div>
         <h2 class="font-heading font-black text-base sm:text-lg text-slate-900 leading-tight">Destaques perto de você</h2>
-        <div class="flex items-center gap-2 mt-0.5">
+        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
           <p class="text-[11px] text-slate-500 font-medium" id="resultsCount">Carregando estabelecimentos...</p>
+          
+          <!-- BADGE DE CATEGORIA ATIVA COM BOTÃO DE LIMPAR (VOLTAR A TODOS) -->
+          <div id="categoryActiveBadge" class="hidden items-center gap-1.5 bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold shadow-2xs">
+            <span id="categoryBadgeLabel">Gastronomia</span>
+            <button type="button" onclick="setCategory('all')" class="hover:text-rose-700 text-emerald-800 font-black cursor-pointer text-xs ml-0.5" title="Ver todos os estabelecimentos">✕</button>
+          </div>
+
           <!-- BADGE DE BUSCA ATIVA COM BOTÃO DE LIMPAR -->
           <div id="searchActiveBadge" class="hidden items-center gap-1.5 bg-emerald-100/90 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
             <span>Buscando: <b id="searchBadgeText"></b></span>
@@ -1537,6 +1513,84 @@
       if (e.key === 'Escape') closeLightbox();
     });
 
+    // MAPEAMENTO DE MACRO-CATEGORIAS (4 GRUPOS CONSOLIDADOS)
+    const MACRO_CATEGORY_MAP = {
+      // 1. Gastronomia (Lanches, Pizzas, Bolos, Marmitas, Bebidas)
+      'gastronomia': 'gastronomia',
+      'delivery': 'gastronomia',
+      'bolos': 'gastronomia',
+      'lanches': 'gastronomia',
+      'restaurante': 'gastronomia',
+      'pizzaria': 'gastronomia',
+      'hamburguer': 'gastronomia',
+      'acai': 'gastronomia',
+      'doces': 'gastronomia',
+
+      // 2. Compras (Roupas, Calçados, Joias, Artigos do Lar, Mercadinhos)
+      'compras': 'compras',
+      'roupas': 'compras',
+      'joias': 'compras',
+      'utilidades': 'compras',
+      'moda': 'compras',
+      'lojas': 'compras',
+      'moveis': 'compras',
+      'calcados': 'compras',
+      'acessorios': 'compras',
+      'mercadinho': 'compras',
+
+      // 3. Serviços & Beleza (Salão, Barbearia, Fretes, Lava Jato, Gás)
+      'servicos': 'servicos',
+      'beleza': 'servicos',
+      'barbearia': 'servicos',
+      'salao': 'servicos',
+      'fretes': 'servicos',
+      'transporte': 'servicos',
+      'mecanica': 'servicos',
+      'lavajato': 'servicos',
+      'estetica': 'servicos',
+
+      // 4. Saúde & Bem-Estar (Farmácias, Clínicas, Dentistas, Treinos)
+      'saude': 'saude',
+      'farmacia': 'saude',
+      'drogaria': 'saude',
+      'clinica': 'saude',
+      'dentista': 'saude',
+      'medico': 'saude',
+      'fitness': 'saude',
+      'treino': 'saude',
+      'academia': 'saude'
+    };
+
+    const MACRO_NAMES = {
+      'gastronomia': '🍴 Gastronomia',
+      'compras': '🛍️ Compras',
+      'servicos': '✂️ Serviços & Beleza',
+      'saude': '🩺 Saúde & Bem-Estar'
+    };
+
+    function matchesMacroCategory(store, targetCat) {
+      if (!targetCat || targetCat === 'all') return true;
+      const rawCat = (store.categoria || '').toLowerCase().trim();
+      const mapped = MACRO_CATEGORY_MAP[rawCat] || rawCat;
+      if (mapped === targetCat) return true;
+
+      // Fallback semântico por palavras-chave se cadastrado com categoria customizada
+      const searchable = `${store.nome || ''} ${store.descricao || ''} ${store.keywords || ''}`.toLowerCase();
+      if (targetCat === 'gastronomia') {
+        return /\b(pizza|lanche|burguer|burger|hamburguer|bolo|doce|confeitaria|acai|açaí|marmita|restaurante|petiscaria|sanduba|grill|delivery)\b/i.test(searchable);
+      }
+      if (targetCat === 'compras') {
+        return /\b(roupa|calcado|calçado|joia|joalheria|semijoia|bijuteria|relogio|acessorio|acessório|moda|casa|lar|moveis|móveis|variedades|mercadinho|mercado|compras)\b/i.test(searchable);
+      }
+      if (targetCat === 'servicos') {
+        return /\b(salao|salão|barba|barbearia|hair|makeup|cabelo|estetica|estética|frete|mudanca|mudança|carreto|lava jato|mecanica|mecânica|eletricista|gas|gás|agua|água|servico|serviço)\b/i.test(searchable);
+      }
+      if (targetCat === 'saude') {
+        return /\b(farmacia|farmácia|drogaria|saude|saúde|clinica|clínica|dentista|medico|médico|laboratorio|laboratório|otica|ótica|cross|treino|academia|fitness|ambulancia|ambulância)\b/i.test(searchable);
+      }
+      return false;
+    }
+
     function renderStores() {
       try {
         const rawStores = getStores();
@@ -1556,7 +1610,7 @@
             (store.keywords && (store.keywords.includes('[STATUS:pendente]') || store.keywords.includes('[STATUS:rascunho]')));
           if (isPending) return false;
 
-          const matchCat = (currentCategory === 'all' || store.categoria === currentCategory);
+          const matchCat = matchesMacroCategory(store, currentCategory);
           const matchBairro = (currentBairro === 'all' || store.bairro === currentBairro);
           
           const searchable = `${store.nome || ''} ${store.descricao || ''} ${store.keywords || ''} ${store.bairro || ''} ${store.endereco || ''} ${store.instagram || ''}`.toLowerCase();
@@ -1753,18 +1807,9 @@
       }
     }
 
-    // FILTRO DE CATEGORIAS (PADRONIZAÇÃO UNIFORME DE CORES)
-    // FILTRO DE CATEGORIAS (PADRONIZAÇÃO UNIFORME DE CORES & SQUIRCLE SYNC)
+    // FILTRO DE CATEGORIAS (4 MACRO-CATEGORIAS INTEGRADAS)
     function setCategory(cat) {
       currentCategory = cat;
-      // Atualiza botões deslizantes horizontais
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        if (btn.getAttribute('data-cat') === cat) {
-          btn.className = 'cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white border border-emerald-700 shadow-xs transition shrink-0 flex items-center gap-1.5';
-        } else {
-          btn.className = 'cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 shadow-xs transition shrink-0 flex items-center gap-1.5';
-        }
-      });
 
       // Atualiza botões squircle de destaque (Estilo Localook)
       document.querySelectorAll('.quick-cat-btn').forEach(btn => {
@@ -1773,14 +1818,28 @@
         const label = btn.querySelector('.quick-cat-label');
         if (iconBox) {
           if (qCat === cat) {
-            iconBox.className = 'quick-cat-icon w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-600 ring-4 ring-emerald-100 text-white flex items-center justify-center shadow-md transition scale-105';
-            if (label) label.className = 'quick-cat-label text-[11px] sm:text-xs font-black text-emerald-800 leading-tight';
+            iconBox.className = 'quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-emerald-600 ring-4 ring-emerald-200 text-white flex items-center justify-center shadow-md transition scale-105';
+            if (label) label.className = 'quick-cat-label text-[10px] sm:text-xs font-black text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center';
           } else {
-            iconBox.className = 'quick-cat-icon w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition';
-            if (label) label.className = 'quick-cat-label text-[11px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight';
+            iconBox.className = 'quick-cat-icon w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#064e3b] text-white flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:bg-emerald-800 transition';
+            if (label) label.className = 'quick-cat-label text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-800 leading-tight h-7 sm:h-auto flex items-center justify-center';
           }
         }
       });
+
+      // Atualiza badge de categoria ativa com botão de limpar (✕)
+      const catBadge = document.getElementById('categoryActiveBadge');
+      const catLabel = document.getElementById('categoryBadgeLabel');
+      if (catBadge && catLabel) {
+        if (cat && cat !== 'all') {
+          catLabel.innerText = MACRO_NAMES[cat] || cat;
+          catBadge.classList.remove('hidden');
+          catBadge.classList.add('inline-flex');
+        } else {
+          catBadge.classList.add('hidden');
+          catBadge.classList.remove('inline-flex');
+        }
+      }
 
       renderStores();
     }
