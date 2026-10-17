@@ -444,6 +444,14 @@
           console.warn('LocalStorage error:', lsErr);
         }
 
+        // LIMPAR STATUS REVOGADO: Se o usuário havia sido excluído antes, o novo cadastro reativa o acesso
+        const cleanEmail = email.toLowerCase().trim();
+        try {
+          let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+          locRev = locRev.filter(item => item !== cleanEmail && item !== userId);
+          localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+        } catch(e) {}
+
         // 3. Criar registro inicial da loja
         const formattedPhone = whatsapp.startsWith('55') ? whatsapp : '55' + whatsapp;
         const newStoreId = String(Date.now());
@@ -468,6 +476,29 @@
 
         // Salvar no Supabase (não-bloqueante com timeout de 3s)
         if (supabaseClient) {
+          // Desbloquear usuário se constava em system_revoked_users (ex: conta teste excluída anteriormente)
+          try {
+            const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
+            if (revRow && revRow.keywords) {
+              let revoked = [];
+              try { revoked = JSON.parse(revRow.keywords || '[]'); } catch(e) {}
+              const cleanedCloud = revoked.filter(item => item !== cleanEmail && item !== userId);
+              if (cleanedCloud.length !== revoked.length) {
+                await supabaseClient.from('stores').upsert([{
+                  id: 'system_revoked_users',
+                  nome: '[SISTEMA] Usuários Revogados',
+                  categoria: 'sistema',
+                  bairro: 'Pilar Centro',
+                  endereco: 'Pilar - AL',
+                  whatsapp: '5582999999999',
+                  keywords: JSON.stringify(cleanedCloud)
+                }], { onConflict: 'id' });
+              }
+            }
+          } catch(revErr) {
+            console.warn('Limpeza de revogados no cadastro:', revErr);
+          }
+
           try {
             await Promise.race([
               supabaseClient.from('stores').insert([storePayload]),
@@ -479,7 +510,7 @@
           try {
             const userItem = {
               id: userId,
-              email: email.toLowerCase().trim(),
+              email: cleanEmail,
               nome: name,
               store_name: storeName,
               whatsapp: formattedPhone,
@@ -489,18 +520,21 @@
             const { data: regRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_registered_users').maybeSingle();
             let currentUsers = [];
             try { currentUsers = JSON.parse(regRow?.keywords || '[]'); } catch(e) {}
-            if (!currentUsers.some(u => u.email === userItem.email)) {
+            const existingIdx = currentUsers.findIndex(u => u.email === userItem.email);
+            if (existingIdx >= 0) {
+              currentUsers[existingIdx] = { ...currentUsers[existingIdx], ...userItem };
+            } else {
               currentUsers.unshift(userItem);
-              await supabaseClient.from('stores').upsert([{
-                id: 'system_registered_users',
-                nome: '[SISTEMA] Registro de Usuários',
-                categoria: 'sistema',
-                bairro: 'Pilar Centro',
-                endereco: 'Pilar - AL',
-                whatsapp: '5582999999999',
-                keywords: JSON.stringify(currentUsers)
-              }], { onConflict: 'id' });
             }
+            await supabaseClient.from('stores').upsert([{
+              id: 'system_registered_users',
+              nome: '[SISTEMA] Registro de Usuários',
+              categoria: 'sistema',
+              bairro: 'Pilar Centro',
+              endereco: 'Pilar - AL',
+              whatsapp: '5582999999999',
+              keywords: JSON.stringify(currentUsers)
+            }], { onConflict: 'id' });
           } catch(sysErr) {
             console.warn('Registro de usuário no sistema:', sysErr);
           }

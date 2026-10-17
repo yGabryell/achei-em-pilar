@@ -1564,6 +1564,31 @@
       // Sincronizar via Vercel API se token de admin estiver ativo
       await sendStoreToCloud(store);
 
+      // Se a loja pertence a um lojista online, garantir que seu e-mail não esteja revogado
+      const ownerEmailMatch = (store.keywords || '').match(/\[EMAIL:(.*?)\]/i);
+      const ownerEmail = ownerEmailMatch ? ownerEmailMatch[1].toLowerCase().trim() : '';
+      if (ownerEmail && supabaseClient) {
+        try {
+          const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
+          if (revRow && revRow.keywords) {
+            let revoked = [];
+            try { revoked = JSON.parse(revRow.keywords || '[]'); } catch(e) {}
+            const cleaned = revoked.filter(item => item !== ownerEmail);
+            if (cleaned.length !== revoked.length) {
+              await supabaseClient.from('stores').upsert([{
+                id: 'system_revoked_users',
+                nome: '[SISTEMA] Usuários Revogados',
+                categoria: 'sistema',
+                bairro: 'Pilar Centro',
+                endereco: 'Pilar - AL',
+                whatsapp: '5582999999999',
+                keywords: JSON.stringify(cleaned)
+              }], { onConflict: 'id' });
+            }
+          }
+        } catch(e) {}
+      }
+
       showToast(`O negócio "${nome || store.nome}" foi aprovado e agora está publicado no guia!`, 'success');
     }
 

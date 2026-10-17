@@ -700,26 +700,95 @@
       // Verificar se este usuário foi revogado/excluído pelo Administrador
       try {
         const myEmail = (currentUser.email || '').toLowerCase().trim();
-        const myUid = currentUser.id;
-        const localRevoked = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
-        if (localRevoked.includes(myEmail) || (myUid && localRevoked.includes(myUid))) {
-          localStorage.removeItem('pilar_current_merchant');
-          localStorage.removeItem('pilar_my_store_id');
-          alert('Esta conta de lojista foi desativada pelo Administrador.');
-          window.location.href = 'entrar.html';
-          return;
-        }
+        const myUid = currentUser.id ? String(currentUser.id).trim() : '';
+
+        let isRegisteredActive = false;
+        let cloudRevoked = [];
 
         if (supabaseClient) {
-          const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
-          let cloudRevoked = [];
-          try { cloudRevoked = JSON.parse(revRow?.keywords || '[]'); } catch(e) {}
+          try {
+            // Buscar em paralelo status do usuário em system_registered_users e system_revoked_users
+            const [revRes, regRes] = await Promise.all([
+              supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle(),
+              supabaseClient.from('stores').select('keywords').eq('id', 'system_registered_users').maybeSingle()
+            ]);
+
+            try { cloudRevoked = JSON.parse(revRes?.data?.keywords || '[]'); } catch(e) {}
+            
+            let regUsers = [];
+            try { regUsers = JSON.parse(regRes?.data?.keywords || '[]'); } catch(e) {}
+            
+            if (regUsers.some(u => (u.email || '').toLowerCase().trim() === myEmail || (myUid && String(u.id) === myUid))) {
+              isRegisteredActive = true;
+            }
+          } catch(fetchErr) {
+            console.warn('Erro ao consultar listas de controle:', fetchErr);
+          }
+        }
+
+        // Se o usuário está cadastrado ativamente, ele NUNCA deve ser bloqueado por histórico antigo de exclusão
+        if (isRegisteredActive) {
+          // Limpar da lista local se estivesse lá
+          try {
+            let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+            locRev = locRev.filter(item => item !== myEmail && item !== myUid);
+            localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+          } catch(e) {}
+
+          // Se ainda constava no cloudRevoked, remove silenciosamente
           if (cloudRevoked.includes(myEmail) || (myUid && cloudRevoked.includes(myUid))) {
-            localStorage.removeItem('pilar_current_merchant');
-            localStorage.removeItem('pilar_my_store_id');
-            alert('Esta conta de lojista foi desativada pelo Administrador.');
-            window.location.href = 'entrar.html';
-            return;
+            const cleanedCloud = cloudRevoked.filter(item => item !== myEmail && item !== myUid);
+            try {
+              await supabaseClient.from('stores').upsert([{
+                id: 'system_revoked_users',
+                nome: '[SISTEMA] Usuários Revogados',
+                categoria: 'sistema',
+                bairro: 'Pilar Centro',
+                endereco: 'Pilar - AL',
+                whatsapp: '5582999999999',
+                keywords: JSON.stringify(cleanedCloud)
+              }], { onConflict: 'id' });
+            } catch(e) {}
+          }
+        } else {
+          // Se não foi encontrado explicitamente no registro, checar se ele possui alguma loja (ativa ou pendente)
+          let hasAnyStore = false;
+          if (supabaseClient) {
+            try {
+              const { data: userStores } = await supabaseClient
+                .from('stores')
+                .select('id')
+                .or(`keywords.ilike.%[EMAIL:${myEmail}]%,keywords.ilike.%[OWNER:${myUid}]%`)
+                .limit(1);
+              if (Array.isArray(userStores) && userStores.length > 0) {
+                hasAnyStore = true;
+              }
+            } catch(e) {}
+          }
+
+          if (hasAnyStore) {
+            // Tem loja associada a ele, portanto não deve ser bloqueado
+            try {
+              let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+              locRev = locRev.filter(item => item !== myEmail && item !== myUid);
+              localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+            } catch(e) {}
+          } else {
+            // Realmente foi revogado/excluído pelo Administrador
+            const localRevoked = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+            const isRevoked = (cloudRevoked.includes(myEmail) || (myUid && cloudRevoked.includes(myUid))) ||
+                              (localRevoked.includes(myEmail) || (myUid && localRevoked.includes(myUid)));
+
+            if (isRevoked) {
+              const loading = document.getElementById('loadingOverlay');
+              if (loading) loading.classList.add('hidden');
+
+              localStorage.removeItem('pilar_current_merchant');
+              localStorage.removeItem('pilar_my_store_id');
+              alert('Esta conta de lojista foi desativada pelo Administrador.');
+              window.location.href = 'entrar.html';
+              return;
+            }
           }
         }
       } catch(revErr) {}
@@ -863,11 +932,15 @@
         }
       } catch(syncErr) {}
 
-      populateForm(store);
-
-      // Ocultar tela de loading
-      const loading = document.getElementById('loadingOverlay');
-      if (loading) loading.classList.add('hidden');
+      try {
+        populateForm(store);
+      } catch(popErr) {
+        console.error('Erro ao preencher formulário:', popErr);
+      } finally {
+        // Ocultar tela de loading
+        const loading = document.getElementById('loadingOverlay');
+        if (loading) loading.classList.add('hidden');
+      }
 
       // Se veio da tela de boas-vindas / cadastro, rolar suavemente para o aviso
       if (window.location.search.includes('origem=cadastro')) {

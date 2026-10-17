@@ -430,15 +430,43 @@
         // Checar se o usuário foi desativado/revogado pelo Administrador
         if (supabaseClient) {
           try {
+            const cleanEmail = email.toLowerCase().trim();
             const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
             let cloudRevoked = [];
             try { cloudRevoked = JSON.parse(revRow?.keywords || '[]'); } catch(e) {}
-            if (cloudRevoked.includes(email.toLowerCase().trim())) {
-              showAlert('Esta conta de lojista foi desativada pelo Administrador.');
-              btn.disabled = false;
-              btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> <span>Entrar no Painel</span>`;
-              safeCreateIcons();
-              return;
+            if (cloudRevoked.includes(cleanEmail)) {
+              // Antes de bloquear, verificar se o lojista foi re-cadastrado no sistema (system_registered_users)
+              const { data: regRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_registered_users').maybeSingle();
+              let regUsers = [];
+              try { regUsers = JSON.parse(regRow?.keywords || '[]'); } catch(e) {}
+              const isRegistered = regUsers.some(u => (u.email || '').toLowerCase().trim() === cleanEmail);
+
+              if (isRegistered) {
+                // Usuário foi recadastrado! Remover do cloudRevoked e permitir login
+                const cleanedCloud = cloudRevoked.filter(item => item !== cleanEmail);
+                try {
+                  await supabaseClient.from('stores').upsert([{
+                    id: 'system_revoked_users',
+                    nome: '[SISTEMA] Usuários Revogados',
+                    categoria: 'sistema',
+                    bairro: 'Pilar Centro',
+                    endereco: 'Pilar - AL',
+                    whatsapp: '5582999999999',
+                    keywords: JSON.stringify(cleanedCloud)
+                  }], { onConflict: 'id' });
+                } catch(e) {}
+                try {
+                  let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+                  locRev = locRev.filter(item => item !== cleanEmail);
+                  localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+                } catch(e) {}
+              } else {
+                showAlert('Esta conta de lojista foi desativada pelo Administrador.');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> <span>Entrar no Painel</span>`;
+                safeCreateIcons();
+                return;
+              }
             }
           } catch(revErr) {}
         }
@@ -458,6 +486,13 @@
             user_metadata: userMeta
           };
           localStorage.setItem('pilar_current_merchant', JSON.stringify(merchantUser));
+
+          // Limpar qualquer rastro local de revogação antiga
+          try {
+            let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+            locRev = locRev.filter(item => item !== email.toLowerCase().trim() && item !== user.id);
+            localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+          } catch(e) {}
 
           // Tentar obter id da loja
           if (supabaseClient) {
