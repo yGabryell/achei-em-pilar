@@ -138,17 +138,52 @@
         </div>
       </div>
 
-      <!-- BARRA DE BUSCA BRANCA EMBUTIDA (PROTAGONISTA COM ALTO CONTRASTE) -->
-      <div class="relative">
-        <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+      <!-- BARRA DE BUSCA BRANCA EMBUTIDA (PROTAGONISTA COM ALTO CONTRASTE & AÇÕES RÁPIDAS) -->
+      <form id="searchForm" onsubmit="handleSearchSubmit(event)" class="relative flex items-center w-full transition-all duration-200 rounded-2xl">
+        <label for="searchInput" class="sr-only">Pesquisar comércios em Pilar</label>
+
+        <!-- Ícone da Lupa na Esquerda -->
+        <div id="searchIconWrapper" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform duration-200">
+          <svg id="searchIconSvg" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+
         <input 
-          type="text" 
+          type="search" 
           id="searchInput" 
-          onkeyup="applyFilters()" 
-          placeholder="O que você procura?" 
-          class="w-full bg-white text-slate-800 placeholder-slate-400 rounded-2xl pl-12 pr-4 py-3.5 text-sm sm:text-base font-semibold shadow-lg shadow-emerald-950/25 focus:outline-none focus:ring-4 focus:ring-emerald-300/40 border-0 transition"
+          oninput="handleSearchInput(event)" 
+          onkeydown="handleSearchKeyDown(event)" 
+          placeholder="O que você procura? (ex: Pizza, Farmácia, Roupa)" 
+          enterkeyhint="search"
+          autocomplete="off"
+          class="w-full bg-white text-slate-900 placeholder-slate-400 rounded-2xl pl-11 sm:pl-12 pr-28 sm:pr-32 py-3.5 text-sm sm:text-base font-semibold shadow-lg shadow-emerald-950/25 focus:outline-none focus:ring-4 focus:ring-emerald-300/60 border-2 border-transparent focus:border-emerald-500 transition"
         >
-      </div>
+
+        <!-- Ações do Lado Direito: Botão Limpar (X) e Botão 'Buscar' -->
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+          <!-- Botão Limpar (X) -->
+          <button 
+            type="button" 
+            id="searchClearBtn" 
+            onclick="clearSearch()" 
+            class="hidden w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition active:scale-90 cursor-pointer"
+            title="Limpar pesquisa"
+            aria-label="Limpar pesquisa"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+
+          <!-- Botão Ativo de Buscar -->
+          <button 
+            type="submit" 
+            id="searchSubmitBtn" 
+            class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-3 sm:px-3.5 py-2 rounded-xl shadow-xs transition cursor-pointer select-none"
+            title="Buscar agora"
+          >
+            <span>Buscar</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </form>
 
     </div>
   </header>
@@ -252,10 +287,17 @@
     </div>
 
     <!-- ================= TÍTULO DA SEÇÃO & CONTADOR (ESTILO LOCALOOK) ================= -->
-    <div class="mt-4 flex items-center justify-between px-1">
+    <div id="storesSection" class="mt-4 flex items-center justify-between px-1 scroll-mt-24">
       <div>
         <h2 class="font-heading font-black text-base sm:text-lg text-slate-900 leading-tight">Destaques perto de você</h2>
-        <p class="text-[11px] text-slate-500 font-medium" id="resultsCount">Carregando estabelecimentos...</p>
+        <div class="flex items-center gap-2 mt-0.5">
+          <p class="text-[11px] text-slate-500 font-medium" id="resultsCount">Carregando estabelecimentos...</p>
+          <!-- BADGE DE BUSCA ATIVA COM BOTÃO DE LIMPAR -->
+          <div id="searchActiveBadge" class="hidden items-center gap-1.5 bg-emerald-100/90 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
+            <span>Buscando: <b id="searchBadgeText"></b></span>
+            <button type="button" onclick="clearSearch()" class="hover:text-rose-700 text-emerald-800 font-black cursor-pointer text-xs ml-0.5" title="Limpar busca">✕</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -265,14 +307,31 @@
     </div>
 
     <!-- SE NENHUM RESULTADO FOR ENCONTRADO -->
-    <div id="noResults" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 mt-4 p-6">
-      <i data-lucide="search-x" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
-      <h3 class="font-bold text-slate-700 text-sm">Nenhum estabelecimento encontrado com esse termo</h3>
-      <p class="text-xs text-slate-400 mt-1">Conhece algum comércio que não está aqui? Crie sua conta e anuncie gratuitamente!</p>
-      <a href="cadastrar.html" class="mt-4 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
-        <i data-lucide="plus-circle" class="w-4 h-4"></i>
-        <span>Cadastrar Comércio no Guia</span>
-      </a>
+    <div id="noResults" class="hidden text-center py-10 bg-white rounded-2xl border border-slate-200 mt-4 p-6 shadow-xs">
+      <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-sm sm:text-base">Nenhum estabelecimento encontrado</h3>
+      <p id="noResultsQuery" class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Não encontramos nada correspondente à sua busca. Tente buscar por outros termos ou categorias.</p>
+
+      <!-- SUGESTÕES RÁPIDAS DE BUSCA -->
+      <div class="mt-4 pt-3 border-t border-slate-100">
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Buscas populares em Pilar:</p>
+        <div class="flex flex-wrap items-center justify-center gap-1.5 max-w-sm mx-auto">
+          <button type="button" onclick="quickSearchTag('Pizza')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">🍕 Pizza</button>
+          <button type="button" onclick="quickSearchTag('Açaí')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">🍧 Açaí</button>
+          <button type="button" onclick="quickSearchTag('Farmácia')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">💊 Farmácia</button>
+          <button type="button" onclick="quickSearchTag('Moda')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">👗 Roupas</button>
+          <button type="button" onclick="clearSearch()" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold transition cursor-pointer">✨ Ver Todos</button>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <a href="cadastrar.html" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          <span>Cadastrar Comércio no Guia</span>
+        </a>
+      </div>
     </div>
   </main>
 
@@ -1513,14 +1572,48 @@
         });
 
         const countEl = document.getElementById('resultsCount');
-        if (countEl) {
-          countEl.innerText = filtered.length === 1 
-            ? '1 estabelecimento encontrado' 
-            : `${filtered.length} estabelecimentos encontrados`;
+        const badgeEl = document.getElementById('searchActiveBadge');
+        const badgeText = document.getElementById('searchBadgeText');
+        const clearBtn = document.getElementById('searchClearBtn');
+
+        if (clearBtn) {
+          clearBtn.classList.toggle('hidden', !query);
         }
+
+        if (countEl) {
+          if (query) {
+            countEl.innerHTML = filtered.length === 1 
+              ? `1 resultado para <b class="text-emerald-800">"${escapeHtml(query)}"</b>` 
+              : `${filtered.length} resultados para <b class="text-emerald-800">"${escapeHtml(query)}"</b>`;
+          } else {
+            countEl.innerText = filtered.length === 1 
+              ? '1 estabelecimento encontrado' 
+              : `${filtered.length} estabelecimentos encontrados`;
+          }
+        }
+
+        if (badgeEl && badgeText) {
+          if (query) {
+            badgeText.innerText = `"${query}"`;
+            badgeEl.classList.remove('hidden');
+            badgeEl.classList.add('inline-flex');
+          } else {
+            badgeEl.classList.add('hidden');
+            badgeEl.classList.remove('inline-flex');
+          }
+        }
+
         const noResultsEl = document.getElementById('noResults');
         if (noResultsEl) {
           noResultsEl.classList.toggle('hidden', filtered.length > 0);
+          const noQueryEl = document.getElementById('noResultsQuery');
+          if (noQueryEl) {
+            if (query) {
+              noQueryEl.innerHTML = `Não encontramos nenhum resultado para <b class="text-slate-800">"${escapeHtml(query)}"</b>. Tente outro termo ou explore as opções sugeridas.`;
+            } else {
+              noQueryEl.innerText = 'Não encontramos estabelecimentos nesta categoria ou bairro.';
+            }
+          }
         }
 
         grid.innerHTML = filtered.map(store => {
@@ -1747,6 +1840,91 @@
 
     function applyFilters() {
       renderStores();
+    }
+
+    // ================= CONTROLE INTERATIVO DO PESQUISADOR (FEEDBACK VISUAL & ENTER) =================
+    function handleSearchInput(e) {
+      const input = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn && input) {
+        clearBtn.classList.toggle('hidden', !input.value.trim());
+      }
+      applyFilters();
+    }
+
+    function handleSearchKeyDown(e) {
+      if (e.key === 'Enter') {
+        handleSearchSubmit(e);
+      }
+    }
+
+    function handleSearchSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('searchInput');
+      if (!input) return;
+      const query = (input.value || '').trim();
+
+      // Vibração sutil em aparelhos móveis
+      try {
+        if (navigator.vibrate) navigator.vibrate(25);
+      } catch(ex) {}
+
+      // Fechar teclado virtual no celular para dar visão completa dos resultados
+      input.blur();
+
+      // Feedback tátil/visual imediato no botão de Buscar
+      const btn = document.getElementById('searchSubmitBtn');
+      if (btn) {
+        btn.classList.add('scale-90', 'bg-emerald-800');
+        setTimeout(() => {
+          btn.classList.remove('scale-90', 'bg-emerald-800');
+        }, 180);
+      }
+
+      // Efeito de pulso luminoso na barra de busca confirmando a ação
+      const form = document.getElementById('searchForm');
+      if (form) {
+        form.classList.add('ring-4', 'ring-emerald-400');
+        setTimeout(() => {
+          form.classList.remove('ring-4', 'ring-emerald-400');
+        }, 350);
+      }
+
+      // Executa a filtragem
+      applyFilters();
+
+      // Rola a página suavemente para a seção de resultados
+      const target = document.getElementById('storesSection') || document.getElementById('storesGrid');
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        const offset = window.pageYOffset + rect.top - 75;
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+      }
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      if (clearBtn) {
+        clearBtn.classList.add('hidden');
+      }
+      applyFilters();
+    }
+
+    function quickSearchTag(term) {
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.value = term;
+      }
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) {
+        clearBtn.classList.remove('hidden');
+      }
+      handleSearchSubmit();
     }
 
     // ================= PÁGINA DEDICADA DA LOJA =================
@@ -2902,6 +3080,8 @@ ${details}
           const searchInput = document.getElementById('searchInput');
           if (searchInput) {
             searchInput.value = searchParam;
+            const clearBtn = document.getElementById('searchClearBtn');
+            if (clearBtn) clearBtn.classList.remove('hidden');
             applyFilters();
           }
         }
