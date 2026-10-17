@@ -864,23 +864,9 @@
       safeCreateIcons();
     }
 
-    // PREENCHER FORMULÁRIO COM DADOS DA LOJA
-    function populateForm(store) {
+    // VERIFICAR E ATUALIZAR STATUS VISUAL DO ESTABELECIMENTO
+    function checkStoreStatus(store) {
       if (!store) return;
-
-      document.getElementById('storeNome').value = store.nome || '';
-      document.getElementById('storeCategoria').value = store.categoria || 'delivery';
-      document.getElementById('storeBairro').value = store.bairro || 'Chã do Pilar';
-      document.getElementById('storeEndereco').value = store.endereco || '';
-      document.getElementById('storeWhatsapp').value = store.whatsapp || '';
-      document.getElementById('storeInstagram').value = (store.instagram || '').replace(/^@/, '');
-      document.getElementById('storeSite').value = store.site || '';
-      document.getElementById('storeMaps').value = store.maps_url || '';
-      document.getElementById('storeHorario').value = store.horario || '';
-      document.getElementById('storeDescricao').value = store.descricao || '';
-      document.getElementById('storeLogo').value = store.logo || '';
-
-      // Status do Comércio (Análise vs Ativo)
       const kw = store.keywords || '';
       const isPending = kw.includes('[STATUS:pendente]') || kw.includes('[STATUS:rascunho]') || store.status === 'pendente' || store.status === 'rascunho';
 
@@ -909,6 +895,27 @@
       if (liveBtn) {
         liveBtn.href = `index.html?busca=${encodeURIComponent(store.nome || '')}`;
       }
+    }
+
+    // PREENCHER FORMULÁRIO COM DADOS DA LOJA
+    function populateForm(store) {
+      if (!store) return;
+      currentStore = store;
+
+      document.getElementById('storeNome').value = store.nome || '';
+      document.getElementById('storeCategoria').value = store.categoria || 'delivery';
+      document.getElementById('storeBairro').value = store.bairro || 'Chã do Pilar';
+      document.getElementById('storeEndereco').value = store.endereco || '';
+      document.getElementById('storeWhatsapp').value = store.whatsapp || '';
+      document.getElementById('storeInstagram').value = (store.instagram || '').replace(/^@/, '');
+      document.getElementById('storeSite').value = store.site || '';
+      document.getElementById('storeMaps').value = store.maps_url || '';
+      document.getElementById('storeHorario').value = store.horario || '';
+      document.getElementById('storeDescricao').value = store.descricao || '';
+      document.getElementById('storeLogo').value = store.logo || '';
+
+      // Status do Comércio (Análise vs Ativo)
+      checkStoreStatus(store);
 
       // Logo & Galeria
       updateLogoPreview();
@@ -975,15 +982,17 @@
         };
 
         if (supabaseClient) {
-          const { error } = await supabaseClient
+          let { error: saveErr } = await supabaseClient
             .from('stores')
             .upsert([fullStorePayload], { onConflict: 'id' });
 
-          if (error) {
-            console.warn('Upsert falhou, tentando update/insert direto:', error);
-            const { error: upErr } = await supabaseClient.from('stores').update(updatePayload).eq('id', storeIdToSave);
-            if (upErr) {
-              await supabaseClient.from('stores').insert([fullStorePayload]);
+          if (saveErr) {
+            console.warn('Upsert falhou, tentando insert direto:', saveErr);
+            const { error: insErr } = await supabaseClient.from('stores').insert([fullStorePayload]);
+            if (insErr) {
+              console.warn('Insert falhou, tentando update:', insErr);
+              const { error: upErr } = await supabaseClient.from('stores').update(updatePayload).eq('id', storeIdToSave);
+              if (upErr) throw upErr;
             }
           }
         }
