@@ -1,6 +1,19 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "achei-em-pilar.vercel.app"
+        }
+      ],
+      "destination": "https://www.acheiempilar.com.br/:path*",
+      "permanent": true
+    }
+  ],
   "functions": {
     "api/loja.js": {
       "includeFiles": "loja-app.html"
