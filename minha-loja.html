@@ -443,8 +443,12 @@
     // LOGOUT
     async function handleLogout() {
       if (supabase) {
-        await supabase.auth.signOut();
+        try {
+          await supabase.auth.signOut();
+        } catch(e) {}
       }
+      localStorage.removeItem('pilar_current_merchant');
+      localStorage.removeItem('pilar_my_store_id');
       window.location.href = 'entrar.html';
     }
 
@@ -588,42 +592,65 @@
       return cleanKw;
     }
 
-    // CARREGAR DADOS DO SUPABASE
+    // CARREGAR DADOS DO SUPABASE E SESSÃO DO LOJISTA
     async function initMerchantDashboard() {
-      if (!supabase) return;
+      currentUser = null;
 
-      const { data: authData } = await supabase.auth.getSession();
-      if (!authData || !authData.session) {
+      // 1. Tentar obter sessão oficial do Supabase Auth
+      if (supabase) {
+        try {
+          const { data: authData } = await supabase.auth.getSession();
+          if (authData && authData.session && authData.session.user) {
+            currentUser = authData.session.user;
+          }
+        } catch(e) {
+          console.warn('Erro getSession:', e);
+        }
+      }
+
+      // 2. Fallback resiliente: sessão de lojista salva no navegador
+      if (!currentUser) {
+        try {
+          const localMerchant = localStorage.getItem('pilar_current_merchant');
+          if (localMerchant) {
+            currentUser = JSON.parse(localMerchant);
+          }
+        } catch(e) {}
+      }
+
+      // Se não houver nenhum login ou sessão local, redireciona para entrar.html
+      if (!currentUser) {
         window.location.href = 'entrar.html';
         return;
       }
 
-      currentUser = authData.session.user;
       const userMeta = currentUser.user_metadata || {};
       const greeting = document.getElementById('merchantGreeting');
       const emailText = document.getElementById('merchantEmail');
       
-      greeting.innerText = `Olá, ${userMeta.full_name || 'Lojista'}!`;
-      emailText.innerText = currentUser.email;
+      if (greeting) greeting.innerText = `Olá, ${userMeta.full_name || userMeta.store_name || 'Lojista'}!`;
+      if (emailText) emailText.innerText = currentUser.email || 'lojista@acheiempilar.com.br';
 
-      // 1. Buscar loja associada ao owner_id deste usuário
       let store = null;
-      try {
-        const { data: ownerStores, error } = await supabase
-          .from('stores')
-          .select('*')
-          .eq('owner_id', currentUser.id)
-          .limit(1);
 
-        if (!error && Array.isArray(ownerStores) && ownerStores.length > 0) {
-          store = ownerStores[0];
-        }
-      } catch(e) {
-        console.warn('Erro ao consultar por owner_id:', e);
+      // 0. Buscar por ID de loja salvo no cadastro recente
+      const savedStoreId = localStorage.getItem('pilar_my_store_id');
+      if (savedStoreId && supabase) {
+        try {
+          const { data: idStores } = await supabase
+            .from('stores')
+            .select('*')
+            .eq('id', savedStoreId)
+            .limit(1);
+
+          if (Array.isArray(idStores) && idStores.length > 0) {
+            store = idStores[0];
+          }
+        } catch(e) {}
       }
 
-      // 1.1 Se não encontrou por coluna owner_id, tentar buscar por tag no keywords
-      if (!store) {
+      // 1. Buscar loja associada ao keywords com tag [OWNER:id]
+      if (!store && supabase && currentUser.id) {
         try {
           const { data: kwStores } = await supabase
             .from('stores')
@@ -637,8 +664,23 @@
         } catch(e) {}
       }
 
-      // 2. Se não encontrou por owner_id, verificar se bate com o WhatsApp informado no cadastro
-      if (!store && userMeta.whatsapp) {
+      // 1.1 Buscar loja por tag [EMAIL:email]
+      if (!store && supabase && currentUser.email) {
+        try {
+          const { data: emailStores } = await supabase
+            .from('stores')
+            .select('*')
+            .ilike('keywords', `%[EMAIL:${currentUser.email.toLowerCase()}]%`)
+            .limit(1);
+
+          if (Array.isArray(emailStores) && emailStores.length > 0) {
+            store = emailStores[0];
+          }
+        } catch(e) {}
+      }
+
+      // 2. Se não encontrou, verificar se bate com o WhatsApp informado no cadastro
+      if (!store && userMeta.whatsapp && supabase) {
         try {
           const cleanZap = userMeta.whatsapp.replace(/\D/g, '');
           const { data: zapStores } = await supabase
@@ -649,12 +691,29 @@
 
           if (Array.isArray(zapStores) && zapStores.length > 0) {
             store = zapStores[0];
-            // Vincular imediatamente ao owner_id deste usuário
+            const kw = (store.keywords || '') + `\n[OWNER:${currentUser.id}]` + (currentUser.email ? `\n[EMAIL:${currentUser.email.toLowerCase()}]` : '');
             try {
-              await supabase.from('stores').update({ owner_id: currentUser.id }).eq('id', store.id);
-            } catch(linkErr) {
-              const kw = (store.keywords || '') + `\n[OWNER:${currentUser.id}]`;
               await supabase.from('stores').update({ keywords: kw }).eq('id', store.id);
+            } catch(linkErr) {}
+          }
+        } catch(e) {}
+      }
+
+      // 2.1 Verificar fallback em pilar_stores local se não achou no Supabase
+      if (!store) {
+        try {
+          const rawLocal = localStorage.getItem('pilar_stores');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            if (savedStoreId) {
+              store = list.find(s => String(s.id) === String(savedStoreId));
+            }
+            if (!store && currentUser.email) {
+              store = list.find(s => (s.keywords || '').toLowerCase().includes(`[email:${currentUser.email.toLowerCase()}]`));
+            }
+            if (!store && userMeta.whatsapp) {
+              const cleanZap = userMeta.whatsapp.replace(/\D/g, '');
+              store = list.find(s => (s.whatsapp || '').includes(cleanZap));
             }
           }
         } catch(e) {}
@@ -679,26 +738,15 @@
           horario: 'Segunda a Sábado',
           logo: '',
           vip: false,
-          keywords: `${storeName.toLowerCase()} pilar\n[PIN:${formattedZap.slice(-4) || '1234'}]\n[OWNER:${currentUser.id}]\n[STATUS:rascunho]`
-        };
-
-        const fullStoreData = {
-          ...baseStoreData,
-          status: 'rascunho',
-          plano: 'basico',
-          owner_id: currentUser.id
+          keywords: `${storeName.toLowerCase()} pilar\n[PIN:${formattedZap.slice(-4) || '1234'}]\n[OWNER:${currentUser.id}]\n[EMAIL:${(currentUser.email || '').toLowerCase()}]\n[STATUS:rascunho]`
         };
 
         try {
-          const { error: insErr } = await supabase.from('stores').insert([fullStoreData]);
-          if (insErr) {
-            await supabase.from('stores').insert([baseStoreData]);
-          }
-          store = fullStoreData;
+          await supabase.from('stores').insert([baseStoreData]);
         } catch(insertErr) {
           console.warn('Inserção inicial fallback:', insertErr);
-          store = baseStoreData;
         }
+        store = baseStoreData;
       }
 
       currentStore = store;
@@ -772,6 +820,9 @@
       if (!cleanKw.includes('[OWNER:')) {
         cleanKw += `\n[OWNER:${currentUser.id}]`;
       }
+      if (currentUser.email && !cleanKw.toLowerCase().includes('[email:')) {
+        cleanKw += `\n[EMAIL:${currentUser.email.toLowerCase()}]`;
+      }
 
       const updatedKeywords = packStoreFotosIntoKeywords(cleanKw, currentGallery);
 
@@ -787,7 +838,6 @@
         horario: document.getElementById('storeHorario').value.trim(),
         descricao: document.getElementById('storeDescricao').value.trim(),
         logo: document.getElementById('storeLogo').value.trim(),
-        owner_id: currentUser.id,
         keywords: updatedKeywords
       };
 
@@ -797,20 +847,26 @@
           .update(updatePayload)
           .eq('id', currentStore.id);
 
-        if (error) {
-          // Se a coluna owner_id não existir ainda no banco, tentar sem ela
-          const fallbackPayload = { ...updatePayload };
-          delete fallbackPayload.owner_id;
-          const { error: fbErr } = await supabase
-            .from('stores')
-            .update(fallbackPayload)
-            .eq('id', currentStore.id);
-          
-          if (fbErr) throw fbErr;
-        }
+        if (error) throw error;
 
         // Atualizar estado em memória
         Object.assign(currentStore, updatePayload);
+
+        // Atualizar fallback local
+        try {
+          const rawLocal = localStorage.getItem('pilar_stores');
+          if (rawLocal) {
+            let list = JSON.parse(rawLocal);
+            const idx = list.findIndex(s => String(s.id) === String(currentStore.id));
+            if (idx >= 0) {
+              list[idx] = { ...list[idx], ...updatePayload };
+            } else {
+              list.unshift(currentStore);
+            }
+            localStorage.setItem('pilar_stores', JSON.stringify(list));
+          }
+        } catch(locErr) {}
+
         showToast('Comércio atualizado com sucesso!', 'success');
 
       } catch(err) {
