@@ -105,9 +105,10 @@
         </a>
 
         <!-- BOTÃO MENU (DRAWER LATERAL) -->
-        <button onclick="toggleSideMenu()" class="shrink-0 flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition backdrop-blur-md border border-white/20 cursor-pointer shadow-2xs" aria-label="Abrir Menu">
+        <button onclick="toggleSideMenu()" class="shrink-0 flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition backdrop-blur-md border border-white/20 cursor-pointer shadow-2xs relative" aria-label="Abrir Menu">
           <i data-lucide="menu" class="w-4 h-4 text-white"></i>
           <span>Menu</span>
+          <span id="menuUserDot" class="hidden w-2 h-2 rounded-full bg-amber-400"></span>
         </button>
       </div>
 
@@ -398,9 +399,9 @@
       <!-- ITENS PRINCIPAIS -->
       <div class="p-4 space-y-2">
         
-        <!-- DESTAQUES LOJISTA: BOTÃO ÚNICO CONSOLIDADO -->
+        <!-- DESTAQUES LOJISTA: BOTÃO DINÂMICO CONSOLIDADO -->
         <div class="mb-3">
-          <a href="entrar.html" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm p-3.5 rounded-2xl transition shadow-md shadow-emerald-600/20 flex items-center gap-3 cursor-pointer text-left no-underline block">
+          <a href="entrar.html" id="drawerMerchantBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm p-3.5 rounded-2xl transition shadow-md shadow-emerald-600/20 flex items-center gap-3 cursor-pointer text-left no-underline block">
             <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
@@ -411,11 +412,17 @@
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <span class="block font-black leading-tight text-sm">Área do Lojista</span>
-              <span class="text-[11px] text-emerald-100 block font-normal">Entrar ou cadastrar sua loja</span>
+              <div class="flex items-center gap-1.5">
+                <span id="drawerMerchantTitle" class="block font-black leading-tight text-sm truncate">Área do Lojista</span>
+                <span id="drawerMerchantBadge" class="hidden text-[9px] bg-amber-400 text-emerald-950 font-black px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">Logado</span>
+              </div>
+              <span id="drawerMerchantSubtitle" class="text-[11px] text-emerald-100 block font-normal truncate">Entrar ou cadastrar sua loja</span>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </a>
+          <button id="drawerLogoutBtn" onclick="handleDrawerLogout()" class="hidden text-[11px] text-slate-400 hover:text-rose-600 font-bold px-2 py-1 transition text-right w-full mt-1 cursor-pointer">
+            Sair da conta lojista
+          </button>
         </div>
 
         <div class="h-px bg-slate-100 my-2"></div>
@@ -1953,6 +1960,96 @@
       }
     }
 
+    // ================= STATUS DINÂMICO DO LOJISTA NO DRAWER =================
+    function updateDrawerMerchantStatus() {
+      try {
+        const rawMerchant = localStorage.getItem('pilar_current_merchant');
+        const myStoreId = localStorage.getItem('pilar_my_store_id');
+        const btn = document.getElementById('drawerMerchantBtn');
+        const title = document.getElementById('drawerMerchantTitle');
+        const subtitle = document.getElementById('drawerMerchantSubtitle');
+        const badge = document.getElementById('drawerMerchantBadge');
+        const logoutBtn = document.getElementById('drawerLogoutBtn');
+        const menuDot = document.getElementById('menuUserDot');
+
+        if (!btn || !title || !subtitle) return;
+
+        if (rawMerchant) {
+          let merchant = {};
+          try {
+            merchant = JSON.parse(rawMerchant);
+          } catch(e) {}
+
+          let storeName = '';
+
+          // 1. Tentar pegar o nome da loja do user_metadata
+          if (merchant.user_metadata && merchant.user_metadata.store_name) {
+            storeName = merchant.user_metadata.store_name;
+          }
+
+          // 2. Se não tiver no metadata, buscar no banco local de lojas
+          if (!storeName) {
+            try {
+              const rawStores = localStorage.getItem('pilar_stores');
+              if (rawStores) {
+                const stores = JSON.parse(rawStores);
+                let found = null;
+                if (myStoreId) {
+                  found = stores.find(s => String(s.id) === String(myStoreId));
+                }
+                if (!found && merchant.id) {
+                  found = stores.find(s => (s.keywords || '').includes(`[OWNER:${merchant.id}]`));
+                }
+                if (!found && merchant.email) {
+                  found = stores.find(s => (s.keywords || '').toLowerCase().includes(`[email:${merchant.email.toLowerCase()}]`));
+                }
+                if (found && found.nome) {
+                  storeName = found.nome;
+                }
+              }
+            } catch(e) {}
+          }
+
+          if (!storeName) {
+            storeName = merchant.user_metadata?.full_name || 'Minha Loja';
+          }
+
+          // Atualizar botão para a loja logada
+          btn.href = 'minha-loja.html';
+          title.innerText = storeName;
+          subtitle.innerText = 'Painel do Comércio • Gerenciar';
+          if (badge) badge.classList.remove('hidden');
+          if (logoutBtn) logoutBtn.classList.remove('hidden');
+          if (menuDot) menuDot.classList.remove('hidden');
+        } else {
+          // Deslogado: estado padrão
+          btn.href = 'entrar.html';
+          title.innerText = 'Área do Lojista';
+          subtitle.innerText = 'Entrar ou cadastrar sua loja';
+          if (badge) badge.classList.add('hidden');
+          if (logoutBtn) logoutBtn.classList.add('hidden');
+          if (menuDot) menuDot.classList.add('hidden');
+        }
+      } catch(err) {
+        console.warn('Erro ao atualizar status do lojista no drawer:', err);
+      }
+    }
+
+    async function handleDrawerLogout() {
+      if (!confirm('Deseja realmente sair da sua conta de lojista neste dispositivo?')) return;
+      try {
+        if (window.supabaseClient) {
+          try { await supabaseClient.auth.signOut(); } catch(e) {}
+        }
+        localStorage.removeItem('pilar_current_merchant');
+        localStorage.removeItem('pilar_my_store_id');
+        updateDrawerMerchantStatus();
+      } catch(e) {}
+    }
+    window.handleDrawerLogout = handleDrawerLogout;
+    window.updateDrawerMerchantStatus = updateDrawerMerchantStatus;
+    window.addEventListener('storage', updateDrawerMerchantStatus);
+
     // ================= MENU LATERAL (DRAWER) & MODAIS =================
     function toggleSideMenu() {
       const drawer = document.getElementById('sideMenuDrawer');
@@ -1961,6 +2058,7 @@
 
       const isClosed = drawer.classList.contains('translate-x-full');
       if (isClosed) {
+        updateDrawerMerchantStatus();
         overlay.classList.remove('hidden');
         setTimeout(() => {
           overlay.classList.remove('opacity-0');
@@ -3091,6 +3189,9 @@ ${details}
 
         // Auto-abrir loja se houver deep link via hash (#loja=ID)
         checkUrlStoreHash();
+
+        // Atualizar status do lojista no menu lateral
+        updateDrawerMerchantStatus();
 
         if (window.lucide) lucide.createIcons();
       } catch(e) {

@@ -643,9 +643,9 @@
 
       // 0. Buscar por ID de loja salvo no cadastro recente
       const savedStoreId = localStorage.getItem('pilar_my_store_id');
-      if (savedStoreId && supabase) {
+      if (savedStoreId && supabaseClient) {
         try {
-          const { data: idStores } = await supabase
+          const { data: idStores } = await supabaseClient
             .from('stores')
             .select('*')
             .eq('id', savedStoreId)
@@ -660,7 +660,7 @@
       // 1. Buscar loja associada ao keywords com tag [OWNER:id]
       if (!store && supabaseClient && currentUser.id) {
         try {
-          const { data: kwStores } = await supabase
+          const { data: kwStores } = await supabaseClient
             .from('stores')
             .select('*')
             .ilike('keywords', `%[OWNER:${currentUser.id}]%`)
@@ -675,7 +675,7 @@
       // 1.1 Buscar loja por tag [EMAIL:email]
       if (!store && supabaseClient && currentUser.email) {
         try {
-          const { data: emailStores } = await supabase
+          const { data: emailStores } = await supabaseClient
             .from('stores')
             .select('*')
             .ilike('keywords', `%[EMAIL:${currentUser.email.toLowerCase()}]%`)
@@ -688,10 +688,10 @@
       }
 
       // 2. Se não encontrou, verificar se bate com o WhatsApp informado no cadastro
-      if (!store && userMeta.whatsapp && supabase) {
+      if (!store && userMeta.whatsapp && supabaseClient) {
         try {
           const cleanZap = userMeta.whatsapp.replace(/\D/g, '');
-          const { data: zapStores } = await supabase
+          const { data: zapStores } = await supabaseClient
             .from('stores')
             .select('*')
             .ilike('whatsapp', `%${cleanZap}%`)
@@ -755,9 +755,20 @@
           console.warn('Inserção inicial fallback:', insertErr);
         }
         store = baseStoreData;
-      }
-
       currentStore = store;
+
+      // Sincronizar nome da loja e ID no storage local para o menu lateral
+      try {
+        if (store.id) localStorage.setItem('pilar_my_store_id', String(store.id));
+        const rawM = localStorage.getItem('pilar_current_merchant');
+        if (rawM) {
+          const mObj = JSON.parse(rawM);
+          if (!mObj.user_metadata) mObj.user_metadata = {};
+          if (store.nome) mObj.user_metadata.store_name = store.nome;
+          localStorage.setItem('pilar_current_merchant', JSON.stringify(mObj));
+        }
+      } catch(syncErr) {}
+
       populateForm(store);
 
       // Ocultar tela de loading
@@ -850,7 +861,7 @@
       };
 
       try {
-        let { error } = await supabase
+        let { error } = await supabaseClient
           .from('stores')
           .update(updatePayload)
           .eq('id', currentStore.id);
@@ -860,7 +871,7 @@
         // Atualizar estado em memória
         Object.assign(currentStore, updatePayload);
 
-        // Atualizar fallback local
+        // Atualizar fallback local e metadata
         try {
           const rawLocal = localStorage.getItem('pilar_stores');
           if (rawLocal) {
@@ -872,6 +883,13 @@
               list.unshift(currentStore);
             }
             localStorage.setItem('pilar_stores', JSON.stringify(list));
+          }
+          const rawM = localStorage.getItem('pilar_current_merchant');
+          if (rawM) {
+            const mObj = JSON.parse(rawM);
+            if (!mObj.user_metadata) mObj.user_metadata = {};
+            mObj.user_metadata.store_name = updatePayload.nome;
+            localStorage.setItem('pilar_current_merchant', JSON.stringify(mObj));
           }
         } catch(locErr) {}
 
