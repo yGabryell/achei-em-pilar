@@ -3082,14 +3082,16 @@ ${details}
           }
         }
 
+        const revAuthorName = rev.author_name || rev.author || rev.nome || 'Morador(a)';
+
         return `
           <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-2xl flex items-start gap-2.5">
             <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
-              ${escapeHtml((rev.author_name || 'M').charAt(0).toUpperCase())}
+              ${escapeHtml(revAuthorName.charAt(0).toUpperCase())}
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between mb-0.5">
-                <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(rev.author_name)}</span>
+                <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(revAuthorName)}</span>
                 <span class="text-[11px] text-amber-500 shrink-0">${'⭐'.repeat(Math.max(1, Math.min(5, rev.rating || 5)))}</span>
               </div>
               <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(userComment)}</p>
@@ -3196,7 +3198,7 @@ ${details}
                   </div>
 
                   <div>
-                    <textarea id="replyText-${escapeHtml(revIdStr)}" rows="2" placeholder="Escreva sua resposta para ${escapeHtml(rev.author_name)} (concordando, opinando ou respondendo)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed resize-none"></textarea>
+                    <textarea id="replyText-${escapeHtml(revIdStr)}" rows="2" placeholder="Escreva sua resposta para ${escapeHtml(revAuthorName)} (concordando, opinando ou respondendo)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed resize-none"></textarea>
                   </div>
 
                   <div class="flex items-center justify-end gap-1.5 pt-0.5">
@@ -3232,6 +3234,7 @@ ${details}
         id: 'local_' + Date.now(),
         store_id: storeId,
         author_name,
+        author: author_name,
         rating,
         comment,
         created_at: new Date().toISOString()
