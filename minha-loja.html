@@ -121,56 +121,44 @@
       </div>
     </div>
 
-    <!-- BANNER: PREPARAÇÃO PARA PAGAMENTO PIX AUTOMÁTICO (FASE SIMACEITO) -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white p-4 sm:p-5 shadow-sm border border-emerald-800/40">
-      <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div class="space-y-0.5">
+    <!-- AVISO DE ESTABELECIMENTO EM FASE DE APROVAÇÃO -->
+    <div id="storeApprovalNotice" class="rounded-3xl bg-amber-50/90 border border-amber-200/90 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-start sm:items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0 shadow-2xs">
+          <i data-lucide="clock" class="w-6 h-6"></i>
+        </div>
+        <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <span class="bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">Novo</span>
-            <h3 class="font-extrabold text-sm text-white">Destaque VIP e Pagamento Pix</h3>
+            <span class="bg-amber-500 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">Aviso Importante</span>
+            <h2 class="font-black text-sm sm:text-base text-amber-950">Estabelecimento em Fase de Aprovação</h2>
           </div>
-          <p class="text-xs text-emerald-100/85 leading-relaxed">
-            Sua loja já tem página exclusiva! Em breve: ative o selo VIP e fique no topo via Pix.
+          <p class="text-xs sm:text-sm text-amber-900/90 leading-relaxed max-w-2xl">
+            Seu comércio foi cadastrado e está em <strong>fase de aprovação pela equipe do Achei em Pilar</strong>. Enquanto avaliamos, você já pode preencher e salvar todas as informações abaixo (fotos, horários e redes sociais) para que sua loja fique 100% pronta para os clientes!
           </p>
         </div>
-        <div class="shrink-0 flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-          <span class="text-xs font-bold text-emerald-50">Plano Básico Liberado</span>
-        </div>
       </div>
-      <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-emerald-500/15 rounded-full blur-xl pointer-events-none"></div>
-    </div>
-
-    <!-- TOAST FLUTUANTE DE SUCESSO/ERRO -->
-    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-      <div class="bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-slate-700">
-        <i id="toastIcon" data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-        <span id="toastMsg">Alterações salvas com sucesso!</span>
+      <div class="shrink-0 self-end sm:self-center">
+        <span class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 font-extrabold text-xs px-3.5 py-1.5 rounded-xl border border-amber-300">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          <span>Aguardando Liberação</span>
+        </span>
       </div>
     </div>
 
-    <!-- BANNER DE BOAS-VINDAS / ETAPA FINAL DO CADASTRO -->
-    <div id="onboardingBanner" class="hidden overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 sm:p-6 shadow-lg shadow-emerald-700/20 border border-emerald-500/40 relative">
-      <div class="relative z-10 flex items-start gap-4">
-        <div class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 text-white shadow-inner">
-          <i data-lucide="sparkles" class="w-6 h-6 text-amber-300"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="inline-flex items-center gap-1.5 bg-white/20 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider mb-1.5">
-            Etapa Final do Cadastro
-          </div>
-          <h2 class="text-base sm:text-lg font-black leading-snug">
-            Vamos finalizar as informações da sua loja!
-          </h2>
-          <p class="text-xs sm:text-sm text-emerald-100 mt-1 leading-relaxed">
-            Confira a categoria, adicione a foto da logo ou dos seus produtos e informe o horário de funcionamento. Quando terminar, basta clicar no botão verde <strong>"Salvar Alterações da Loja"</strong> no fim da página para publicar no guia de Pilar!
-          </p>
-        </div>
-        <button type="button" onclick="document.getElementById('onboardingBanner').remove()" class="shrink-0 text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer" title="Fechar">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+    <!-- AVISO DE ESTABELECIMENTO APROVADO E PUBLICADO -->
+    <div id="storeActiveNotice" class="hidden rounded-3xl bg-emerald-50/90 border border-emerald-200/90 p-4 sm:p-5 shadow-xs flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs">
+        <i data-lucide="badge-check" class="w-5 h-5"></i>
       </div>
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="bg-emerald-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">Publicado</span>
+          <h2 class="font-extrabold text-xs sm:text-sm text-emerald-950">Seu estabelecimento está aprovado e ativo no Achei em Pilar!</h2>
+        </div>
+        <p class="text-xs text-emerald-800/80 mt-0.5">
+          Todas as alterações salvas abaixo são atualizadas em tempo real para os visitantes do guia.
+        </p>
+      </div>
     </div>
 
     <!-- FORMULÁRIO DE EDIÇÃO DO ESTABELECIMENTO -->
@@ -811,13 +799,11 @@
       const loading = document.getElementById('loadingOverlay');
       if (loading) loading.classList.add('hidden');
 
-      // Se veio da tela de boas-vindas / cadastro, exibir o banner guia
+      // Se veio da tela de boas-vindas / cadastro, rolar suavemente para o aviso
       if (window.location.search.includes('origem=cadastro')) {
-        const ob = document.getElementById('onboardingBanner');
-        if (ob) {
-          ob.classList.remove('hidden');
-          // Rolar suavemente para o banner
-          setTimeout(() => ob.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+        const notice = document.getElementById('storeApprovalNotice');
+        if (notice) {
+          setTimeout(() => notice.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
         }
       }
 
@@ -840,20 +826,32 @@
       document.getElementById('storeDescricao').value = store.descricao || '';
       document.getElementById('storeLogo').value = store.logo || '';
 
-      // Status Badge
+      // Status do Comércio (Análise vs Ativo)
+      const kw = store.keywords || '';
+      const isPending = kw.includes('[STATUS:pendente]') || kw.includes('[STATUS:rascunho]') || store.status === 'pendente' || store.status === 'rascunho';
+
       const badge = document.getElementById('badgeStoreStatus');
-      const isLive = store.status === 'ativo' || !store.status;
-      if (isLive) {
-        badge.innerText = 'No Ar no Guia';
-        badge.className = 'bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1';
-        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> No Ar no Guia`;
+      const approvalNotice = document.getElementById('storeApprovalNotice');
+      const activeNotice = document.getElementById('storeActiveNotice');
+      const liveBtn = document.getElementById('btnViewLiveStore');
+
+      if (isPending) {
+        if (badge) {
+          badge.className = 'bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs';
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Em Fase de Aprovação`;
+        }
+        if (approvalNotice) approvalNotice.classList.remove('hidden');
+        if (activeNotice) activeNotice.classList.add('hidden');
       } else {
-        badge.innerText = 'Em Rascunho / Análise';
-        badge.className = 'bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full';
+        if (badge) {
+          badge.className = 'bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs';
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> No Ar no Guia`;
+        }
+        if (approvalNotice) approvalNotice.classList.add('hidden');
+        if (activeNotice) activeNotice.classList.remove('hidden');
       }
 
       // Link para o card ao vivo
-      const liveBtn = document.getElementById('btnViewLiveStore');
       if (liveBtn) {
         liveBtn.href = `index.html?busca=${encodeURIComponent(store.nome || '')}`;
       }
