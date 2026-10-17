@@ -628,6 +628,16 @@
     async function initMerchantDashboard() {
       currentUser = null;
 
+      // Failsafe: nunca prender o usuário na tela de loading por mais de 3.5 segundos
+      setTimeout(() => {
+        const loading = document.getElementById('loadingOverlay');
+        if (loading && !loading.classList.contains('hidden')) {
+          console.warn('Failsafe: ocultando loadingOverlay');
+          loading.classList.add('hidden');
+          safeCreateIcons();
+        }
+      }, 3500);
+
       // 1. Tentar obter sessão oficial do Supabase Auth
       if (supabaseClient) {
         try {
@@ -779,6 +789,8 @@
           console.warn('Inserção inicial fallback:', insertErr);
         }
         store = baseStoreData;
+      }
+
       currentStore = store;
 
       // Sincronizar nome da loja e ID no storage local para o menu lateral
