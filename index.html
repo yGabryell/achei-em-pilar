@@ -1547,7 +1547,8 @@
         const filtered = stores.filter(store => {
           if (!store) return false;
 
-          // Esconder lojas pendentes de aprovação ou em rascunho
+          // Esconder lojas pendentes de aprovação, em rascunho ou registros internos do sistema
+          if (store.categoria === 'sistema' || String(store.id).startsWith('system_')) return false;
           const isPending = store.status === 'pendente' || store.status === 'rascunho' || 
             (store.keywords && (store.keywords.includes('[STATUS:pendente]') || store.keywords.includes('[STATUS:rascunho]')));
           if (isPending) return false;
@@ -2702,16 +2703,59 @@ ${details}
       });
     }
 
-    function toggleReplyBox(reviewId) {
+    function isCurrentUserStoreOwner(storeId) {
+      try {
+        const rawMerchant = localStorage.getItem('pilar_current_merchant');
+        if (!rawMerchant) return false;
+        const merchant = JSON.parse(rawMerchant);
+        const myStoreId = localStorage.getItem('pilar_my_store_id');
+        if (myStoreId && String(myStoreId) === String(storeId)) return true;
+
+        const stores = getStores();
+        const st = stores.find(s => String(s.id) === String(storeId));
+        if (!st) return false;
+
+        const kw = (st.keywords || '').toLowerCase();
+        if (merchant.id && kw.includes(`[owner:${String(merchant.id).toLowerCase()}]`)) return true;
+        if (merchant.email && kw.includes(`[email:${merchant.email.toLowerCase()}]`)) return true;
+        if (merchant.user_metadata) {
+          const zap = (merchant.user_metadata.whatsapp || '').replace(/\D/g, '');
+          if (zap && zap.length >= 8 && (st.whatsapp || '').replace(/\D/g, '').includes(zap)) return true;
+        }
+      } catch(e) {}
+      return false;
+    }
+
+    function toggleReplyBox(reviewId, storeId) {
       const box = document.getElementById(`replyBox-${reviewId}`);
       if (box) {
         box.classList.toggle('hidden');
         if (!box.classList.contains('hidden')) {
           if (window.lucide) lucide.createIcons();
           const authorInput = document.getElementById(`replyAuthor-${reviewId}`);
-          if (authorInput && !authorInput.value) {
-            authorInput.value = localStorage.getItem('pilar_user_name') || '';
+          const roleSelect = document.getElementById(`replyRole-${reviewId}`);
+          const pinContainer = document.getElementById(`replyOwnerPinContainer-${reviewId}`);
+          const verifiedNotice = document.getElementById(`replyVerifiedOwnerNotice-${reviewId}`);
+
+          const isOwnerLoggedIn = isCurrentUserStoreOwner(storeId);
+          const isAdminLoggedIn = !!sessionStorage.getItem('pilar_admin_token');
+
+          if (isOwnerLoggedIn || isAdminLoggedIn) {
+            if (roleSelect) roleSelect.value = 'owner';
+            const stores = getStores();
+            const targetStore = stores.find(s => String(s.id) === String(storeId));
+            if (authorInput && targetStore) {
+              authorInput.value = targetStore.nome;
+            }
+            if (pinContainer) pinContainer.classList.add('hidden');
+            if (verifiedNotice) verifiedNotice.classList.remove('hidden');
+          } else {
+            if (authorInput && !authorInput.value) {
+              authorInput.value = localStorage.getItem('pilar_user_name') || '';
+            }
+            if (verifiedNotice) verifiedNotice.classList.add('hidden');
           }
+
           const txt = document.getElementById(`replyText-${reviewId}`);
           if (txt) setTimeout(() => txt.focus(), 80);
         }
@@ -2721,20 +2765,30 @@ ${details}
     function toggleReplyRoleNotice(reviewId, storeId) {
       const roleSelect = document.getElementById(`replyRole-${reviewId}`);
       const pinContainer = document.getElementById(`replyOwnerPinContainer-${reviewId}`);
+      const verifiedNotice = document.getElementById(`replyVerifiedOwnerNotice-${reviewId}`);
       const authorInput = document.getElementById(`replyAuthor-${reviewId}`);
+      const isOwnerLoggedIn = isCurrentUserStoreOwner(storeId);
+      const isAdminLoggedIn = !!sessionStorage.getItem('pilar_admin_token');
       
       if (roleSelect) {
         if (roleSelect.value === 'owner') {
-          if (pinContainer) pinContainer.classList.remove('hidden');
           const stores = getStores();
           const targetStore = stores.find(s => String(s.id) === String(storeId));
           if (targetStore && authorInput && (!authorInput.value || authorInput.value === localStorage.getItem('pilar_user_name'))) {
             authorInput.value = targetStore.nome;
           }
-          const pinInput = document.getElementById(`replyPin-${reviewId}`);
-          if (pinInput) setTimeout(() => pinInput.focus(), 80);
+          if (isOwnerLoggedIn || isAdminLoggedIn) {
+            if (pinContainer) pinContainer.classList.add('hidden');
+            if (verifiedNotice) verifiedNotice.classList.remove('hidden');
+          } else {
+            if (pinContainer) pinContainer.classList.remove('hidden');
+            if (verifiedNotice) verifiedNotice.classList.add('hidden');
+            const pinInput = document.getElementById(`replyPin-${reviewId}`);
+            if (pinInput) setTimeout(() => pinInput.focus(), 80);
+          }
         } else {
           if (pinContainer) pinContainer.classList.add('hidden');
+          if (verifiedNotice) verifiedNotice.classList.add('hidden');
           if (authorInput && authorInput.value) {
             authorInput.value = localStorage.getItem('pilar_user_name') || '';
           }
@@ -2769,12 +2823,14 @@ ${details}
         localStorage.setItem('pilar_user_name', authorName);
       }
 
-      // Se marcou que é o Estabelecimento/Proprietário, validar PIN de 4 dígitos ou sessão de admin
+      // Se marcou que é o Estabelecimento/Proprietário, validar se é o dono logado, admin ou PIN de 4 dígitos
       if (isOwner) {
         const token = sessionStorage.getItem('pilar_admin_token');
-        const isLogged = !!token;
+        const isAdmin = !!token;
+        const isVerifiedOwner = isCurrentUserStoreOwner(storeId);
 
-        if (!isLogged) {
+        // Se NÃO estiver logado como dono nem como admin, exige o PIN
+        if (!isAdmin && !isVerifiedOwner) {
           const pinInput = document.getElementById(`replyPin-${reviewId}`);
           const enteredPin = pinInput ? pinInput.value.trim() : '';
 
@@ -2946,7 +3002,7 @@ ${details}
                   </button>
 
                   <!-- BOTÃO RESPONDER (SEMPRE DISPONÍVEL) -->
-                  <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[10.5px] font-bold text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg transition flex items-center gap-1 cursor-pointer ml-1" title="Responder ou comentar nesta avaliação">
+                  <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="text-[10.5px] font-bold text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg transition flex items-center gap-1 cursor-pointer ml-1" title="Responder ou comentar nesta avaliação">
                     <i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-600"></i> Responder
                   </button>
                 </div>
@@ -2989,6 +3045,12 @@ ${details}
                       </select>
                     </div>
 
+                    <!-- AVISO DE DONO AUTENTICADO VERIFICADO (SEM PIN) -->
+                    <div id="replyVerifiedOwnerNotice-${escapeHtml(revIdStr)}" class="hidden mt-2 p-2.5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 text-xs font-bold flex items-center gap-2 shadow-2xs">
+                      <i data-lucide="badge-check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                      <span>Conectado como <strong>Proprietário Verificado</strong>. Sua resposta será publicada com selo oficial de Estabelecimento sem precisar de PIN!</span>
+                    </div>
+
                     <!-- CAMPO DO PIN DE 4 DÍGITOS EXCLUSIVO DA LOJA (OPÇÃO 2) -->
                     <div id="replyOwnerPinContainer-${escapeHtml(revIdStr)}" class="hidden mt-2 p-2.5 bg-emerald-50/90 border border-emerald-300 rounded-xl space-y-1.5">
                       <div class="flex items-center justify-between">
@@ -3021,7 +3083,7 @@ ${details}
                   </div>
 
                   <div class="flex items-center justify-end gap-1.5 pt-0.5">
-                    <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}')" class="text-[11px] font-bold text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onclick="toggleReplyBox('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="text-[11px] font-bold text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-lg cursor-pointer">Cancelar</button>
                     <button type="button" onclick="submitReviewReply('${escapeHtml(revIdStr)}', '${escapeHtml(storeId)}')" class="text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-xl transition active:scale-95 shadow-2xs cursor-pointer flex items-center gap-1">
                       <i data-lucide="send" class="w-3 h-3"></i> Publicar Resposta
                     </button>
@@ -3136,9 +3198,9 @@ ${details}
           if (!deletedIds.includes('6')) deletedIds.push('6');
           if (!deletedIds.includes('22')) deletedIds.push('22');
 
-          // Filtrar estabelecimentos deletados e limpar zeros de whatsapp
+          // Filtrar estabelecimentos deletados, registros internos do sistema e limpar zeros de whatsapp
           const validCloudStores = cloudStores
-            .filter(cs => !deletedIds.includes(String(cs.id)))
+            .filter(cs => !deletedIds.includes(String(cs.id)) && cs.categoria !== 'sistema' && !String(cs.id).startsWith('system_'))
             .map(cs => {
               const zapDigits = (cs.whatsapp || '').replace(/\D/g, '');
               const clean = { ...cs };

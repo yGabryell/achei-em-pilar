@@ -466,6 +466,36 @@
               new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 3000))
             ]).catch(e => console.warn('Supabase store insert notice:', e));
           } catch(dbErr) {}
+
+          // Registrar no índice de usuários do sistema para o painel de ADM
+          try {
+            const userItem = {
+              id: userId,
+              email: email.toLowerCase().trim(),
+              nome: name,
+              store_name: storeName,
+              whatsapp: formattedPhone,
+              store_id: newStoreId,
+              created_at: new Date().toISOString()
+            };
+            const { data: regRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_registered_users').maybeSingle();
+            let currentUsers = [];
+            try { currentUsers = JSON.parse(regRow?.keywords || '[]'); } catch(e) {}
+            if (!currentUsers.some(u => u.email === userItem.email)) {
+              currentUsers.unshift(userItem);
+              await supabaseClient.from('stores').upsert([{
+                id: 'system_registered_users',
+                nome: '[SISTEMA] Registro de Usuários',
+                categoria: 'sistema',
+                bairro: 'Pilar Centro',
+                endereco: 'Pilar - AL',
+                whatsapp: '5582999999999',
+                keywords: JSON.stringify(currentUsers)
+              }], { onConflict: 'id' });
+            }
+          } catch(sysErr) {
+            console.warn('Registro de usuário no sistema:', sysErr);
+          }
         }
 
         // Salvar em fallback local

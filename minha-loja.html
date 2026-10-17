@@ -404,6 +404,18 @@
 
   </main>
 
+  <!-- NOTIFICAÇÃO TOAST FLUTUANTE DE FEEDBACK -->
+  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none max-w-md w-[92%] sm:w-auto">
+    <div class="bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3">
+      <div id="toastIconBox" class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+        <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <div class="flex-1 min-w-0 pr-1">
+        <p id="toastMsg" class="text-xs sm:text-sm font-bold text-slate-100 leading-snug"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- RODAPÉ -->
   <footer class="text-center py-5 text-xs text-slate-400 border-t border-slate-200 bg-white">
     <p>© 2026 Achei em Pilar — O Guia Comercial de Pilar & Chã do Pilar • AL</p>
@@ -419,6 +431,7 @@
     let currentUser = null;
     let currentStore = null;
     let currentGallery = [];
+    let toastTimer = null;
 
     try {
       if (window.supabase) {
@@ -436,28 +449,41 @@
       } catch(e) {}
     }
 
-    // FEEDBACK TOAST
+    // FEEDBACK TOAST DE SALVAMENTO
     function showToast(msg, type = 'success') {
       const toast = document.getElementById('toastNotification');
       const text = document.getElementById('toastMsg');
       const icon = document.getElementById('toastIcon');
+      const iconBox = document.getElementById('toastIconBox');
+      if (!toast || !text) {
+        alert(msg);
+        return;
+      }
       text.innerText = msg;
 
       if (type === 'error') {
-        icon.setAttribute('data-lucide', 'alert-circle');
-        icon.className = 'w-4 h-4 text-rose-400';
+        if (icon) {
+          icon.setAttribute('data-lucide', 'alert-circle');
+          icon.className = 'w-5 h-5 text-rose-400';
+        }
+        if (iconBox) iconBox.className = 'w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0';
       } else {
-        icon.setAttribute('data-lucide', 'check-circle');
-        icon.className = 'w-4 h-4 text-emerald-400';
+        if (icon) {
+          icon.setAttribute('data-lucide', 'check-circle');
+          icon.className = 'w-5 h-5 text-emerald-400';
+        }
+        if (iconBox) iconBox.className = 'w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0';
       }
       safeCreateIcons();
 
-      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.remove('-translate-y-24', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-24', 'opacity-0');
-      }, 3500);
+        toast.classList.add('-translate-y-24', 'opacity-0');
+      }, 4000);
     }
 
     // LOGOUT
@@ -653,6 +679,33 @@
         window.location.href = 'entrar.html';
         return;
       }
+
+      // Verificar se este usuário foi revogado/excluído pelo Administrador
+      try {
+        const myEmail = (currentUser.email || '').toLowerCase().trim();
+        const myUid = currentUser.id;
+        const localRevoked = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+        if (localRevoked.includes(myEmail) || (myUid && localRevoked.includes(myUid))) {
+          localStorage.removeItem('pilar_current_merchant');
+          localStorage.removeItem('pilar_my_store_id');
+          alert('Esta conta de lojista foi desativada pelo Administrador.');
+          window.location.href = 'entrar.html';
+          return;
+        }
+
+        if (supabaseClient) {
+          const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
+          let cloudRevoked = [];
+          try { cloudRevoked = JSON.parse(revRow?.keywords || '[]'); } catch(e) {}
+          if (cloudRevoked.includes(myEmail) || (myUid && cloudRevoked.includes(myUid))) {
+            localStorage.removeItem('pilar_current_merchant');
+            localStorage.removeItem('pilar_my_store_id');
+            alert('Esta conta de lojista foi desativada pelo Administrador.');
+            window.location.href = 'entrar.html';
+            return;
+          }
+        }
+      } catch(revErr) {}
 
       const userMeta = currentUser.user_metadata || {};
       const greeting = document.getElementById('merchantGreeting');
@@ -864,28 +917,34 @@
 
     // SALVAR ALTERAÇÕES
     async function handleSaveStore(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       if (!currentStore || !currentUser) {
         showToast('Sessão expirada. Faça login novamente.', 'error');
         return;
       }
 
       const btn = document.getElementById('btnSaveStore');
-      btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Salvando dados...`;
-      safeCreateIcons();
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> <span>Salvando dados...</span>`;
+        safeCreateIcons();
+      }
 
       const rawZap = document.getElementById('storeWhatsapp').value.replace(/\D/g, '');
-      const formattedZap = rawZap.startsWith('55') ? rawZap : '55' + rawZap;
+      const formattedZap = rawZap.startsWith('55') ? rawZap : (rawZap ? '55' + rawZap : '');
       const rawInsta = document.getElementById('storeInstagram').value.trim();
       const formattedInsta = rawInsta ? (rawInsta.startsWith('@') ? rawInsta : '@' + rawInsta) : '';
 
       let cleanKw = (currentStore.keywords || `${document.getElementById('storeNome').value.toLowerCase()} pilar`);
-      if (!cleanKw.includes('[OWNER:')) {
+      if (!cleanKw.includes('[OWNER:') && currentUser.id) {
         cleanKw += `\n[OWNER:${currentUser.id}]`;
       }
       if (currentUser.email && !cleanKw.toLowerCase().includes('[email:')) {
         cleanKw += `\n[EMAIL:${currentUser.email.toLowerCase()}]`;
+      }
+      // Se a loja ainda não estiver com status ativo no admin, garantir status pendente para entrar em aprovação
+      if (!cleanKw.includes('[STATUS:ativo]') && !cleanKw.includes('[STATUS:pendente]')) {
+        cleanKw += `\n[STATUS:pendente]`;
       }
 
       const updatedKeywords = packStoreFotosIntoKeywords(cleanKw, currentGallery);
@@ -906,29 +965,44 @@
       };
 
       try {
-        let { error } = await supabaseClient
-          .from('stores')
-          .update(updatePayload)
-          .eq('id', currentStore.id);
+        const storeIdToSave = String(currentStore.id || localStorage.getItem('pilar_my_store_id') || Date.now());
+        currentStore.id = storeIdToSave;
 
-        if (error) throw error;
+        const fullStorePayload = {
+          id: storeIdToSave,
+          ...updatePayload
+        };
+
+        if (supabaseClient) {
+          const { error } = await supabaseClient
+            .from('stores')
+            .upsert([fullStorePayload], { onConflict: 'id' });
+
+          if (error) {
+            console.warn('Upsert falhou, tentando update/insert direto:', error);
+            const { error: upErr } = await supabaseClient.from('stores').update(updatePayload).eq('id', storeIdToSave);
+            if (upErr) {
+              await supabaseClient.from('stores').insert([fullStorePayload]);
+            }
+          }
+        }
 
         // Atualizar estado em memória
         Object.assign(currentStore, updatePayload);
 
         // Atualizar fallback local e metadata
         try {
+          localStorage.setItem('pilar_my_store_id', storeIdToSave);
           const rawLocal = localStorage.getItem('pilar_stores');
-          if (rawLocal) {
-            let list = JSON.parse(rawLocal);
-            const idx = list.findIndex(s => String(s.id) === String(currentStore.id));
-            if (idx >= 0) {
-              list[idx] = { ...list[idx], ...updatePayload };
-            } else {
-              list.unshift(currentStore);
-            }
-            localStorage.setItem('pilar_stores', JSON.stringify(list));
+          let list = rawLocal ? JSON.parse(rawLocal) : [];
+          const idx = list.findIndex(s => String(s.id) === String(storeIdToSave));
+          if (idx >= 0) {
+            list[idx] = { ...list[idx], ...updatePayload };
+          } else {
+            list.unshift(currentStore);
           }
+          localStorage.setItem('pilar_stores', JSON.stringify(list));
+
           const rawM = localStorage.getItem('pilar_current_merchant');
           if (rawM) {
             const mObj = JSON.parse(rawM);
@@ -938,15 +1012,32 @@
           }
         } catch(locErr) {}
 
-        showToast('Comércio atualizado com sucesso!', 'success');
+        // Atualizar avisos visuais na tela
+        checkStoreStatus(currentStore);
+
+        showToast('✅ Alterações da loja salvas com sucesso!', 'success');
+
+        if (btn) {
+          btn.disabled = false;
+          btn.className = 'w-full sm:w-auto bg-emerald-700 text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-2xl transition shadow-lg shadow-emerald-700/25 flex items-center justify-center gap-2 cursor-pointer';
+          btn.innerHTML = `<i data-lucide="check-check" class="w-4 h-4 text-emerald-200"></i> <span>✅ Salvo com Sucesso!</span>`;
+          safeCreateIcons();
+
+          setTimeout(() => {
+            btn.className = 'w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-2xl transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer';
+            btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> <span>Salvar Alterações da Loja</span>`;
+            safeCreateIcons();
+          }, 3500);
+        }
 
       } catch(err) {
         console.error('Erro ao salvar:', err);
-        showToast('Erro ao salvar alterações: ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Salvar Alterações da Loja`;
-        safeCreateIcons();
+        showToast('Erro ao salvar alterações: ' + (err.message || 'Tente novamente'), 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> <span>Salvar Alterações da Loja</span>`;
+          safeCreateIcons();
+        }
       }
     }
 

@@ -130,6 +130,12 @@
             <span id="badgePendingStores" class="bg-amber-100 text-amber-800 text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-extrabold shrink-0">0</span>
           </button>
 
+          <button onclick="switchTab('users')" id="tabBtn-users" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
+            <i data-lucide="users" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0"></i>
+            <span class="truncate">Usuários Lojistas</span>
+            <span id="badgeUsersCount" class="bg-emerald-100 text-emerald-800 text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-extrabold shrink-0">0</span>
+          </button>
+
           <button onclick="switchTab('form')" id="tabBtn-form" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer shrink-0">
             <i data-lucide="plus-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0"></i>
             <span id="tabFormTitle" class="truncate">Cadastrar Novo</span>
@@ -239,6 +245,45 @@
           <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Nenhum novo cadastro pendente no momento. Quando um comerciante cadastrar pelo site, ele aparecerá nesta tela para sua revisão e aprovação.</p>
         </div>
 
+      </section>
+
+      <!-- ================= ABA NOVA: USUÁRIOS LOJISTAS ================= -->
+      <section id="tabContent-users" class="hidden space-y-4">
+        <!-- HEADER DA SEÇÃO DE USUÁRIOS -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="font-heading font-extrabold text-base sm:text-lg text-slate-900">👥 Usuários Lojistas Cadastrados</h2>
+              <span id="usersCounterBadge" class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full">0 usuários</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Gerencie as contas de lojistas, vincule lojas que você cadastrou manualmente aos lojistas ou exclua contas de teste.</p>
+          </div>
+
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <div class="relative flex-1 md:w-64">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="searchUsersInput" oninput="renderUsersTab()" placeholder="Buscar por nome, e-mail..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <button onclick="loadUsersFromCloud()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer shrink-0" title="Atualizar Lista">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Atualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LISTA DE USUÁRIOS LOJISTAS -->
+        <div id="usersListContainer" class="space-y-3">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <!-- EMPTY STATE SE NÃO HOUVER USUÁRIOS -->
+        <div id="usersEmptyState" class="hidden text-center py-12 bg-white rounded-3xl border border-slate-200">
+          <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="users" class="w-7 h-7"></i>
+          </div>
+          <h4 class="font-bold text-sm text-slate-800">Nenhum usuário cadastrado</h4>
+          <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Quando lojistas criarem contas pelo site, elas aparecerão aqui para gerenciamento e vinculação de lojas.</p>
+        </div>
       </section>
 
       <!-- ================= ABA 2: FORMULÁRIO DE CADASTRO / EDIÇÃO ================= -->
@@ -365,7 +410,7 @@
               <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                 <i data-lucide="phone-call" class="w-3.5 h-3.5 text-emerald-600"></i> Contatos, Redes Sociais & Segurança
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp (DDD + Número)</label>
                   <input type="tel" id="formWhatsapp" placeholder="Ex: 82999990000" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
@@ -379,13 +424,28 @@
                   <label class="block text-xs font-bold text-slate-700 mb-1">Instagram (com @)</label>
                   <input type="text" id="formInstagram" placeholder="Ex: @pilar.grill" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-pink-500 bg-slate-50/50">
                 </div>
+              </div>
+
+              <!-- VINCULAR CONTA DE USUÁRIO / LOJISTA & PIN -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-3.5">
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-emerald-800">
+                      <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                      E-mail do Lojista (Vincular à Conta de Usuário)
+                    </span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">Painel do Lojista</span>
+                  </label>
+                  <input type="email" id="formOwnerEmail" placeholder="Ex: smith@gmail.com" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+                  <span class="text-[10px] text-slate-400 mt-0.5 block">Ao informar o e-mail do lojista, ele poderá acessar esta loja pelo painel e responder avaliações sem precisar de PIN.</span>
+                </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
                     <span>PIN da Loja (4 dígitos)</span>
                     <button type="button" onclick="generateRandomStorePin()" class="text-[10px] text-emerald-600 hover:text-emerald-800 font-bold hover:underline cursor-pointer">Gerar Novo</button>
                   </label>
                   <input type="text" id="formPin" maxlength="4" placeholder="Ex: 4521" class="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 font-mono tracking-widest font-black text-center">
-                  <span class="text-[10px] text-slate-400 mt-0.5 block">PIN para responder avaliações. Padrão: final do WhatsApp.</span>
+                  <span class="text-[10px] text-slate-400 mt-0.5 block">PIN legado para responder avaliações. Padrão: final do WhatsApp.</span>
                 </div>
               </div>
             </div>
@@ -720,7 +780,7 @@
     let currentActiveTab = 'stores';
     function switchTab(tabId) {
       currentActiveTab = tabId;
-      const tabs = ['stores', 'pending', 'form', 'metrics', 'settings'];
+      const tabs = ['stores', 'pending', 'users', 'form', 'metrics', 'settings'];
       tabs.forEach(t => {
         const content = document.getElementById(`tabContent-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
@@ -743,6 +803,8 @@
         renderAdminStores();
       } else if (tabId === 'pending') {
         renderPendingStores();
+      } else if (tabId === 'users') {
+        renderUsersTab();
       }
       lucide.createIcons();
     }
@@ -861,14 +923,15 @@
     }
 
     async function loadAllStores() {
-      storesData = getLocalStores();
+      storesData = getLocalStores().filter(s => s && s.categoria !== 'sistema' && !String(s.id).startsWith('system_'));
       
       // Tentar atualizar a partir do Supabase caso exista conexão
       if (supabaseClient) {
         try {
           const { data, error } = await supabaseClient.from('stores').select('*').order('nome');
           if (!error && Array.isArray(data) && data.length > 0) {
-            storesData = data.map(s => {
+            const publicStores = data.filter(s => s && s.categoria !== 'sistema' && !String(s.id).startsWith('system_'));
+            storesData = publicStores.map(s => {
               s.fotos = extractStoreFotos(s);
               return s;
             });
@@ -881,6 +944,7 @@
 
       renderAdminStores();
       renderPendingStores();
+      await loadUsersFromCloud();
     }
 
     function renderAdminStores() {
@@ -1046,7 +1110,7 @@
               </span>
               ${isOnlineAccount ? `
                 <span class="inline-flex items-center gap-1 text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold" title="${escapeHtml(userEmail || 'Conta criada pelo lojista com e-mail e senha')}">
-                  <i data-lucide="user-check" class="w-3 h-3 text-emerald-600"></i> Cadastro com Senha
+                  <i data-lucide="user-check" class="w-3 h-3 text-emerald-600"></i> ${escapeHtml(userEmail || 'Cadastro com Senha')}
                 </span>
               ` : (pin ? `
                 <span class="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">PIN: <strong class="text-slate-800">${pin}</strong></span>
@@ -1173,6 +1237,332 @@
       renderPendingStores();
     }
 
+    // ================= GERENCIAMENTO DE USUÁRIOS LOJISTAS =================
+    let usersData = [];
+
+    async function loadUsersFromCloud() {
+      usersData = [];
+      const scannedEmails = new Set();
+
+      // 1. Carregar registros da linha especial system_registered_users no Supabase
+      if (supabaseClient) {
+        try {
+          const { data: regRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_registered_users').maybeSingle();
+          if (regRow && regRow.keywords) {
+            try {
+              const list = JSON.parse(regRow.keywords);
+              if (Array.isArray(list)) {
+                list.forEach(u => {
+                  if (u && u.email && !scannedEmails.has(u.email.toLowerCase().trim())) {
+                    scannedEmails.add(u.email.toLowerCase().trim());
+                    usersData.push(u);
+                  }
+                });
+              }
+            } catch(e) {}
+          }
+        } catch(e) {}
+      }
+
+      // 2. Varrer todas as lojas para identificar lojistas adicionais que possuem [EMAIL:...]
+      storesData.forEach(st => {
+        const kw = st.keywords || '';
+        const emailMatch = kw.match(/\[EMAIL:(.*?)\]/i);
+        const ownerMatch = kw.match(/\[OWNER:(.*?)\]/i);
+        if (emailMatch && emailMatch[1]) {
+          const em = emailMatch[1].trim().toLowerCase();
+          if (!scannedEmails.has(em)) {
+            scannedEmails.add(em);
+            usersData.push({
+              id: ownerMatch ? ownerMatch[1] : 'usr_' + st.id,
+              email: em,
+              nome: st.nome,
+              store_name: st.nome,
+              whatsapp: st.whatsapp || '',
+              store_id: st.id,
+              created_at: st.created_at || new Date().toISOString()
+            });
+          }
+        }
+      });
+
+      const badge = document.getElementById('badgeUsersCount');
+      if (badge) {
+        badge.innerText = usersData.length;
+        badge.classList.remove('hidden');
+      }
+      const counter = document.getElementById('usersCounterBadge');
+      if (counter) counter.innerText = `${usersData.length} usuário${usersData.length === 1 ? '' : 's'}`;
+
+      renderUsersTab();
+    }
+
+    function renderUsersTab() {
+      const container = document.getElementById('usersListContainer');
+      const emptyState = document.getElementById('usersEmptyState');
+      if (!container) return;
+
+      const search = (document.getElementById('searchUsersInput')?.value || '').toLowerCase().trim();
+
+      const filtered = usersData.filter(u => {
+        if (!u) return false;
+        if (!search) return true;
+        const targetStore = storesData.find(s => String(s.id) === String(u.store_id) || (s.keywords || '').toLowerCase().includes(`[email:${u.email.toLowerCase()}]`));
+        const storeName = targetStore ? targetStore.nome.toLowerCase() : (u.store_name || '').toLowerCase();
+        return (u.nome || '').toLowerCase().includes(search) ||
+               (u.email || '').toLowerCase().includes(search) ||
+               (u.whatsapp || '').includes(search) ||
+               storeName.includes(search);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      // Lista de todas as lojas para vincular
+      const storeOptionsHtml = storesData.map(s => {
+        const isPend = isStorePending(s);
+        return `<option value="${escapeHtml(s.id)}">${escapeHtml(s.nome)} (${escapeHtml(s.bairro || 'Pilar')})${isPend ? ' [EM APROVAÇÃO]' : ''}</option>`;
+      }).join('');
+
+      container.innerHTML = filtered.map(u => {
+        const uEmail = (u.email || '').toLowerCase().trim();
+        // Identificar loja vinculada
+        const linkedStore = storesData.find(s => {
+          const kw = (s.keywords || '').toLowerCase();
+          return kw.includes(`[email:${uEmail}]`) || (u.id && kw.includes(`[owner:${String(u.id).toLowerCase()}]`)) || String(s.id) === String(u.store_id);
+        });
+
+        const isPend = linkedStore ? isStorePending(linkedStore) : false;
+        const cleanZap = (u.whatsapp || '').replace(/\D/g, '');
+        const selectId = 'linkStoreSelect-' + uEmail.replace(/[^a-zA-Z0-9]/g, '_');
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition space-y-3.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm">
+                  ${escapeHtml((u.nome || u.email || 'U').charAt(0).toUpperCase())}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate">${escapeHtml(u.nome || u.store_name || 'Lojista')}</h3>
+                    <span class="bg-slate-100 text-slate-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Conta Lojista</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-slate-500 mt-0.5 flex-wrap">
+                    <span class="flex items-center gap-1 font-semibold text-slate-700">
+                      <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-400"></i>
+                      ${escapeHtml(u.email)}
+                    </span>
+                    ${cleanZap ? `
+                      <a href="https://wa.me/${cleanZap.startsWith('55') ? cleanZap : '55' + cleanZap}" target="_blank" class="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline">
+                        <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        ${escapeHtml(u.whatsapp)}
+                      </a>
+                    ` : ''}
+                    <span class="text-[11px] text-slate-400">Desde: ${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : 'Recente'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BOTÃO DE EXCLUIR USUÁRIO -->
+              <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <button type="button" onclick="confirmDeleteUser('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}')" class="bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Excluir este usuário e revogar acesso">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
+                  <span>Excluir Usuário</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- VINCULAÇÃO DE LOJA -->
+            <div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div class="min-w-0">
+                <span class="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Loja Vinculada Atualmente</span>
+                ${linkedStore ? `
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                      <i data-lucide="store" class="w-4 h-4 text-emerald-600"></i>
+                      ${escapeHtml(linkedStore.nome)}
+                    </span>
+                    <span class="text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${isPend ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'}">
+                      ${isPend ? '⏳ Em Aprovação' : '✅ Publicada no Guia'}
+                    </span>
+                    <button type="button" onclick="startEditingStore('${escapeHtml(linkedStore.id)}')" class="text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline ml-1">
+                      Editar Loja
+                    </button>
+                  </div>
+                ` : `
+                  <div class="flex items-center gap-1.5 text-amber-700 text-xs font-bold">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500"></i>
+                    <span>Nenhuma loja vinculada a este e-mail no momento.</span>
+                  </div>
+                `}
+              </div>
+
+              <!-- CONTROLE RÁPIDO PARA VINCULAR QUALQUER LOJA MANUAL -->
+              <div class="flex items-center gap-2 w-full lg:w-auto">
+                <select id="${selectId}" class="flex-1 lg:w-72 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                  <option value="">-- Vincular a uma loja --</option>
+                  ${storeOptionsHtml}
+                </select>
+                <button type="button" onclick="linkUserToStore('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}', '${selectId}')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0">
+                  <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
+                  <span>Vincular</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function linkUserToStore(userEmail, userId, selectElementId) {
+      const select = document.getElementById(selectElementId);
+      if (!select) return;
+      const targetStoreId = select.value;
+      if (!targetStoreId) {
+        alert('Por favor, selecione uma loja no menu para vincular.');
+        return;
+      }
+
+      const targetStore = storesData.find(s => String(s.id) === String(targetStoreId));
+      if (!targetStore) return;
+
+      if (!confirm(`Deseja vincular a loja "${targetStore.nome}" à conta do lojista "${userEmail}"?\n\nO lojista terá acesso total a esta loja no painel e poderá responder avaliações como proprietário sem precisar de PIN.`)) {
+        return;
+      }
+
+      showToast(`Vinculando "${targetStore.nome}" a ${userEmail}...`, 'info');
+
+      // Atualizar keywords da loja com [EMAIL:...] e [OWNER:...]
+      let kw = targetStore.keywords || `${targetStore.nome.toLowerCase()} pilar`;
+      kw = kw.replace(/\n*\[EMAIL:.*?\]/gi, '').trim() + `\n[EMAIL:${userEmail.toLowerCase().trim()}]`;
+      if (userId) {
+        kw = kw.replace(/\n*\[OWNER:.*?\]/gi, '').trim() + `\n[OWNER:${userId}]`;
+      }
+      targetStore.keywords = kw;
+
+      // Atualizar registro de usuários
+      const uObj = usersData.find(u => u.email.toLowerCase() === userEmail.toLowerCase().trim());
+      if (uObj) {
+        uObj.store_id = targetStore.id;
+        uObj.store_name = targetStore.nome;
+      }
+
+      // Salvar no Supabase
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('stores').update({ keywords: kw }).eq('id', targetStore.id);
+          await saveSystemUsersRegistry();
+        } catch(err) {
+          console.warn('Erro ao salvar vínculo:', err);
+        }
+      }
+
+      saveLocalStores(storesData);
+      showToast(`Loja "${targetStore.nome}" vinculada com sucesso a ${userEmail}!`, 'success');
+      renderUsersTab();
+    }
+
+    async function confirmDeleteUser(userEmail, userId) {
+      if (!confirm(`Tem certeza que deseja EXCLUIR o usuário "${userEmail}"?\n\nIsso removerá a conta do lojista, revogará seu acesso e desvinculará de qualquer loja cadastrada.`)) {
+        return;
+      }
+
+      const deleteStoreAlso = confirm(`Deseja também excluir permanentemente as lojas pendentes associadas a este usuário (${userEmail})?`);
+
+      showToast(`Excluindo usuário ${userEmail}...`, 'info');
+
+      // 1. Remover de usersData
+      usersData = usersData.filter(u => u.email.toLowerCase() !== userEmail.toLowerCase());
+
+      // 2. Registrar em system_revoked_users no Supabase
+      if (supabaseClient) {
+        try {
+          const { data: revRow } = await supabaseClient.from('stores').select('keywords').eq('id', 'system_revoked_users').maybeSingle();
+          let revoked = [];
+          try { revoked = JSON.parse(revRow?.keywords || '[]'); } catch(e) {}
+          if (!revoked.includes(userEmail.toLowerCase())) revoked.push(userEmail.toLowerCase());
+          if (userId && !revoked.includes(userId)) revoked.push(userId);
+          await supabaseClient.from('stores').upsert([{
+            id: 'system_revoked_users',
+            nome: '[SISTEMA] Usuários Revogados',
+            categoria: 'sistema',
+            bairro: 'Pilar Centro',
+            endereco: 'Pilar - AL',
+            whatsapp: '5582999999999',
+            keywords: JSON.stringify(revoked)
+          }], { onConflict: 'id' });
+        } catch(e) {}
+      }
+
+      // Atualizar lista local de revogados
+      try {
+        let locRev = JSON.parse(localStorage.getItem('pilar_revoked_users') || '[]');
+        if (!locRev.includes(userEmail.toLowerCase())) locRev.push(userEmail.toLowerCase());
+        if (userId && !locRev.includes(userId)) locRev.push(userId);
+        localStorage.setItem('pilar_revoked_users', JSON.stringify(locRev));
+      } catch(e) {}
+
+      // 3. Desvincular ou deletar lojas associadas
+      const storesToProcess = storesData.filter(s => {
+        const kw = (s.keywords || '').toLowerCase();
+        return kw.includes(`[email:${userEmail.toLowerCase()}]`) || (userId && kw.includes(`[owner:${userId.toLowerCase()}]`));
+      });
+
+      for (const st of storesToProcess) {
+        if (deleteStoreAlso && isStorePending(st)) {
+          // Excluir loja pendente
+          storesData = storesData.filter(s => String(s.id) !== String(st.id));
+          if (supabaseClient) {
+            try { await supabaseClient.from('stores').delete().eq('id', st.id); } catch(e) {}
+          }
+        } else {
+          // Apenas desvincular o lojista
+          let cleanKw = (st.keywords || '')
+            .replace(/\n*\[EMAIL:.*?\]/gi, '')
+            .replace(/\n*\[OWNER:.*?\]/gi, '')
+            .trim();
+          st.keywords = cleanKw;
+          if (supabaseClient) {
+            try { await supabaseClient.from('stores').update({ keywords: cleanKw }).eq('id', st.id); } catch(e) {}
+          }
+        }
+      }
+
+      await saveSystemUsersRegistry();
+      saveLocalStores(storesData);
+
+      showToast(`Usuário "${userEmail}" excluído com sucesso!`, 'success');
+      renderUsersTab();
+      renderPendingStores();
+      renderAdminStores();
+    }
+
+    async function saveSystemUsersRegistry() {
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('stores').upsert([{
+            id: 'system_registered_users',
+            nome: '[SISTEMA] Registro de Usuários',
+            categoria: 'sistema',
+            bairro: 'Pilar Centro',
+            endereco: 'Pilar - AL',
+            whatsapp: '5582999999999',
+            keywords: JSON.stringify(usersData)
+          }], { onConflict: 'id' });
+        } catch(e) {
+          console.warn('Erro ao salvar system_registered_users:', e);
+        }
+      }
+    }
+
     // FORMULÁRIO: CADASTRAR OU EDITAR
     
     // CONTROLE DE GALERIA DE FOTOS (CARROSSEL)
@@ -1243,6 +1633,8 @@
       renderFormGallery();
       document.getElementById('formEditId').value = '';
       document.querySelector('#tabContent-form form').reset();
+      const ownerEmailEl = document.getElementById('formOwnerEmail');
+      if (ownerEmailEl) ownerEmailEl.value = '';
       document.getElementById('formLogoPreview').classList.add('hidden');
       document.getElementById('formLogoPlaceholder').classList.remove('hidden');
       document.getElementById('formBadgeMode').innerText = 'Novo Cadastro';
@@ -1274,6 +1666,10 @@
       document.getElementById('formDescricao').value = store.descricao || '';
       document.getElementById('formLogo').value = store.logo || '';
       document.getElementById('formPin').value = extractStorePin(store);
+
+      const emailMatch = (store.keywords || '').match(/\[EMAIL:(.*?)\]/i);
+      const ownerEmailEl = document.getElementById('formOwnerEmail');
+      if (ownerEmailEl) ownerEmailEl.value = emailMatch ? emailMatch[1].trim() : '';
 
       updateFormLogoPreview();
       const fotosFromStore = extractStoreFotos(store);
@@ -1355,11 +1751,20 @@
 
       const fotosList = [...currentStoreGallery];
       const pin = (document.getElementById('formPin').value || '').trim();
+      const ownerEmail = (document.getElementById('formOwnerEmail')?.value || '').trim().toLowerCase();
       const rawKw = `${nome} ${descricao} ${bairro} ${categoria} ${instagram} ${site}`.toLowerCase();
       let packedKeywords = packStoreFotosIntoKeywords(rawKw, fotosList);
       packedKeywords = packedKeywords.replace(/\[STATUS:(pendente|rascunho)\]/g, '').trim() + '\n[STATUS:ativo]';
       if (pin && /^\d{4}$/.test(pin)) {
         packedKeywords = packStorePinIntoKeywords(packedKeywords, pin);
+      }
+      if (ownerEmail) {
+        packedKeywords += `\n[EMAIL:${ownerEmail}]`;
+      }
+      const existingStore = editId ? storesData.find(s => String(s.id) === String(editId)) : null;
+      const existingOwnerMatch = existingStore && existingStore.keywords ? existingStore.keywords.match(/\[OWNER:(.*?)\]/i) : null;
+      if (existingOwnerMatch && existingOwnerMatch[1]) {
+        packedKeywords += `\n[OWNER:${existingOwnerMatch[1]}]`;
       }
 
       const storePayload = {
@@ -1395,6 +1800,27 @@
 
       // Salvar na Nuvem (Vercel API com fallback Supabase)
       await sendStoreToCloud(storePayload);
+
+      // Sincronizar vínculo em usersData
+      if (ownerEmail) {
+        let existingU = usersData.find(u => u.email.toLowerCase() === ownerEmail);
+        if (existingU) {
+          existingU.store_id = storePayload.id;
+          existingU.store_name = nome;
+        } else {
+          usersData.push({
+            id: existingOwnerMatch ? existingOwnerMatch[1] : ('usr_' + Date.now()),
+            email: ownerEmail,
+            nome: nome,
+            store_name: nome,
+            whatsapp: whatsapp || '',
+            store_id: storePayload.id,
+            created_at: new Date().toISOString()
+          });
+        }
+        await saveSystemUsersRegistry();
+        renderUsersTab();
+      }
 
       btn.innerHTML = originalText;
       lucide.createIcons();
@@ -1443,6 +1869,8 @@
       storesData = storesData.filter(s => String(s.id) !== String(id));
       saveLocalStores(storesData);
       renderAdminStores();
+      renderPendingStores();
+      renderUsersTab();
 
       const token = sessionStorage.getItem('pilar_admin_token');
       let deletedViaApi = false;
