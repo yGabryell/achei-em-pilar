@@ -768,7 +768,7 @@
           horario: 'Segunda a Sábado',
           logo: '',
           vip: false,
-          keywords: `${storeName.toLowerCase()} pilar\n[PIN:${formattedZap.slice(-4) || '1234'}]\n[OWNER:${currentUser.id}]\n[EMAIL:${(currentUser.email || '').toLowerCase()}]\n[STATUS:rascunho]`
+          keywords: `${storeName.toLowerCase()} pilar\n[OWNER:${currentUser.id}]\n[EMAIL:${(currentUser.email || '').toLowerCase()}]\n[STATUS:rascunho]`
         };
 
         try {
@@ -880,7 +880,7 @@
       const rawInsta = document.getElementById('storeInstagram').value.trim();
       const formattedInsta = rawInsta ? (rawInsta.startsWith('@') ? rawInsta : '@' + rawInsta) : '';
 
-      let cleanKw = (currentStore.keywords || `${document.getElementById('storeNome').value.toLowerCase()} pilar\n[PIN:${formattedZap.slice(-4)}]`);
+      let cleanKw = (currentStore.keywords || `${document.getElementById('storeNome').value.toLowerCase()} pilar`);
       if (!cleanKw.includes('[OWNER:')) {
         cleanKw += `\n[OWNER:${currentUser.id}]`;
       }

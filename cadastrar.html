@@ -439,7 +439,6 @@
         // 3. Criar registro inicial da loja
         const formattedPhone = whatsapp.startsWith('55') ? whatsapp : '55' + whatsapp;
         const newStoreId = String(Date.now());
-        const pin = whatsapp.slice(-4) || '1234';
         try {
           localStorage.setItem('pilar_my_store_id', newStoreId);
         } catch(e) {}
@@ -456,7 +455,7 @@
           horario: 'Segunda a Sábado',
           logo: '',
           vip: false,
-          keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${userId}]\n[EMAIL:${email.toLowerCase()}]\n[STATUS:pendente]`
+          keywords: `${storeName.toLowerCase()} pilar\n[OWNER:${userId}]\n[EMAIL:${email.toLowerCase()}]\n[STATUS:pendente]`
         };
 
         // Salvar no Supabase (não-bloqueante com timeout de 3s)
