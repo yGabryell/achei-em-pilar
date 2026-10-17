@@ -46,6 +46,8 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col overflow-x-hidden">
@@ -116,7 +118,7 @@
 
       <!-- BARRA DE NAVEGAÇÃO POR ABAS -->
       <div class="bg-slate-50 border-t border-slate-200 px-3 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto flex items-center overflow-x-auto gap-1.5 sm:gap-2.5 py-2">
+        <div class="max-w-7xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 sm:gap-2.5 py-2">
           
           <button onclick="switchTab('stores')" id="tabBtn-stores" class="tab-btn flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-emerald-700 shadow-xs border border-slate-200 cursor-pointer shrink-0">
             <i data-lucide="store" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0"></i>
@@ -1344,78 +1346,111 @@
         const selectId = 'linkStoreSelect-' + uEmail.replace(/[^a-zA-Z0-9]/g, '_');
 
         return `
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition space-y-3.5">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-3">
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition space-y-4 overflow-hidden">
+            
+            <!-- CABEÇALHO DO USUÁRIO -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100">
+              <div class="flex items-center gap-3 min-w-0">
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm">
                   ${escapeHtml((u.nome || u.email || 'U').charAt(0).toUpperCase())}
                 </div>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate">${escapeHtml(u.nome || u.store_name || 'Lojista')}</h3>
-                    <span class="bg-slate-100 text-slate-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Conta Lojista</span>
+                    <h3 class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug truncate">${escapeHtml(u.nome || u.store_name || 'Lojista')}</h3>
+                    <span class="bg-slate-100 text-slate-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0">Conta Lojista</span>
                   </div>
-                  <div class="flex items-center gap-3 text-xs text-slate-500 mt-0.5 flex-wrap">
-                    <span class="flex items-center gap-1 font-semibold text-slate-700">
-                      <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <div class="flex items-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1 flex-wrap">
+                    <span class="flex items-center gap-1 font-semibold text-slate-700 break-all">
+                      <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                       ${escapeHtml(u.email)}
                     </span>
                     ${cleanZap ? `
-                      <a href="https://wa.me/${cleanZap.startsWith('55') ? cleanZap : '55' + cleanZap}" target="_blank" class="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline">
+                      <a href="https://wa.me/${cleanZap.startsWith('55') ? cleanZap : '55' + cleanZap}" target="_blank" class="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline shrink-0">
                         <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600"></i>
                         ${escapeHtml(u.whatsapp)}
                       </a>
                     ` : ''}
-                    <span class="text-[11px] text-slate-400">Desde: ${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : 'Recente'}</span>
+                    <span class="text-[11px] text-slate-400 shrink-0">Desde: ${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : 'Recente'}</span>
                   </div>
                 </div>
               </div>
 
               <!-- BOTÃO DE EXCLUIR USUÁRIO -->
-              <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                <button type="button" onclick="confirmDeleteUser('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}')" class="bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Excluir este usuário e revogar acesso">
+              <div class="flex items-center gap-2 sm:self-center shrink-0">
+                <button type="button" onclick="confirmDeleteUser('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}')" class="w-full sm:w-auto bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs" title="Excluir este usuário e revogar acesso">
                   <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
                   <span>Excluir Usuário</span>
                 </button>
               </div>
             </div>
 
-            <!-- VINCULAÇÃO DE LOJA -->
-            <div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-              <div class="min-w-0">
-                <span class="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Loja Vinculada Atualmente</span>
+            <!-- CARD DE VINCULAÇÃO DE LOJA (100% RESPONSIVO, SEM TRANSBORDAR NO MOBILE) -->
+            <div class="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 space-y-3 min-w-0">
+              
+              <!-- STATUS DA LOJA ATUAL -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-200/70">
+                <div class="min-w-0">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Loja Vinculada Atualmente</span>
+                  ${linkedStore ? `
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <i data-lucide="store" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                        <span class="truncate max-w-[200px] sm:max-w-sm">${escapeHtml(linkedStore.nome)}</span>
+                      </span>
+                      <span class="text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${isPend ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'}">
+                        ${isPend ? '⏳ Em Aprovação' : '✅ Publicada no Guia'}
+                      </span>
+                    </div>
+                  ` : `
+                    <div class="flex items-center gap-1.5 text-amber-700 text-xs font-bold">
+                      <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 shrink-0"></i>
+                      <span>Nenhuma loja vinculada a este usuário.</span>
+                    </div>
+                  `}
+                </div>
+
                 ${linkedStore ? `
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                      <i data-lucide="store" class="w-4 h-4 text-emerald-600"></i>
-                      ${escapeHtml(linkedStore.nome)}
-                    </span>
-                    <span class="text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${isPend ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'}">
-                      ${isPend ? '⏳ Em Aprovação' : '✅ Publicada no Guia'}
-                    </span>
-                    <button type="button" onclick="startEditingStore('${escapeHtml(linkedStore.id)}')" class="text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline ml-1">
-                      Editar Loja
+                  <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+                    <button type="button" onclick="startEditingStore('${escapeHtml(linkedStore.id)}')" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-xl transition cursor-pointer">
+                      <i data-lucide="pencil" class="w-3 h-3"></i>
+                      <span>Editar Loja</span>
+                    </button>
+                    <button type="button" onclick="unlinkUserFromStore('${escapeHtml(uEmail)}', '${escapeHtml(linkedStore.id)}', '${escapeHtml(linkedStore.nome)}')" class="inline-flex items-center gap-1 text-xs text-slate-600 hover:text-rose-700 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 px-2.5 py-1.5 rounded-xl transition cursor-pointer" title="Desvincular esta loja">
+                      <i data-lucide="unlink" class="w-3 h-3 text-rose-500"></i>
+                      <span>Desvincular</span>
                     </button>
                   </div>
-                ` : `
-                  <div class="flex items-center gap-1.5 text-amber-700 text-xs font-bold">
-                    <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500"></i>
-                    <span>Nenhuma loja vinculada a este e-mail no momento.</span>
-                  </div>
-                `}
+                ` : ''}
               </div>
 
-              <!-- CONTROLE RÁPIDO PARA VINCULAR QUALQUER LOJA MANUAL -->
-              <div class="flex items-center gap-2 w-full lg:w-auto">
-                <select id="${selectId}" class="flex-1 lg:w-72 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
-                  <option value="">-- Vincular a uma loja --</option>
-                  ${storeOptionsHtml}
-                </select>
-                <button type="button" onclick="linkUserToStore('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}', '${selectId}')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0">
-                  <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
-                  <span>Vincular</span>
-                </button>
+              <!-- ÁREA DE VINCULAÇÃO/ALTERAÇÃO -->
+              <div class="space-y-1.5 min-w-0">
+                <label class="block text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                  <i data-lucide="link-2" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                  <span>${linkedStore ? 'Trocar vínculo para outra loja:' : 'Vincular a uma loja existente no guia:'}</span>
+                </label>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full min-w-0">
+                  <div class="relative flex-1 min-w-0 w-full">
+                    <select id="${selectId}" class="w-full min-w-0 bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 cursor-pointer shadow-2xs truncate">
+                      <option value="">-- Selecione uma loja na lista --</option>
+                      ${storesData.map(s => {
+                        const isPendStore = isStorePending(s);
+                        const isSelected = linkedStore && String(s.id) === String(linkedStore.id);
+                        return `<option value="${escapeHtml(s.id)}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.nome)} (${escapeHtml(s.bairro || 'Pilar')})${isPendStore ? ' [EM APROVAÇÃO]' : ''}</option>`;
+                      }).join('')}
+                    </select>
+                  </div>
+                  <button type="button" onclick="linkUserToStore('${escapeHtml(uEmail)}', '${escapeHtml(u.id || '')}', '${selectId}')" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+                    <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
+                    <span>${linkedStore ? 'Alterar Vínculo' : 'Vincular Loja'}</span>
+                  </button>
+                </div>
+                <p class="text-[10.5px] text-slate-400">
+                  Ao vincular, o lojista poderá gerenciar esta loja no painel e responder avaliações como proprietário.
+                </p>
               </div>
+
             </div>
           </div>
         `;
@@ -1442,6 +1477,19 @@
 
       showToast(`Vinculando "${targetStore.nome}" a ${userEmail}...`, 'info');
 
+      // Limpar vínculo anterior desse lojista em outras lojas
+      storesData.forEach(s => {
+        if (s.keywords && String(s.id) !== String(targetStore.id)) {
+          const kwLow = s.keywords.toLowerCase();
+          if (kwLow.includes(`[email:${userEmail.toLowerCase().trim()}]`)) {
+            s.keywords = s.keywords.replace(new RegExp(`\\n*\\[EMAIL:${userEmail.trim()}\\]`, 'gi'), '');
+            if (supabaseClient) {
+              supabaseClient.from('stores').update({ keywords: s.keywords }).eq('id', s.id).then();
+            }
+          }
+        }
+      });
+
       // Atualizar keywords da loja com [EMAIL:...] e [OWNER:...]
       let kw = targetStore.keywords || `${targetStore.nome.toLowerCase()} pilar`;
       kw = kw.replace(/\n*\[EMAIL:.*?\]/gi, '').trim() + `\n[EMAIL:${userEmail.toLowerCase().trim()}]`;
@@ -1451,7 +1499,7 @@
       targetStore.keywords = kw;
 
       // Atualizar registro de usuários
-      const uObj = usersData.find(u => u.email.toLowerCase() === userEmail.toLowerCase().trim());
+      const uObj = usersData.find(u => (u.email || '').toLowerCase() === userEmail.toLowerCase().trim());
       if (uObj) {
         uObj.store_id = targetStore.id;
         uObj.store_name = targetStore.nome;
@@ -1469,6 +1517,42 @@
 
       saveLocalStores(storesData);
       showToast(`Loja "${targetStore.nome}" vinculada com sucesso a ${userEmail}!`, 'success');
+      renderUsersTab();
+    }
+
+    async function unlinkUserFromStore(userEmail, storeId, storeName) {
+      if (!confirm(`Deseja desvincular a loja "${storeName}" da conta do lojista "${userEmail}"?\n\nO lojista deixará de ter acesso para editar esta loja até que seja vinculado novamente.`)) {
+        return;
+      }
+
+      showToast(`Desvinculando "${storeName}"...`, 'info');
+
+      const targetStore = storesData.find(s => String(s.id) === String(storeId));
+      if (targetStore && targetStore.keywords) {
+        targetStore.keywords = targetStore.keywords
+          .replace(new RegExp(`\\n*\\[EMAIL:${userEmail.trim()}\\]`, 'gi'), '')
+          .replace(new RegExp(`\\n*\\[OWNER:.*?\\]`, 'gi'), '')
+          .trim();
+
+        if (supabaseClient) {
+          try {
+            await supabaseClient.from('stores').update({ keywords: targetStore.keywords }).eq('id', targetStore.id);
+          } catch(e) { console.warn(e); }
+        }
+      }
+
+      const uObj = usersData.find(u => (u.email || '').toLowerCase() === userEmail.toLowerCase().trim());
+      if (uObj) {
+        delete uObj.store_id;
+        delete uObj.store_name;
+      }
+
+      if (supabaseClient) {
+        try { await saveSystemUsersRegistry(); } catch(e) {}
+      }
+
+      saveLocalStores(storesData);
+      showToast(`Loja "${storeName}" desvinculada com sucesso!`, 'success');
       renderUsersTab();
     }
 
