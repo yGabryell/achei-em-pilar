@@ -295,10 +295,10 @@
     const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
     
-    let supabase = null;
+    let supabaseClient = null;
     try {
       if (window.supabase && typeof window.supabase.createClient === 'function') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
       console.error('Erro ao conectar ao Supabase:', err);
@@ -403,7 +403,7 @@
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('btnLoginSubmit');
 
-      if (!supabase) {
+      if (!supabaseClient) {
         showAlert('Erro ao inicializar conexão com o servidor. Tente recarregar.');
         return;
       }
@@ -412,7 +412,7 @@
       btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Entrando...`;
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email: email,
           password: password,
         });
@@ -559,9 +559,9 @@
       try {
         let userId = null;
 
-        if (supabase) {
+        if (supabaseClient) {
           try {
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
               email: email,
               password: password,
               options: {
@@ -577,7 +577,7 @@
               userId = authData.user.id;
             } else if (authError) {
               if (authError.message.toLowerCase().includes('already registered')) {
-                const { data: loginData } = await supabase.auth.signInWithPassword({
+                const { data: loginData } = await supabaseClient.auth.signInWithPassword({
                   email: email,
                   password: password
                 });
@@ -630,9 +630,9 @@
           keywords: `${storeName.toLowerCase()} pilar\n[PIN:${pin}]\n[OWNER:${userId}]\n[EMAIL:${email.toLowerCase()}]\n[STATUS:pendente]`
         };
 
-        if (supabase) {
+        if (supabaseClient) {
           try {
-            await supabase.from('stores').insert([storePayload]);
+            await supabaseClient.from('stores').insert([storePayload]);
           } catch(dbErr) {
             console.warn('Erro ao salvar loja no banco:', dbErr);
           }
@@ -670,7 +670,7 @@
       safeCreateIcons();
 
       try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + '/entrar.html?modo=reset'
         });
 
@@ -700,9 +700,9 @@
         return;
       }
 
-      if (supabase) {
+      if (supabaseClient) {
         try {
-          const { data } = await supabase.auth.getSession();
+          const { data } = await supabaseClient.auth.getSession();
           if (data && data.session) {
             window.location.href = 'minha-loja.html';
             return;

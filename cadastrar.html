@@ -221,10 +221,10 @@
     const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
     
-    let supabase = null;
+    let supabaseClient = null;
     try {
       if (window.supabase && typeof window.supabase.createClient === 'function') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
       console.error('Erro ao conectar ao Supabase:', err);
@@ -371,9 +371,9 @@
         let userId = null;
 
         // 1. Tentar criar usuário no Supabase Auth com timeout de 4s para nunca travar
-        if (supabase) {
+        if (supabaseClient) {
           try {
-            const authPromise = supabase.auth.signUp({
+            const authPromise = supabaseClient.auth.signUp({
               email: email,
               password: password,
               options: {
@@ -394,7 +394,7 @@
               if (errMsg.includes('already registered') || errMsg.includes('already_exists')) {
                 // Tenta autenticar se já existia
                 try {
-                  const { data: loginData } = await supabase.auth.signInWithPassword({
+                  const { data: loginData } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                   });
@@ -453,10 +453,10 @@
         };
 
         // Salvar no Supabase (não-bloqueante com timeout de 3s)
-        if (supabase) {
+        if (supabaseClient) {
           try {
             await Promise.race([
-              supabase.from('stores').insert([storePayload]),
+              supabaseClient.from('stores').insert([storePayload]),
               new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 3000))
             ]).catch(e => console.warn('Supabase store insert notice:', e));
           } catch(dbErr) {}

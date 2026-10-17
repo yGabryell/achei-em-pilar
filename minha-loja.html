@@ -396,14 +396,14 @@
     const SUPABASE_URL = 'https://qivnfhxcbzgfuroihvcd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdm5maHhjYnpnZnVyb2lodmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc4NzEsImV4cCI6MjEwNzM5Mzg3MX0.0HdFcvj5_9MRdq03Ii-qUk4PG6B_mR0vmt_dxU9Q3CU';
     
-    let supabase = null;
+    let supabaseClient = null;
     let currentUser = null;
     let currentStore = null;
     let currentGallery = [];
 
     try {
       if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(err) {
       console.error('Erro no Supabase:', err);
@@ -443,9 +443,9 @@
 
     // LOGOUT
     async function handleLogout() {
-      if (supabase) {
+      if (supabaseClient) {
         try {
-          await supabase.auth.signOut();
+          await supabaseClient.auth.signOut();
         } catch(e) {}
       }
       localStorage.removeItem('pilar_current_merchant');
@@ -598,9 +598,9 @@
       currentUser = null;
 
       // 1. Tentar obter sessão oficial do Supabase Auth
-      if (supabase) {
+      if (supabaseClient) {
         try {
-          const { data: authData } = await supabase.auth.getSession();
+          const { data: authData } = await supabaseClient.auth.getSession();
           if (authData && authData.session && authData.session.user) {
             currentUser = authData.session.user;
           }
@@ -651,7 +651,7 @@
       }
 
       // 1. Buscar loja associada ao keywords com tag [OWNER:id]
-      if (!store && supabase && currentUser.id) {
+      if (!store && supabaseClient && currentUser.id) {
         try {
           const { data: kwStores } = await supabase
             .from('stores')
@@ -666,7 +666,7 @@
       }
 
       // 1.1 Buscar loja por tag [EMAIL:email]
-      if (!store && supabase && currentUser.email) {
+      if (!store && supabaseClient && currentUser.email) {
         try {
           const { data: emailStores } = await supabase
             .from('stores')
@@ -694,7 +694,7 @@
             store = zapStores[0];
             const kw = (store.keywords || '') + `\n[OWNER:${currentUser.id}]` + (currentUser.email ? `\n[EMAIL:${currentUser.email.toLowerCase()}]` : '');
             try {
-              await supabase.from('stores').update({ keywords: kw }).eq('id', store.id);
+              await supabaseClient.from('stores').update({ keywords: kw }).eq('id', store.id);
             } catch(linkErr) {}
           }
         } catch(e) {}
@@ -743,7 +743,7 @@
         };
 
         try {
-          await supabase.from('stores').insert([baseStoreData]);
+          await supabaseClient.from('stores').insert([baseStoreData]);
         } catch(insertErr) {
           console.warn('Inserção inicial fallback:', insertErr);
         }
