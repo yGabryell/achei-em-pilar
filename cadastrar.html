@@ -477,10 +477,10 @@
           localStorage.setItem('pilar_stores', JSON.stringify(localList));
         } catch(locErr) {}
 
-        showAlert('Conta criada com sucesso! Entrando no seu painel...', 'success');
+        showAlert('Conta criada com sucesso! Redirecionando...', 'success');
         setTimeout(() => {
-          window.location.replace('minha-loja.html');
-        }, 500);
+          window.location.replace('boas-vindas.html');
+        }, 350);
 
       } catch(err) {
         console.error('Erro no cadastro:', err);

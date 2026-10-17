@@ -149,6 +149,30 @@
       </div>
     </div>
 
+    <!-- BANNER DE BOAS-VINDAS / ETAPA FINAL DO CADASTRO -->
+    <div id="onboardingBanner" class="hidden overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 sm:p-6 shadow-lg shadow-emerald-700/20 border border-emerald-500/40 relative">
+      <div class="relative z-10 flex items-start gap-4">
+        <div class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 text-white shadow-inner">
+          <i data-lucide="sparkles" class="w-6 h-6 text-amber-300"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="inline-flex items-center gap-1.5 bg-white/20 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider mb-1.5">
+            Etapa Final do Cadastro
+          </div>
+          <h2 class="text-base sm:text-lg font-black leading-snug">
+            Vamos finalizar as informações da sua loja!
+          </h2>
+          <p class="text-xs sm:text-sm text-emerald-100 mt-1 leading-relaxed">
+            Confira a categoria, adicione a foto da logo ou dos seus produtos e informe o horário de funcionamento. Quando terminar, basta clicar no botão verde <strong>"Salvar Alterações da Loja"</strong> no fim da página para publicar no guia de Pilar!
+          </p>
+        </div>
+        <button type="button" onclick="document.getElementById('onboardingBanner').remove()" class="shrink-0 text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer" title="Fechar">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
     <!-- FORMULÁRIO DE EDIÇÃO DO ESTABELECIMENTO -->
     <form id="storeForm" onsubmit="event.preventDefault(); handleSaveStore(event); return false;" class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-8 shadow-sm space-y-6">
       
@@ -774,6 +798,17 @@
       // Ocultar tela de loading
       const loading = document.getElementById('loadingOverlay');
       if (loading) loading.classList.add('hidden');
+
+      // Se veio da tela de boas-vindas / cadastro, exibir o banner guia
+      if (window.location.search.includes('origem=cadastro')) {
+        const ob = document.getElementById('onboardingBanner');
+        if (ob) {
+          ob.classList.remove('hidden');
+          // Rolar suavemente para o banner
+          setTimeout(() => ob.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+        }
+      }
+
       safeCreateIcons();
     }
 
