@@ -1,0 +1,63 @@
+{
+  "name": "Achei em Pilar — O Guia Comercial de Pilar & Chã",
+  "short_name": "Achei em Pilar",
+  "description": "Encontre lojas, lanchonetes, serviços, telefones úteis e horários de micro-ônibus em Pilar - AL.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#064e3b",
+  "theme_color": "#064e3b",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["shopping", "business", "food", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Horários dos Micro-ônibus",
+      "short_name": "Micro-ônibus",
+      "description": "Veja horários em tempo real dos ônibus",
+      "url": "/onibus.html?source=pwa_shortcut",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Telefones Úteis e Emergência",
+      "short_name": "Telefones Úteis",
+      "description": "SAMU, Polícia, Hospital e Bombeiros",
+      "url": "/telefones.html?source=pwa_shortcut",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cadastrar Estabelecimento",
+      "short_name": "Cadastrar Loja",
+      "description": "Cadastre sua loja no guia de Pilar",
+      "url": "/cadastrar.html?source=pwa_shortcut",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

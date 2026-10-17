@@ -30,10 +30,28 @@
   <meta name="twitter:title" content="Achei em Pilar — Guia Comercial">
   <meta name="twitter:description" content="Tudo que você precisa em Pilar e Chã em um só lugar. Encontre lanchonetes, lojas e serviços no WhatsApp.">
   <meta name="twitter:image" content="https://acheiempilar.com.br/banner-preview.png?v=3">
-  <meta name="theme-color" content="#065f46">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+  <!-- ================= PWA & WEB APP STANDALONE (TELA CHEIA & SPLASH SCREEN) ================= -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#064e3b">
+  
+  <!-- Apple iOS Standalone / Fullscreen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Achei em Pilar">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+
+  <!-- Android / Windows Tiles -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Achei em Pilar">
+  <meta name="msapplication-TileColor" content="#064e3b">
+  <meta name="msapplication-TileImage" content="/icons/icon-512x512.png">
+  
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -426,8 +444,20 @@
 
         <div class="h-px bg-slate-100 my-2"></div>
 
-        <!-- INSTITUCIONAL -->
+        <!-- MAIS OPÇÕES -->
         <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block">Mais Opções</span>
+
+        <!-- BOTÃO BAIXAR / INSTALAR APLICATIVO -->
+        <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/90 text-emerald-900 p-3 rounded-2xl transition flex items-center gap-3 font-bold text-xs cursor-pointer text-left">
+          <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <i data-lucide="download" class="w-4 h-4"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="block font-black text-xs leading-tight">Baixar Aplicativo</span>
+            <span class="text-[10px] text-emerald-700 block font-medium">Instalar no celular em tela cheia</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-emerald-600"></i>
+        </button>
 
         <button onclick="toggleSideMenu(); openAboutModal();" class="w-full hover:bg-slate-50 p-3 rounded-2xl transition flex items-center gap-3 text-slate-700 font-bold text-xs cursor-pointer text-left">
           <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
@@ -3338,6 +3368,63 @@ ${details}
     }
 
     window.addEventListener('hashchange', checkUrlStoreHash);
+
+    // ================= SUPORTE COMPLETO PWA (INSTALAÇÃO & SERVICE WORKER) =================
+    let deferredPwaPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPwaPrompt = e;
+      const installBtn = document.getElementById('pwaInstallBtn');
+      if (installBtn) {
+        installBtn.classList.remove('hidden');
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPwaPrompt = null;
+      console.log('Achei em Pilar foi instalado como aplicativo!');
+    });
+
+    function triggerPwaInstall() {
+      toggleSideMenu();
+      if (deferredPwaPrompt) {
+        deferredPwaPrompt.prompt();
+        deferredPwaPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('Usuário aceitou instalar o app');
+          }
+          deferredPwaPrompt = null;
+        });
+      } else {
+        const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        if (isStandalone) {
+          alert('Você já está usando a versão em aplicativo do Achei em Pilar!');
+          return;
+        }
+
+        if (isIos) {
+          alert('Para instalar no iPhone ou iPad:\n\n1. Toque no botão de Compartilhar (o ícone com uma setinha para cima no Safari)\n2. Role para baixo e toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar" no canto superior direito.\n\nPronto! O app abrirá em tela cheia.');
+        } else {
+          alert('Para instalar no seu celular Android:\n\n1. Toque no menu do navegador (ícone de 3 pontinhos no canto superior)\n2. Toque em "Instalar aplicativo" ou "Adicionar à tela inicial"\n\nPronto! O aplicativo abrirá em tela cheia sem a barra de endereços.');
+        }
+      }
+    }
+
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => {
+            console.log('PWA ServiceWorker ativo no escopo:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('ServiceWorker notice:', err);
+          });
+      });
+    }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
